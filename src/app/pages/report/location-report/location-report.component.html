@@ -1,0 +1,86 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card p-fluid">
+            <form [formGroup]="formSetting">
+                <div class="grid">
+                    <div class="col-12 md:col-6 pb-0">
+                        <div class="field">
+                            <label for="location">สถานที่ตรวจ</label>
+                            <p-dropdown [options]="locations" optionLabel="name" [filter]="true" filterBy="name"
+                                placeholder="เลือกสถานที่ตรวจ" formControlName="location" (onChange)="selectLocation()">
+                            </p-dropdown>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <h5>รายการห้องตรวจ</h5>
+            <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
+                [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines"
+                [rowsPerPageOptions]="[10, 25, 50]">
+                <ng-template pTemplate="caption">
+                    <div class="flex justify-content-between flex-column sm:flex-row">
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" class="w-full" />
+                        </span>
+
+                        <div class="pt-1 flex align-items-center" *ngIf="permissions?.manag_room">
+                            <button *ngIf="formSetting.get('location')?.value" (click)="reportLocation()" pButton icon="pi pi-file-pdf"
+                                class="p-button-secondary mr-2 outline" label="รายงาน" style="width:auto;"></button>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 100px;">
+                            <div class="flex justify-content-center  align-items-center">
+                                ลำดับ
+                            </div>
+                        </th>
+                        <th style="width: auto;">
+                            <div class="flex justify-content-start align-items-center">
+                                ชื่อสถานที่ตรวจ
+                            </div>
+                        </th>
+                        <th style="width: 120px;">
+                            <div class="flex justify-content-center  align-items-center">
+                                ตรวจ/จำนวน
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <!-- open template button edit and delete  -->
+                <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                    <tr>
+
+                        <td class="text-center">
+                            {{ rowIndex + 1 }}
+                        </td>
+
+                        <td class="text-left">
+                            {{item.name}}
+                        </td>
+
+                        <td class="text-center">
+                            {{item.complete_count}}/{{item.total_count}}
+                        </td>
+
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                    <tr>
+                        <td [attr.colspan]="4" class="text-center">ไม่มีข้อมูล</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<p-toast position="top-right"></p-toast>

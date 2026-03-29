@@ -1,0 +1,23 @@
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  color: white;
+  display: inline-block;
+  min-width: 80px;
+  /* Adjust as needed */
+  text-align: center;
+}
+
+.status-open {
+  background-color: #238626;
+}
+
+.status-edit {
+  background-color: #e3c934;
+}
+
+.status-cancel {
+  background-color: #ff0000;
+}

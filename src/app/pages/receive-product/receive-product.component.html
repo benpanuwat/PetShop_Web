@@ -1,0 +1,215 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h5>รายการรับสินค้า</h5>
+            <p-table [value]="formProductLot.value?.products" responsiveLayout="scroll" [scrollable]="true"
+                scrollHeight="400px">
+
+                <ng-template pTemplate="caption">
+                    <form [formGroup]="formProductLot">
+                        <div class="flex justify-content-between flex-column sm:flex-row">
+                            <span class="p-input-icon-left">
+                                <div class="grid">
+                                    <div class="col-12 pb-0">
+                                        <div class="field">
+                                            <label htmlFor="name">ชื่อการรับของ</label>
+                                            <input class="ml-3" pInputText type="text" formControlName="name"
+                                                maxlength="200" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+
+                            <div class="pt-1 flex align-items-center">
+                                <button (click)="openAdd()" pButton icon="pi pi-plus" label="เพิ่มสินค้า"
+                                    style="width:auto;"></button>
+                            </div>
+                        </div>
+                    </form>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 70px;text-align: center;">เลขที่</th>
+                        <th style="width: 100px;text-align: center;">รหัส</th>
+                        <th>สินค้า</th>
+                        <th style="width: 160px;text-align: right;">วันหมดอายุ</th>
+                        <th style="width: auto;text-align: right;">จำนวน</th>
+                        <th style="width: 140px;text-align: right;">ราคาต่อหน่วย</th>
+                        <th style="width: 120px;text-align: right;">ราคารวม</th>
+                        <th style="width: 50px;text-align: right;">ลบ</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                    <tr>
+                        <td style="text-align: center;">
+                            {{rowIndex+1}}
+                        </td>
+                        <td style="text-align: center;">
+                            {{item.code}}
+                        </td>
+                        <td>
+                            {{item.name}}
+                        </td>
+                        <td><p-calendar [(ngModel)]="item.expiry_date" [showIcon]="true" dateFormat="ddmmyy"
+                                appendTo="body">
+                            </p-calendar></td>
+                        <td style="text-align: right;">
+                            <input pInputText type="number" [(ngModel)]="item.qty" min="1" max="9999" />
+                        </td>
+                        <td style="text-align: right;">
+                            <input pInputText type="number" [(ngModel)]="item.cost_unit" min="1" max="9999"
+                                (change)="calCostUnit(item)" />
+                        </td>
+                        <td style="text-align: right;">
+                            <input pInputText type="number" [(ngModel)]="item.cost_total" min="1" max="9999"
+                                (change)="calCostTotal(item)" />
+                        </td>
+                        <td style="text-align: right;">
+                            <button pButton icon="pi pi-trash" class="p-button-danger mr-2 outline"
+                                (click)="removeProduct(rowIndex)" [disabled]="step=='order'"></button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <div class="card" style="display: flex; justify-content: space-between;">
+            <button pButton icon="pi pi-trash" label="ล้างข้อมูล" style="width:auto;"
+                class="p-button-danger mr-2 outline" (click)="clearData()"></button>
+            <button pButton icon="pi pi-check" label="รับเข้าสินค้า" style="width:auto;"
+                class="p-button-success mr-2 outline" (click)="addProductLot()"></button>
+        </div>
+    </div>
+
+</div>
+
+<p-dialog header="เพิ่มสินค้า" [(visible)]="displayAdd" modal="modal" showEffect="fade" [style]="{width: '70vw'}"
+    [breakpoints]="{'960px': '75vw'}">
+
+    <div class="grid">
+        <div class="col-12">
+            <ng-container *ngIf="select_type=='product_type'">
+                <p-dataView #dv [value]="product_type_groups" [paginator]="true" [rows]="20" filterBy="name"
+                    layout="grid">
+                    <ng-template pTemplate="header">
+                        <div class="grid grid-nogutter flex-column md:flex-row justify-content-between">
+
+
+                            <button pButton icon="pi pi-arrow-left" label="กลับ" style="width:auto;" [disabled]="true"
+                                class="p-button-danger mr-2 outline"></button>
+
+
+                            <span class="p-input-icon-left mb-2 md:mb-0">
+                                <i class="pi pi-search"></i>
+                                <input type="search" pInputText placeholder="ค้นหา"
+                                    (input)="dv.filter($event.target.value)">
+                            </span>
+
+                            <!-- <p-dropdown [options]="sortOptions" [(ngModel)]="sortKey" placeholder="Sort By Price"
+                                (onChange)="onSortChange($event)"></p-dropdown> -->
+                        </div>
+                    </ng-template>
+
+                    <ng-template let-item pTemplate="gridItem">
+                        <div class="col-6 md:col-3" style="cursor: pointer;" (click)="selectProductType(item)">
+                            <div class="card m-3 border-1 surface-border">
+                                <div class="text-center">
+                                    <div class="text-xl" style="color: blue;">{{item.name}}</div>
+                                    <img [src]="item.image" [alt]="item.name" class="w-9 shadow-2 my-3 mx-0"
+                                        draggable="false" />
+
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </ng-container>
+            <ng-container *ngIf="select_type=='product_brand'">
+                <p-dataView #dv [value]="product_brand_groups" [paginator]="true" [rows]="20" filterBy="name"
+                    layout="grid">
+                    <ng-template pTemplate="header">
+                        <div class="grid grid-nogutter flex-column md:flex-row justify-content-between">
+
+
+                            <button (click)="backToProductType()" pButton icon="pi pi-arrow-left" label="กลับ"
+                                style="width:auto;" class="p-button-danger mr-2 outline"></button>
+
+
+                            <span class="p-input-icon-left mb-2 md:mb-0">
+                                <i class="pi pi-search"></i>
+                                <input type="search" pInputText placeholder="ค้นหา"
+                                    (input)="dv.filter($event.target.value)">
+                            </span>
+
+                            <!-- <p-dropdown [options]="sortOptions" [(ngModel)]="sortKey" placeholder="Sort By Price"
+                                (onChange)="onSortChange($event)"></p-dropdown> -->
+                        </div>
+                    </ng-template>
+
+                    <ng-template let-item pTemplate="gridItem">
+                        <div class="col-6 md:col-3" style="cursor: pointer;" (click)="selectProductBrand(item)">
+                            <div class="card m-3 border-1 surface-border">
+                                <div class="text-center">
+                                    <div class="text-xl" style="color: blue;">{{item.name}}</div>
+                                    <img [src]="item.image" [alt]="item.name" class="w-9 shadow-2 my-3 mx-0"
+                                        draggable="false" />
+
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </ng-container>
+            <ng-container *ngIf="select_type=='product'">
+                <p-dataView #dv [value]="product_groups" [paginator]="true" [rows]="20" filterBy="name" layout="grid">
+                    <ng-template pTemplate="header">
+                        <div class="grid grid-nogutter flex-column md:flex-row justify-content-between">
+
+
+                            <button (click)="backToProductBrand()" pButton icon="pi pi-arrow-left" label="กลับ"
+                                style="width:auto;" class="p-button-danger mr-2 outline"></button>
+
+
+                            <span class="p-input-icon-left mb-2 md:mb-0">
+                                <i class="pi pi-search"></i>
+                                <input type="search" pInputText placeholder="ค้นหา"
+                                    (input)="dv.filter($event.target.value)">
+                            </span>
+
+                            <!-- <p-dropdown [options]="sortOptions" [(ngModel)]="sortKey" placeholder="Sort By Price"
+                                (onChange)="onSortChange($event)"></p-dropdown> -->
+                        </div>
+                    </ng-template>
+
+                    <ng-template let-item pTemplate="gridItem">
+                        <div class="col-6 md:col-3" style="cursor: pointer;" (click)="selectProduct(item)">
+                            <div class="card m-3 border-1 surface-border">
+                                <div class="text-center">
+                                    <div class="text-xl" style="color: blue;">{{item.name}}</div>
+                                    <img [src]="item.image" [alt]="item.name" class="w-9 shadow-2 my-3 mx-0"
+                                        draggable="false" />
+
+                                </div>
+                                <div class="flex align-items-center justify-content-between">
+                                    <span class="sm:ml-2 product-badge status-instock">คลัง :
+                                        {{item.count}}</span>
+                                    <div class="flex align-items-center">
+                                        <i class="pi pi-tag mr-2"></i>
+                                        <span class="font-semibold" style="color: red;">{{item.price}}.-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </ng-container>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-window-close" (click)="displayAdd = false" label="ปิด"
+            class="p-button-secondary ml-2"></button>
+    </ng-template>
+</p-dialog>
+
+<p-toast position="bottom-center"></p-toast>

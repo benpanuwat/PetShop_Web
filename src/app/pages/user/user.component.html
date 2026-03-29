@@ -1,0 +1,276 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h5>รายการผู้ใช้งาน</h5>
+            <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
+                [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines"
+                [rowsPerPageOptions]="[10, 25, 50]">
+                <!-- เปิด ng-template -->
+                <ng-template pTemplate="caption">
+                    <div class="flex justify-content-between flex-column sm:flex-row">
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" class="w-full" />
+                        </span>
+
+                        <div class="pt-1" style="
+                                display: flex;
+                                align-items: center;" *ngIf="permissions?.manag_user">
+                            <button (click)="openAdd()" pButton icon="pi pi-plus" label="เพิ่มผู้ใช้งาน"
+                                style="width:auto;"></button>
+                        </div>
+                    </div>
+                </ng-template>
+                <!-- ปิด ng-template -->
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 100px;">
+                            <div class="flex justify-content-center  align-items-center">
+                                ลำดับ
+                            </div>
+                        </th>
+                        <th style="width: auto;">
+                            <div class="flex justify-content-start align-items-center">
+                                ชื่อเข้าใช้งาน
+                            </div>
+                        </th>
+                        <th style="width: auto;">
+                            <div class="flex justify-content-start align-items-center">
+                                ชื่อ
+                            </div>
+                        </th>
+                        <th style="width: auto;">
+                            <div class="flex justify-content-start align-items-center">
+                                นามสกุล
+                            </div>
+                        </th>
+                        <th style="width: auto;">
+                            <div class="flex justify-content-center align-items-center">
+                                เพศ
+                            </div>
+                        </th>
+                        <th style="width: auto;">
+                            <div class="flex justify-content-center align-items-center">
+                                กลุ่มสิทธิ
+                            </div>
+                        </th>
+                        <th style="width: 70px;" *ngIf="permissions?.manag_user">
+                            <div class="flex justify-content-center align-items-center">
+                                จัดการ
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <!-- open template button edit and delete  -->
+                <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                    <tr>
+
+                        <td style="text-align: center;">
+                            {{ rowIndex + 1 }}
+                        </td>
+
+                        <td style="text-align: start;">
+                            {{item.username}}
+                        </td>
+
+                        <td style="text-align: start;">
+                            {{item.first_name}}
+                        </td>
+
+                        <td style="text-align: start;">
+                            {{item.last_name}}
+                        </td>
+
+                        <td style="text-align: center;">
+                            <span *ngIf="item.gender=='M'">ชาย</span>
+                            <span *ngIf="item.gender=='F'">หญิง</span>
+                        </td>
+
+                        <td style="text-align: center;">
+                            {{item.group_name}}
+                        </td>
+
+                        <td style="text-align: center;" *ngIf="permissions?.manag_user">
+                            <div class="dropdown">
+                                <button pButton type="button" class="p-button-secondary p-button-text"><span></span>
+                                    <i class="pi pi-bars"></i>
+                                </button>
+                                <div class="dropdown-content" tabindex="0">
+                                    <a href="javascript:void(0);" (click)="openEdit(item.id)"><i
+                                            class="pi pi-file-edit pr-2"></i>แก้ไข</a>
+                                    <a href="javascript:void(0);" (click)="openResetPass(item.id)"><i
+                                            class="pi pi-key pr-2"></i>เปลี่ยนรหัสผ่าน</a>
+                                    <a href="javascript:void(0);" (click)="openDelete(item.id)"><i
+                                            class="pi pi-trash pr-2"></i>ลบ</a>
+                                </div>
+                            </div>
+                        </td>
+
+                    </tr>
+                    <tr *ngIf="data.length == 0">
+                        <td colspan="3" style="text-align: center;">
+                            ไม่มีข้อมูล
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<p-dialog header="เพิ่มผู้ใช้งาน" [(visible)]="displayAdd" modal="modal" showEffect="fade" [style]="{width: '40vw'}"
+    [breakpoints]="{'960px': '75vw'}">
+    <form [formGroup]="formAdd">
+        <div class="card p-fluid">
+            <div class="grid">
+                <div class="col-6 py-0">
+                    <div class="field">
+                        <label htmlFor="first_name">ชื่อ</label>
+                        <input pInputText type="text" formControlName="first_name" maxlength="200" />
+                    </div>
+                </div>
+                <div class="col-6 py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">นามสกุล</label>
+                        <input pInputText type="text" formControlName="last_name" maxlength="200" />
+                    </div>
+                </div>
+                <div class="col-6 py-0">
+                    <div class="field">
+                        <label htmlFor="gender">เพศ</label>
+                        <p-dropdown formControlName="gender" [options]="genders" optionLabel="name" optionValue="value"
+                            placeholder="เลือกเพศ"></p-dropdown>
+                    </div>
+                </div>
+                <div class="col-6  py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">ชิ่อเข้าใช้งาน</label>
+                        <input pInputText type="text" formControlName="username" maxlength="20" />
+                    </div>
+                </div>
+                <div class="col-6  py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">รหัสผ่าน</label>
+                        <input pInputText type="password" formControlName="password" maxlength="20" />
+                    </div>
+                </div>
+                <div class="col-6  py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">ยืนยันรหัสผ่าน</label>
+                        <input pInputText type="password" formControlName="confirm_password" maxlength="20" />
+                    </div>
+                </div>
+                <div class="col-6 py-0">
+                    <div class="field">
+                        <label htmlFor="gender">กลุ่มสิทธิ</label>
+                        <p-dropdown formControlName="user_group_id" [options]="userGroups" optionLabel="name"
+                            optionValue="id" placeholder="เลือกกลุ่มสิทธิ" appendTo="body"></p-dropdown>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmAdd()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelAdd()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="แก้ไขผู้ใช้งาน" [(visible)]="displayEdit" modal="modal" showEffect="fade" [style]="{width: '40vw'}"
+    [breakpoints]="{'960px': '75vw'}">
+    <form [formGroup]="formEdit">
+        <div class="card p-fluid">
+            <div class="grid">
+                <div class="col-6 py-0">
+                    <div class="field">
+                        <label htmlFor="first_name">ชื่อ</label>
+                        <input pInputText type="text" formControlName="first_name" maxlength="200" />
+                    </div>
+                </div>
+                <div class="col-6 py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">นามสกุล</label>
+                        <input pInputText type="text" formControlName="last_name" maxlength="200" />
+                    </div>
+                </div>
+                <div class="col-6 py-0">
+                    <div class="field">
+                        <label htmlFor="gender">เพศ</label>
+                        <p-dropdown formControlName="gender" [options]="genders" optionLabel="name" optionValue="value"
+                            placeholder="เลือกเพศ" appendTo="body"></p-dropdown>
+                    </div>
+                </div>
+                <div class="col-6 py-0">
+                    <div class="field">
+                        <label htmlFor="gender">กลุ่มสิทธิ</label>
+                        <p-dropdown formControlName="user_group_id" [options]="userGroups" optionLabel="name"
+                            optionValue="id" placeholder="เลือกกลุ่มสิทธิ" appendTo="body"></p-dropdown>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmEdit()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelEdit()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="เปลี่ยนรหัสผ่าน" [(visible)]="displayResetPass" modal="modal" showEffect="fade"
+    [style]="{width: '40vw'}" [breakpoints]="{'960px': '75vw'}">
+    <form [formGroup]="formResetPass">
+        <div class="card p-fluid">
+            <div class="grid">
+                <div class="col-6  py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">รหัสผ่าน</label>
+                        <input pInputText type="password" formControlName="password" maxlength="20" />
+                    </div>
+                </div>
+                <div class="col-6  py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">ยืนยันรหัสผ่าน</label>
+                        <input pInputText type="password" formControlName="confirm_password" maxlength="20" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmResetPass()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelResetPass()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="ลบผู้ใช้งาน" [(visible)]="displayDelete" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
+    [breakpoints]="{'960px': '75vw'}">
+    <div class="card p-fluid">
+        <div class="grid">
+            <div class="col-12 py-0">
+                <h5>ต้องการลบผู้ใช้งานนี้ใช่หรือไม่?</h5>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmDelete()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelDelete()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+
+
+<p-toast position="bottom-center"></p-toast>

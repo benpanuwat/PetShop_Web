@@ -1,0 +1,200 @@
+<div class="topbar">
+    <div class="topbar-wrapper">
+        <div class="topbar-left">
+            <a href="javascript:void(0);" class="topbar-logo">
+                <!-- <img [src]="app.layout === 'default' ? 'assets/layout/images/logo-black.png' : 'assets/layout/images/logo-white.png'"
+                    style="border: 0 none"> -->
+                <!-- <img src="assets/layout/images/login/logo.png"> -->
+                <h1 style="margin-top:10px">PuyPuy PetMart</h1>
+            </a>
+
+            <a href="#" id="menu-button" (click)="appMain.onMenuButtonClick($event)">
+                <i class="pi pi-bars"></i>
+            </a>
+
+            <!-- <label for="topbar-search">
+                <i class="pi pi-search topbar-search-icon"></i>
+            </label> -->
+            <!-- <input type="text" class="topbar-search" placeholder="Type your search here" id="topbar-search"/> -->
+        </div>
+
+        <div class="topbar-right">
+            <a href="#" id="user-display" (click)="appMain.onTopbarMenuButtonClick($event)">
+                <span class="username">[สาขา {{branch_name}}] {{profile.first_name}} {{profile.last_name}}</span>
+                <img [src]="profile.image_profile" style="border: 0px;border-radius: 25px">
+            </a>
+
+            <ul id="topbar-menu" class="fadeInDown" [ngClass]="{'topbar-menu-visible': appMain.topbarMenuActive}">
+                <li>
+                    <a href="javascript:void(0);" (click)="openEditProfile()">
+                        <i class="topbar-icon pi pi-fw pi-user"></i>
+                        <span class="topbar-item-name">แก้ไขข้อมูลส่วนตัว</span>
+                    </a>
+                    <a href="javascript:void(0);" (click)="openChangePass()">
+                        <i class="topbar-icon pi pi-fw pi-key"></i>
+                        <span class="topbar-item-name">เปลี่ยนรหัสผ่าน</span>
+                    </a>
+
+                    <a href="javascript:void(0);" (click)="logout()">
+                        <i class="topbar-icon pi pi-fw pi-sign-out"></i>
+                        <span class="topbar-item-name">ออกจากระบบ</span>
+                    </a>
+
+                </li>
+
+
+                <!-- <li #profile [ngClass]="{'menuitem-active':appMain.activeTopbarItem === profile}">
+                    <a href="#" (click)="appMain.onTopbarItemClick($event, profile)">
+                        <i class="topbar-icon pi pi-fw pi-user"></i>
+                        <span class="topbar-item-name">Profile</span>
+                    </a>
+                    <ul>
+                        <li role="menuitem">
+                            <a href="#" (click)="appMain.onTopbarSubItemClick($event)">
+                                <i class="pi pi-fw pi-user"></i>
+                                <span>Profile</span>
+                            </a>
+                        </li>
+                        <li role="menuitem">
+                            <a href="#" (click)="appMain.onTopbarSubItemClick($event)">
+                                <i class="pi pi-fw pi-lock"></i>
+                                <span>Privacy</span>
+                            </a>
+                        </li>
+                        <li role="menuitem">
+                            <a href="#" (click)="appMain.onTopbarSubItemClick($event)">
+                                <i class="pi pi-fw pi-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li role="menuitem">
+                            <a href="#" (click)="appMain.onTopbarSubItemClick($event)">
+                                <i class="pi pi-fw pi-sign-out"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li #settings [ngClass]="{'menuitem-active':appMain.activeTopbarItem === settings}">
+                    <a href="#" (click)="appMain.onTopbarItemClick($event, settings)">
+                        <i class="topbar-icon pi pi-fw pi-cog"></i>
+                        <span class="topbar-item-name">Settings</span>
+                    </a>
+                    <ul>
+                        <li role="menuitem">
+                            <a href="#" (click)="appMain.onTopbarSubItemClick($event)">
+                                <i class="pi pi-fw pi-palette"></i>
+                                <span>Change Theme</span>
+                                <span class="topbar-badge">1</span>
+                            </a>
+                        </li>
+                        <li role="menuitem">
+                            <a href="#" (click)="appMain.onTopbarSubItemClick($event)">
+                                <i class="pi pi-fw pi-star"></i>
+                                <span>Favorites</span>
+                            </a>
+                        </li>
+                        <li role="menuitem">
+                            <a href="#" (click)="appMain.onTopbarSubItemClick($event)">
+                                <i class="pi pi-fw pi-lock"></i>
+                                <span>Lock Screen</span>
+                                <span class="topbar-badge">3</span>
+                            </a>
+                        </li>
+                        <li role="menuitem">
+                            <a href="#" (click)="appMain.onTopbarSubItemClick($event)">
+                                <i class="pi pi-fw pi-image"></i>
+                                <span>Wallpaper</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li> -->
+            </ul>
+        </div>
+    </div>
+</div>
+
+<p-dialog header="แก้ไขข้อมูลส่วนตัว" [(visible)]="displayEditProfile" modal="modal" showEffect="fade"
+    [style]="{width: '25vw'}" [breakpoints]="{'960px': '75vw'}">
+    <form [formGroup]="formEdit">
+        <div class="card p-fluid">
+            <div class="grid">
+                <div class="col-12 py-0 pb-5" style="text-align: center;">
+                    <img class="profile-img" [src]="formEdit.get('image_profile')!.value" width="100" height="100"
+                        style="cursor: pointer;" (click)="fileInput.click()">
+                    <input #fileInput type="file" (change)="onSelectImageProfile($event)" accept="image/*" hidden />
+                </div>
+                <div class="col-12 py-5">
+                    <div class="field">
+                        <label htmlFor="first_name">ชื่อ</label>
+                        <input pInputText type="text" formControlName="first_name" maxlength="200" />
+                    </div>
+                </div>
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">นามสกุล</label>
+                        <input pInputText type="text" formControlName="last_name" maxlength="200" />
+                    </div>
+                </div>
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label htmlFor="gender">เพศ</label>
+                        <p-dropdown formControlName="gender" [options]="genders" optionLabel="name" optionValue="value"
+                            placeholder="เลือกเพศ" appendTo="body"></p-dropdown>
+                    </div>
+                </div>
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label htmlFor="member_group_name">กลุ่มสิทธิ</label>
+                        <input pInputText type="text" formControlName="member_group_name" maxlength="200"
+                            class="disabled" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmEdit()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelEdit()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="เปลี่ยนรหัสผ่าน" [(visible)]="displayChangePass" modal="modal" showEffect="fade"
+    [style]="{width: '20vw'}" [breakpoints]="{'960px': '75vw'}">
+    <form [formGroup]="formResetPass">
+        <div class="card p-fluid">
+            <div class="grid">
+                <div class="col-12  py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">รหัสผ่านเดิม</label>
+                        <input pInputText type="password" formControlName="old_password" maxlength="20" />
+                    </div>
+                </div>
+                <div class="col-12  py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">รหัสผ่านใหม่</label>
+                        <input pInputText type="password" formControlName="password" maxlength="20" />
+                    </div>
+                </div>
+                <div class="col-12  py-0">
+                    <div class="field">
+                        <label htmlFor="last_name">ยืนยันรหัสผ่านใหม่</label>
+                        <input pInputText type="password" formControlName="confirm_password" maxlength="20" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmChangePass()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelChangePass()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-toast position="top-right"></p-toast>

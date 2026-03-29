@@ -1,0 +1,57 @@
+<div class="login-body">
+
+    <div class="login-panel p-fluid">
+
+        <ng-container *ngIf="step==1">
+            <form [formGroup]="loginForm" class="grid grid-nogutter">
+                <div class="col-12" style="text-align: center;">
+                    <img src="assets/layout/images/login/logo.jpg" width="300">
+                </div>
+
+                <div class="col-12">
+                    <label for="username" class="purple">Username</label>
+                    <div class="input-wrapper">
+                        <input type="text" autocomplete="off" pInputText formControlName="username">
+                        <img src="assets/layout/images/login/user.png" class="user-icon">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label for="password" class="purple">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" autocomplete="off" pInputText formControlName="password">
+                        <img src="assets/layout/images/login/lock.png" class="lock-icon">
+
+                    </div>
+                </div>
+                <div class="col-12 button-container">
+                    <button type="submit" pButton label="Login" class="p-button-raised bg-purple"
+                        (click)="login()"></button>
+                </div>
+            </form>
+        </ng-container>
+
+        <ng-container *ngIf="step==2">
+            <form [formGroup]="selectForm" class="grid grid-nogutter">
+                <div class="col-12" style="text-align: center;">
+                    <img src="assets/layout/images/login/logo.jpg" width="300">
+                </div>
+
+                <div class="col-12">
+                    <div class="field">
+                        <label htmlFor="gender">สาขา</label>
+                        <p-dropdown formControlName="branch_id" [options]="branchs" optionLabel="name" optionValue="id"
+                            placeholder="เลือกสาขา" appendTo="body"></p-dropdown>
+                    </div>
+                </div>
+
+                <div class="col-12 button-container">
+                    <button type="submit" pButton label="ตกลง" class="p-button-raised bg-purple"
+                        (click)="select_branch()"></button>
+                </div>
+
+            </form>
+        </ng-container>
+    </div>
+</div>
+
+<p-toast position="bottom-center"></p-toast>

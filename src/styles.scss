@@ -1,0 +1,119 @@
+/* You can add global styles to this file, and also import other style files */
+$gutter: 1rem; //for primeflex grid system
+
+@import "../node_modules/primeng/resources/primeng.min.css";
+@import "../node_modules/primeflex/primeflex.scss";
+@import "../node_modules/primeicons/primeicons.css";
+@import "../node_modules/prismjs/themes/prism-coy.css";
+@import "assets/demo/flags/flags.css";
+@import "assets/demo/documentation.scss";
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap');
+
+$thai-font-stack: 'Mitr', 'Noto Sans Thai', 'Sarabun', Tahoma, sans-serif;
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+    font-family: $thai-font-stack !important;
+}
+
+
+.dropdown {
+    float: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    left: auto;
+    right: 0px;
+}
+
+.dropdown-content a,
+.dropdown-content .dropdown-action {
+    float: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    width: 100%;
+    background: transparent;
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.dropdown-content a:hover,
+.dropdown-content .dropdown-action:hover,
+.dropdown-content .dropdown-action:focus {
+    background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content,
+.dropdown:focus-within .dropdown-content {
+    display: block;
+}
+
+.disabled {
+    background-color: #f4f4f4;
+}
+
+.profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 1px solid #000;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.img {
+    width: 100px;
+    height: 100px;
+    border: 1px solid #000;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.icon-img {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #000;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.table {
+  font-family: $thai-font-stack;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+.p-inputtext[readonly] {
+  background-color: #E3E3E3 !important;
+  border: 1px solid #ced4da !important;
+  color: #495057 !important;
+  opacity: 1 !important;
+  cursor: default !important;
+}

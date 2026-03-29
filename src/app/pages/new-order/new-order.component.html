@@ -1,0 +1,803 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="grid">
+            <div class="col-12">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between;padding-bottom: 10px;">
+                        <h5>รายการสั่งซื้อ</h5>
+                        <div>
+                            <form [formGroup]="formSetting">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label for="name">Barcode</label>
+                                        </td>
+                                        <td><input pInputText type="text" formControlName="barcode" maxlength="50"
+                                                (keydown.enter)="onEnterBracode()" />
+                                        </td>
+                                        <td>
+                                            <button pButton label="ลบ" style="width:auto;"
+                                                class="p-button-danger mr-2 outline" (click)="deleteBracode()"></button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </div>
+                        <div> <button pButton icon="pi pi-plus" label="สมาชิก" style="width:auto;"
+                                class="p-button-primary mr-2 outline" (click)="openAddMember()"></button>
+                            <button pButton icon="pi pi-plus" label="สินค้า" style="width:auto;"
+                                class="p-button-primary mr-2 outline" (click)="openAddProduct()"></button>
+                            <button pButton icon="pi pi-plus" label="อื่นๆ" style="width:auto;"
+                                class="p-button-primary mr-2 outline" (click)="addItem()"></button>
+                        </div>
+                    </div>
+
+                    <p-table #dt [value]="formCart.value?.products" responsiveLayout="scroll" [scrollable]="true"
+                        scrollHeight="400px">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 100px;">รูป</th>
+                                <th>สินค้า</th>
+                                <th style="width: 120px;text-align: right;">ราคา</th>
+                                <th style="width: auto;text-align: right;">จำนวน</th>
+                                <th style="width: 120px;text-align: right;">ราคารวม</th>
+                                <th style="width: 50px;text-align: right;">ลบ</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                            <tr>
+                                <td *ngIf="item.id!=0">
+                                    <img class="icon-img" [src]="item.image">
+                                </td>
+                                <td *ngIf="item.id==0">
+                                </td>
+                                <td *ngIf="item.id!=0">
+                                    {{item.name}}
+                                </td>
+                                <td *ngIf="item.id==0">
+                                    <input pInputText type="text" [(ngModel)]="item.name" maxlength="200"
+                                        style="text-align: left;width: 300px;" [readonly]="step=='order'" />
+                                </td>
+
+                                <td *ngIf="step=='select'" style="text-align: right;color: blue;">
+                                    <span style="cursor: pointer;" (click)="openPrice(item)">{{item.price}}</span>
+                                </td>
+                                <td *ngIf="step=='order'" style="text-align: right;">
+                                    {{item.price}}</td>
+
+                                <td *ngIf="step=='select'" style="text-align: right;color: blue;"> <span
+                                        style="cursor: pointer;" (click)="openQty(item)">{{item.qty}}</span></td>
+                                <td *ngIf="step=='order'" style="text-align: right;">
+                                    {{item.qty}}</td>
+
+                                <td style="text-align: right;">
+                                    {{item.net_total| number:'1.2-2'}}
+                                </td>
+                                <td style="text-align: right;">
+                                    <button pButton icon="pi pi-trash" class="p-button-danger mr-2 outline"
+                                        (click)="removeProduct(rowIndex)" [disabled]="step=='order'"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+                <ng-container *ngIf="step=='select'">
+                    <div class="card" style="display: flex; justify-content: space-between;">
+                        <button pButton icon="pi pi-trash" label="ล้างข้อมูล" style="width:auto;"
+                            class="p-button-danger mr-2 outline" (click)="clearData()"></button>
+                        <button pButton icon="pi pi-check" label="สร้างคำสั่งซื้อ" style="width:auto;"
+                            [disabled]="disabledAddOrder" class="p-button-success mr-2 outline"
+                            (click)="addOrder()"></button>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="step=='order'">
+                    <div class="card" style="display: flex; justify-content: space-between;">
+                        <button pButton icon="pi pi-plus" label="รายการสั่งซื้อใหม่" style="width:auto;"
+                            class="p-button-success mr-2 outline" (click)="newCreate()"></button>
+                        <button pButton icon="pi pi-print" label="พิมพ์ใบเสร็จ" style="width:auto;"
+                            class="p-button-primary mr-2 outline" (click)="printSlip()"></button>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="col-6">
+                <form [formGroup]="formCart">
+                    <div class="card">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td>
+                                    <div class="grid">
+                                        <div class="col-6 pb-0">
+                                            <div class="field">
+                                                <label for="name">เลขสมาชิก</label>
+                                                <table>
+                                                    <tr>
+                                                        <td><input pInputText type="text" formControlName="member_phone"
+                                                                maxlength="20" (keydown.enter)="onEnterMemberPhone()"
+                                                                [readonly]="step=='order'" /></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 pb-0">
+                                            <div class="field">
+                                                <label for="name">ข้อมูลสมาชิก</label>
+                                                <table class="table">
+                                                    <tr>
+                                                        <td style="width: 20px;">ชื่อ</td>
+                                                        <td>{{this.formCart.value.member_name}}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td>
+                                    <div class="grid">
+                                        <div class="col-6 pb-0 py-0">
+                                            <div class="field">
+                                                <label for="name">ประเภทการชำระ</label>
+                                                <table>
+                                                    <tr>
+                                                        <td> <p-dropdown [options]="payment_types" optionLabel="name"
+                                                                optionValue="name" placeholder="เลือกประเภทการชำระ"
+                                                                formControlName="payment_type"
+                                                                (onChange)="selectPaymentType()"
+                                                                [style]="{'width': '200px'}"></p-dropdown></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div *ngIf="formCart.get('payment_type')?.value == 'เงินสด' ||
+                                         formCart.get('payment_type')?.value == 'โอน' ||
+                                          formCart.get('payment_type')?.value == 'คนละครึ่ง'" class="col-6 pb-0 py-0">
+
+                                            <div class="field" *ngIf="formCart.get('payment_type')?.value == 'โอน' ||
+                                          formCart.get('payment_type')?.value == 'คนละครึ่ง'">
+                                                <label for="name">ยอดโอน</label>
+                                                <table>
+                                                    <tr>
+                                                        <td><input pInputText type="number"
+                                                                formControlName="cash_transfer" [readonly]="true" />
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" pButton icon="pi pi-th-large" label=""
+                                                                style="width:50px;"
+                                                                class="p-button-primary mr-2 outline"
+                                                                (click)="openCashTransfer()"></button>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="field">
+                                                <label for="name">เงินสดที่ได้รับ</label>
+                                                <table>
+                                                    <tr>
+                                                        <td><input pInputText type="number"
+                                                                formControlName="cash_received" [readonly]="true" />
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" pButton icon="pi pi-th-large" label=""
+                                                                style="width:50px;"
+                                                                class="p-button-primary mr-2 outline"
+                                                                (click)="openCashReceived()"></button>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </form>
+
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <form [formGroup]="formCart">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td>
+                                    <h5>ราคาสินค้ารวม</h5>
+                                </td>
+                                <td style="text-align: right;">{{this.formCart.value.total| number:'1.2-2'}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <h5>ส่วนลด
+                                        <input pInputText type="number" formControlName="discount_per" min="0" max="20"
+                                            style="text-align: right;" (change)="calSum()"
+                                            [readonly]="step=='order'" />%
+                                    </h5>
+                                </td>
+                                <td style="text-align: right;">{{this.formCart.value.discount| number:'1.2-2'}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <h5>ยอดที่ต้องชำระ</h5>
+                                </td>
+                                <td style="text-align: right;"><u>{{this.formCart.value.net_total| number:'1.2-2'}}</u>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <h5>เงินทอน</h5>
+                                </td>
+                                <td style="text-align: right;"><u>{{this.formCart.value.cash_return|
+                                        number:'1.2-2'}}</u>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-toast position="bottom-center"></p-toast>
+
+<p-dialog header="เพิ่มสมาชิก" [(visible)]="displayAddMember" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
+    [breakpoints]="{'960px': '75vw'}">
+    <form [formGroup]="formAddMember">
+        <div class="card p-fluid">
+            <div class="grid">
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label htmlFor="name">ชื่อ</label>
+                        <input pInputText type="text" formControlName="name" maxlength="200" />
+                    </div>
+                </div>
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label htmlFor="name">เบอร์โทร</label>
+                        <input pInputText type="text" formControlName="phone" maxlength="20" />
+                    </div>
+                </div>
+                <div class="col-6  py-0">
+                    <div class="field">
+                        <label htmlFor="name">ส่วนลด(%)</label>
+                        <input pInputText type="number" formControlName="discount" min="0" max="20" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmAddMember()" label="ยืนยัน" [disabled]="disabledAddMember"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelAddMember()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="เพิ่มสินค้า" [(visible)]="displayAddProduct" modal="modal" showEffect="fade" [style]="{width: '70vw'}"
+    [breakpoints]="{'960px': '75vw'}">
+
+    <div class="grid">
+        <div class="col-12">
+            <ng-container *ngIf="select_type=='product_type'">
+                <p-dataView #dv [value]="product_type_groups" [paginator]="true" [rows]="20" filterBy="name"
+                    layout="grid">
+                    <ng-template pTemplate="header">
+                        <div class="grid grid-nogutter flex-column md:flex-row justify-content-between">
+
+
+                            <button pButton icon="pi pi-arrow-left" label="กลับ" style="width:auto;" [disabled]="true"
+                                class="p-button-danger mr-2 outline"></button>
+
+
+                            <span class="p-input-icon-left mb-2 md:mb-0">
+                                <i class="pi pi-search"></i>
+                                <input type="search" pInputText placeholder="ค้นหา"
+                                    (input)="dv.filter($event.target.value)">
+                            </span>
+
+                            <!-- <p-dropdown [options]="sortOptions" [(ngModel)]="sortKey" placeholder="Sort By Price"
+                                (onChange)="onSortChange($event)"></p-dropdown> -->
+                        </div>
+                    </ng-template>
+
+                    <ng-template let-item pTemplate="gridItem">
+                        <div class="col-6 md:col-3" style="cursor: pointer;" (click)="selectProductType(item)">
+                            <div class="card m-3 border-1 surface-border">
+                                <div class="text-center">
+                                    <div class="text-xl" style="color: blue;">{{item.name}}</div>
+                                    <img [src]="item.image" [alt]="item.name" class="w-9 shadow-2 my-3 mx-0"
+                                        draggable="false" />
+
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </ng-container>
+            <ng-container *ngIf="select_type=='product_brand'">
+                <p-dataView #dv [value]="product_brand_groups" [paginator]="true" [rows]="20" filterBy="name"
+                    layout="grid">
+                    <ng-template pTemplate="header">
+                        <div class="grid grid-nogutter flex-column md:flex-row justify-content-between">
+
+
+                            <button (click)="backToProductType()" pButton icon="pi pi-arrow-left" label="กลับ"
+                                style="width:auto;" class="p-button-danger mr-2 outline"></button>
+
+
+                            <span class="p-input-icon-left mb-2 md:mb-0">
+                                <i class="pi pi-search"></i>
+                                <input type="search" pInputText placeholder="ค้นหา"
+                                    (input)="dv.filter($event.target.value)">
+                            </span>
+
+                            <!-- <p-dropdown [options]="sortOptions" [(ngModel)]="sortKey" placeholder="Sort By Price"
+                                (onChange)="onSortChange($event)"></p-dropdown> -->
+                        </div>
+                    </ng-template>
+
+                    <ng-template let-item pTemplate="gridItem">
+                        <div class="col-6 md:col-3" style="cursor: pointer;" (click)="selectProductBrand(item)">
+                            <div class="card m-3 border-1 surface-border">
+                                <div class="text-center">
+                                    <div class="text-xl" style="color: blue;">{{item.name}}</div>
+                                    <img [src]="item.image" [alt]="item.name" class="w-9 shadow-2 my-3 mx-0"
+                                        draggable="false" />
+
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </ng-container>
+            <ng-container *ngIf="select_type=='product'">
+                <p-dataView #dv [value]="product_groups" [paginator]="true" [rows]="20" filterBy="name" layout="grid">
+                    <ng-template pTemplate="header">
+                        <div class="grid grid-nogutter flex-column md:flex-row justify-content-between">
+
+
+                            <button (click)="backToProductBrand()" pButton icon="pi pi-arrow-left" label="กลับ"
+                                style="width:auto;" class="p-button-danger mr-2 outline"></button>
+
+
+                            <span class="p-input-icon-left mb-2 md:mb-0">
+                                <i class="pi pi-search"></i>
+                                <input type="search" pInputText placeholder="ค้นหา"
+                                    (input)="dv.filter($event.target.value)">
+                            </span>
+
+                            <!-- <p-dropdown [options]="sortOptions" [(ngModel)]="sortKey" placeholder="Sort By Price"
+                                (onChange)="onSortChange($event)"></p-dropdown> -->
+                        </div>
+                    </ng-template>
+
+                    <ng-template let-item pTemplate="gridItem">
+                        <div class="col-6 md:col-3" style="cursor: pointer;" (click)="selectProduct(item)">
+                            <div class="card m-3 border-1 surface-border">
+                                <div class="text-center">
+                                    <div class="text-xl" style="color: blue;">{{item.name}}</div>
+                                    <img [src]="item.image" [alt]="item.name" class="w-9 shadow-2 my-3 mx-0"
+                                        draggable="false" />
+
+                                </div>
+                                <div class="flex align-items-center justify-content-between">
+                                    <span class="sm:ml-2 product-badge status-instock">คลัง :
+                                        {{item.count}}</span>
+                                    <div class="flex align-items-center">
+                                        <i class="pi pi-tag mr-2"></i>
+                                        <span class="font-semibold" style="color: red;">{{item.price}}.-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+            </ng-container>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-window-close" (click)="displayAddProduct = false" label="ปิด"
+            class="p-button-secondary ml-2"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="แก้ไขจำนวนเงิน" [(visible)]="displayPrice" modal="modal" showEffect="fade" [style]="{width: '25vw'}"
+    [breakpoints]="{'960px': '75vw'}">
+    <div class="card p-fluid">
+        <div class="grid">
+            <div class="col-12 py-0">
+                <div class="field">
+                    <input pInputText type="number" min="1" max="9999" [(ngModel)]="_editNumber"
+                        style="text-align: center;font-size: 40px;" [readOnly]="true" />
+                </div>
+            </div>
+            <div class="col-12 py-0 center">
+                <table>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="7"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('7')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="8"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('8')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="9"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('9')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="4"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('4')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="5"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('5')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="6"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('6')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="1"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('1')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="2"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('2')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="3"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('3')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="ลบทั้งหมด"
+                                class="p-button-danger mr-2 outline" (click)="editNumber('clear')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="0"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('0')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="ลบ"
+                                class="p-button-danger mr-2 outline" (click)="editNumber('del')"></button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmPrice()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelPrice()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="แก้ไขจำนวน" [(visible)]="displayQty" modal="modal" showEffect="fade" [style]="{width: '25vw'}"
+    [breakpoints]="{'960px': '75vw'}">
+    <div class="card p-fluid">
+        <div class="grid">
+            <div class="col-12 py-0">
+                <div class="field">
+                    <input pInputText type="number" min="1" max="9999" [(ngModel)]="_editNumber"
+                        style="text-align: center;font-size: 40px;" [readOnly]="true" />
+                </div>
+            </div>
+            <div class="col-12 py-0">
+                <table>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="7"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('7')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="8"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('8')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="9"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('9')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="4"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('4')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="5"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('5')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="6"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('6')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="1"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('1')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="2"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('2')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="3"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('3')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="ลบทั้งหมด"
+                                class="p-button-danger mr-2 outline" (click)="editNumber('clear')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="0"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('0')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="ลบ"
+                                class="p-button-danger mr-2 outline" (click)="editNumber('del')"></button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmQty()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelQty()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="แก้ไขจำนวนรับเงินโอน" [(visible)]="displayCashTransfer" modal="modal" showEffect="fade"
+    [style]="{width: '25vw'}" [breakpoints]="{'960px': '75vw'}">
+    <div class="card p-fluid">
+        <div class="grid">
+            <div class="col-12 py-0">
+                <div class="field">
+                    <input pInputText type="number" min="1" max="9999" [(ngModel)]="_editNumber"
+                        style="text-align: center;font-size: 40px;" [readOnly]="true" />
+                </div>
+            </div>
+            <div class="col-12 py-0">
+                <table>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="7"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('7')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="8"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('8')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="9"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('9')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="4"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('4')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="5"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('5')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="6"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('6')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="1"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('1')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="2"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('2')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="3"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('3')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="ลบทั้งหมด"
+                                class="p-button-danger mr-2 outline" (click)="editNumber('clear')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="0"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('0')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="ลบ"
+                                class="p-button-danger mr-2 outline" (click)="editNumber('del')"></button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmCashTransfer()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelCashTransfer()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="แก้ไขจำนวนรับเงินสด" [(visible)]="displayCashReceived" modal="modal" showEffect="fade"
+    [style]="{width: '25vw'}" [breakpoints]="{'960px': '75vw'}">
+    <div class="card p-fluid">
+        <div class="grid">
+            <div class="col-12 py-0">
+                <div class="field">
+                    <input pInputText type="number" min="1" max="9999" [(ngModel)]="_editNumber"
+                        style="text-align: center;font-size: 40px;" [readOnly]="true" />
+                </div>
+            </div>
+            <div class="col-12 py-0">
+                <table>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="7"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('7')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="8"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('8')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="9"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('9')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="4"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('4')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="5"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('5')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="6"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('6')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="1"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('1')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="2"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('2')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="3"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('3')"></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="ลบทั้งหมด"
+                                class="p-button-danger mr-2 outline" (click)="editNumber('clear')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="0"
+                                class="p-button-primary mr-2 outline" (click)="editNumber('0')"></button>
+                        </td>
+                        <td>
+                            <button pButton style="width:80px;height: 70px;" label="ลบ"
+                                class="p-button-danger mr-2 outline" (click)="editNumber('del')"></button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmCashReceived()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelCashReceived()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<div id="slip-content"
+    style="width: 80mm; padding: 3px; font-family: 'Courier New', Courier, monospace; font-size: 10px;" hidden>
+    <div class="card">
+        <div style="text-align: center; margin-top: 10px;">
+            <img src="assets/images/logo.jpg" width="150">
+        </div>
+        <table style="width: 100%;text-align: center;font-size: 10px;">
+            <tr>
+                <td>สาขาพัฒนาการตัดใหม่</td>
+            </tr>
+            <tr>
+                <td>ถนนพัฒนาการตัดใหม่, แขวงประเวศ เขตประเวศ กรุงเทพมหานคร 10250</td>
+            </tr>
+            <tr>
+                <td>โทร. 094-657-8259</td>
+            </tr>
+        </table>
+        <hr style="border-top: 1px dashed #000;">
+        <table style="width: 100%;font-size: 10px;">
+            <tr>
+                <td style="width: 80px;">หมายเลขคำสั่งซื้อ</td>
+                <td style="width: auto;">{{this.formCart.value.code}}</td>
+                <td style="width: 60px;">วันที่สั่งซื้อ</td>
+                <td style="width: 60px;">{{this.formCart.value.created_date}}</td>
+            </tr>
+            <tr>
+                <td>รหัสลูกค้า</td>
+                <td>{{this.formCart.value.member_phone}}</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+        <hr style="border-top: 1px dashed #000;">
+        <div style="font-size: 14px;"><b>รายการสินค้า</b></div>
+        <table style="width: 100%;font-size: 10px;">
+            <tr *ngFor="let product of formCart.value?.products;let i = index">
+                <td style="width: auto;">{{i+1}}.{{ product.name }}</td>
+                <td style="width: 15%;">{{ product.qty }} ชิ้น</td>
+                <td style="width: 15%;text-align: right;">{{ product.net_total| number:'1.2-2' }}</td>
+            </tr>
+        </table>
+        <hr style="border-top: 1px dashed #000;">
+        <table style="width: 100%;font-size: 10px;">
+            <tr>
+                <td style="width: 80px;">การชำระเงิน:</td>
+                <td style="width: 80px;">{{this.formCart.value.payment_type}}</td>
+                <td style="width: 80px;">รวม:</td>
+                <td style="width: 80px;text-align: right;"> {{this.formCart.value.total| number:'1.2-2'}} บาท</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>ส่วนลด:</td>
+                <td style="text-align: right;"> {{this.formCart.value.discount| number:'1.2-2'}} บาท</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>ยอดชำระ:</td>
+                <td style="text-align: right;"> {{this.formCart.value.net_total| number:'1.2-2'}} บาท</td>
+            </tr>
+        </table>
+        <div style="text-align: center; margin-top: 10px;">
+            <div style="font-size: 16px;">ขอบคุณที่ใช้บริการ</div>
+        </div>
+    </div>
+</div>
