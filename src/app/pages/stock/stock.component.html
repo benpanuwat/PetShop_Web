@@ -14,9 +14,9 @@
                     </div>
                     <div class="col-12 md:col-6">
                         <div class="field">
-                            <label htmlFor="location">แบรน์สินค้า</label>
+                            <label htmlFor="location">แบรนด์สินค้า</label>
                             <p-dropdown [options]="filter_product_brands" optionLabel="name" [filter]="true"
-                                filterBy="name" [showClear]="true" placeholder="เลือกแบรน์สินค้า"
+                                filterBy="name" [showClear]="true" placeholder="เลือกแบรนด์สินค้า"
                                 formControlName="product_brand" (onChange)="selectProductBrandFilter()">
                             </p-dropdown>
                         </div>
@@ -31,7 +31,6 @@
             <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
                 [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines"
                 [rowsPerPageOptions]="[10, 25, 50]">
-                <!-- เปิด ng-template -->
                 <ng-template pTemplate="caption">
                     <div class="flex justify-content-between flex-column sm:flex-row">
                         <span class="p-input-icon-left">
@@ -40,17 +39,16 @@
                         </span>
                     </div>
                 </ng-template>
-                <!-- ปิด ng-template -->
 
                 <ng-template pTemplate="header">
                     <tr>
                         <th style="width: 100px;">
-                            <div class="flex justify-content-center  align-items-center">
+                            <div class="flex justify-content-center align-items-center">
                                 ลำดับ
                             </div>
                         </th>
                         <th style="width: 100px;">
-                            <div class="flex justify-content-center  align-items-center">
+                            <div class="flex justify-content-center align-items-center">
                                 รูปภาพ
                             </div>
                         </th>
@@ -61,12 +59,17 @@
                         </th>
                         <th style="width: auto;">
                             <div class="flex justify-content-start align-items-center">
-                                ชื่อแบรน์สินค้า
+                                ชื่อแบรนด์สินค้า
                             </div>
                         </th>
                         <th style="width: auto;">
                             <div class="flex justify-content-start align-items-center">
                                 ชื่อสินค้า
+                            </div>
+                        </th>
+                        <th style="width: 100px;">
+                            <div class="flex justify-content-center align-items-center">
+                                ราคา
                             </div>
                         </th>
                         <th style="width: 100px;">
@@ -87,10 +90,8 @@
                     </tr>
                 </ng-template>
 
-                <!-- open template button edit and delete  -->
                 <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
                     <tr>
-
                         <td class="text-center">
                             {{ rowIndex + 1 }}
                         </td>
@@ -98,19 +99,22 @@
                             <img class="icon-img" [src]="item.image">
                         </td>
                         <td class="text-left">
-                            {{item.PRODUCT_TYPE_NAME}}
+                            {{ item.product_type_name }}
                         </td>
                         <td class="text-left">
-                            {{item.PRODUCT_BRAND_NAME}}
+                            {{ item.product_brand_name }}
                         </td>
                         <td class="text-left">
-                            {{item.NAME}}
+                            {{ item.name }}
                         </td>
                         <td class="text-center">
-                            {{item.count|number}}
+                            {{ item.price | number }}.-
                         </td>
                         <td class="text-center">
-                            {{item.max|number}}
+                            {{ item.count | number }}
+                        </td>
+                        <td class="text-center">
+                            {{ item.max | number }}
                         </td>
                         <td class="text-center" *ngIf="permissions.manag_stock">
                             <div class="dropdown">
@@ -118,17 +122,16 @@
                                     <i class="pi pi-bars"></i>
                                 </button>
                                 <div class="dropdown-content" tabindex="0" style="cursor: pointer;">
-                                    <button type="button" class="dropdown-action" (click)="openEdit(item.id)" *ngIf="permissions?.manag_product_type"><i
+                                    <button type="button" class="dropdown-action" (click)="openEdit(item.id)" *ngIf="permissions?.manag_stock"><i
                                             class="pi pi-file-edit pr-2"></i>แก้ไข</button>
                                 </div>
                             </div>
                         </td>
-
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="emptyMessage" let-columns>
                     <tr>
-                        <td [attr.colspan]="6" class="text-center">ไม่มีข้อมูล</td>
+                        <td [attr.colspan]="9" class="text-center">ไม่มีข้อมูล</td>
                     </tr>
                 </ng-template>
             </p-table>
@@ -167,4 +170,3 @@
 </p-dialog>
 
 <p-toast position="top-right"></p-toast>
-

@@ -172,11 +172,16 @@ export class StockComponent {
       max: 0,
     });
     this._service.getStock(this.editId)
-      .subscribe((resp: any) => {
-        this.formEdit.patchValue({
-          ...resp.data
-        })
-        this.displayEdit = true;
+      .subscribe({
+        next: (resp: any) => {
+          this.formEdit.patchValue({
+            ...resp.data
+          })
+          this.displayEdit = true;
+        },
+        error: (err) => {
+          this.showError(err?.error?.message ?? 'ไม่สามารถโหลดข้อมูลแก้ไขได้');
+        },
       });
   }
 

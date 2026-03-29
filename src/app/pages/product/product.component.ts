@@ -271,25 +271,30 @@ export class ProductComponent {
       // prices: this._fb.array([]),
     });
     this._service.getProduct(this.editId)
-      .subscribe((resp: any) => {
-        this.formEdit.patchValue({
-          ...resp.data
-        })
+      .subscribe({
+        next: (resp: any) => {
+          this.formEdit.patchValue({
+            ...resp.data
+          })
 
-        // this.edit_prices.clear();
-        // if (resp.data.prices != null) {
-        //   for (let price of resp.data.prices) {
-        //     const itemGroup = this._fb.group({
-        //       id: [price.id],
-        //       count: [price.count],
-        //       price: [price.price],
-        //     });
+          // this.edit_prices.clear();
+          // if (resp.data.prices != null) {
+          //   for (let price of resp.data.prices) {
+          //     const itemGroup = this._fb.group({
+          //       id: [price.id],
+          //       count: [price.count],
+          //       price: [price.price],
+          //     });
 
-        //     this.edit_prices.push(itemGroup);
-        //   };
-        // }
-        this.selectProductType(this.formEdit.value.product_type_id);
-        this.displayEdit = true;
+          //     this.edit_prices.push(itemGroup);
+          //   };
+          // }
+          this.selectProductType(this.formEdit.value.product_type_id);
+          this.displayEdit = true;
+        },
+        error: (err) => {
+          this.showError(err?.error?.message ?? 'ไม่สามารถโหลดข้อมูลแก้ไขได้');
+        },
       });
   }
 

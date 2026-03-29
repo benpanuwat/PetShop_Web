@@ -113,28 +113,28 @@
                             {{ rowIndex + 1 }}
                         </td>
                         <td class="text-center">
-                            {{ item.CODE}}
+                            {{ item.code }}
                         </td>
                         <td class="text-center">
-                            {{item.CREATED_DATE}}
+                            {{ item.created_date }}
                         </td>
                         <td class="text-left">
-                            {{item.MEMBER_PHONE}}
+                            {{ item.member_phone }}
                         </td>
                         <td class="text-left">
-                            {{item.MEMBER_NAME}}
+                            {{ item.member_name }}
                         </td>
                         <td class="text-center">
-                            {{item.PAYMENT_TYPE}}
+                            {{ item.payment_type }}
                         </td>
                         <td class="text-right">
-                            {{item.TOTAL|number}}
+                            {{ item.total | number }}
                         </td>
                         <td class="text-right">
-                            {{item.DiSCOUNT|number}}
+                            {{ item.discount | number }}
                         </td>
                         <td class="text-right">
-                            {{item.NET_TOTAL|number}}
+                            {{ item.net_total | number }}
                         </td>
 
                         <td style="text-align: center;" class="white-space-nowrap">
@@ -192,5 +192,3 @@
 </p-dialog>
 
 <p-toast position="bottom-center"></p-toast>
-
-

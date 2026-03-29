@@ -27,7 +27,7 @@ textarea {
 .dropdown {
     float: left;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .dropdown-content {
@@ -64,7 +64,6 @@ textarea {
     background-color: #ddd;
 }
 
-.dropdown:hover .dropdown-content,
 .dropdown:focus-within .dropdown-content {
     display: block;
 }
