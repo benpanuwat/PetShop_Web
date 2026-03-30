@@ -10,9 +10,14 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  pre_login(data: any) {
+    return this.http.post(environment.url + `/pre_login`, data);
+  }
+
   login(data: any) {
     return this.http.post(environment.url + `/login`, data);
   }
+
 
   logout() {
     localStorage.removeItem('token'); // ลบ Token ออกจาก Local Storage

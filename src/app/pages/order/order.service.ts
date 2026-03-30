@@ -11,10 +11,9 @@ export class OrderService {
 
   constructor(private http: HttpClient) { }
 
-  page(data: { branchId: number, perPage: number, page: number, search?: string, date_start?: string, date_end?: string }) {
+  page(data: { perPage: number, page: number, search?: string, date_start?: string, date_end?: string }) {
     return this.http.get(environment.url + `/order/page`, {
       params: {
-        branchId: data.branchId,
         perPage: data.perPage,
         page: data.page,
         search: data?.search ?? "",

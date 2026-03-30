@@ -14,7 +14,6 @@ import { StockService } from '../stock/stock.service';
 })
 export class StockComponent {
   public permissions: string[] = [];
-  public branch_id: number;
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;
@@ -48,13 +47,11 @@ export class StockComponent {
     private _messageService: MessageService,
   ) {
     this.permissions = JSON.parse(localStorage.getItem('permissions'));
-    this.branch_id = Number(localStorage.getItem('branch'));
   }
 
   ngOnInit() {
     this._route.queryParamMap.subscribe(params => {
       this.urlData.product_type_id = params.get('product_type_id');
-      this.urlData.product_brand_id = params.get('product_brand_id');
     });
 
 
@@ -81,7 +78,7 @@ export class StockComponent {
 
           const page = first / rows + 1;
 
-          this._service.page({ branchId: this.branch_id, perPage: rows, page: page, search: query, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id })
+          this._service.page({ perPage: rows, page: page, search: query, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id })
             .subscribe((resp: any) => {
               this.data = resp.data;
               this.data = this.data.map((item, index) => ({ ...item, order: index + 1 }));
@@ -100,7 +97,7 @@ export class StockComponent {
 
     const page = event.first / event.rows + 1;
 
-    this._service.page({ branchId: this.branch_id, perPage: event.rows, page, search: this.search.value, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id })
+    this._service.page({ perPage: event.rows, page, search: this.search.value, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id })
       .subscribe((resp: any) => {
         this.data = resp.data;
         this.totalRecords = resp.totalRecords;

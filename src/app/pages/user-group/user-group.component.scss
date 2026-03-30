@@ -12,3 +12,14 @@
       }
       
 }
+
+:host ::ng-deep .action-menu-table .p-datatable-wrapper,
+:host ::ng-deep .action-menu-table .p-datatable-table,
+:host ::ng-deep .action-menu-table .p-datatable-tbody > tr,
+:host ::ng-deep .action-menu-table .p-datatable-tbody > tr > td {
+    overflow: visible !important;
+}
+
+:host ::ng-deep .action-menu-table .p-datatable-tbody > tr > td:last-child {
+    position: relative;
+}

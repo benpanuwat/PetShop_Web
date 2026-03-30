@@ -11,10 +11,9 @@ export class StockService {
 
   constructor(private http: HttpClient) { }
 
-  page(data: {branchId: number, perPage: number, page: number, search?: string, searchId1?: string, searchId2?: string }) {
+  page(data: { perPage: number, page: number, search?: string, searchId1?: string, searchId2?: string }) {
     return this.http.get(environment.url + `/stock/page`, {
       params: {
-        branchId: data.branchId,
         perPage: data.perPage,
         page: data.page,
         search: data?.search ?? "",

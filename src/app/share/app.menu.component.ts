@@ -31,34 +31,35 @@ export class AppMenuComponent implements OnInit {
                 itemsMenu2.push({ label: 'สมาชิก', icon: 'pi pi-fw pi-users', routerLink: ['/app/member'] });
 
                 let itemsMenu3 = [];
-                itemsMenu3.push({ label: 'สาขา', icon: 'pi pi-fw pi-building', routerLink: ['/app/branch'] });
-
-                let itemsMenu4 = [];
                 if (this.permissions.view_product_type)
-                    itemsMenu4.push({ label: 'ประเภทสินค้า', icon: 'pi pi-th-large', routerLink: ['/app/product_type'] });
+                    itemsMenu3.push({ label: 'ประเภทสินค้า', icon: 'pi pi-th-large', routerLink: ['/app/product_type'] });
                 // if (this.permissions.view_product_brand)
-                itemsMenu4.push({ label: 'แบรนด์สินค้า', icon: 'pi pi-apple', routerLink: ['/app/product_brand'] });
+                itemsMenu3.push({ label: 'แบรนด์สินค้า', icon: 'pi pi-apple', routerLink: ['/app/product_brand'] });
                 if (this.permissions.view_product)
-                    itemsMenu4.push({ label: 'สินค้า', icon: 'pi pi-fw pi-box', routerLink: ['/app/product'] });
+                    itemsMenu3.push({ label: 'สินค้า', icon: 'pi pi-fw pi-box', routerLink: ['/app/product'] });
                 if (this.permissions.view_patient)
-                    itemsMenu4.push({ label: 'คนไข้', icon: 'pi pi-fw pi-users', routerLink: ['/app/patient'] });
+                    itemsMenu3.push({ label: 'คนไข้', icon: 'pi pi-fw pi-users', routerLink: ['/app/patient'] });
                 if (this.permissions.view_report)
-                    itemsMenu4.push({
+                    itemsMenu3.push({
                         label: 'รายงาน', icon: 'pi pi-fw pi-chart-bar', items: [
                             { label: 'รายงานสถานที่ตรวจ', routerLink: ['/app/location_report'] },
                             { label: 'รายงานห้องตรวจ', routerLink: ['/app/room_report'] }
                         ]
                     });
 
-                let itemsMenu5 = [];
+                let itemsMenu4 = [];
                 if (this.permissions.view_stock)
-                    itemsMenu5.push({ label: 'คลังสินค้า', icon: 'pi pi-fw pi-th-large', routerLink: ['/app/stock'] });
-                itemsMenu5.push({ label: 'รับสินค้า', icon: 'pi pi-fw pi-download', routerLink: ['/app/receive_product'] });
-                itemsMenu5.push({ label: 'รายการรับสินค้า', icon: 'pi pi-fw pi-list', routerLink: ['/app/product_lot'] });
+                    itemsMenu4.push({ label: 'คลังสินค้า', icon: 'pi pi-fw pi-th-large', routerLink: ['/app/stock'] });
+                itemsMenu4.push({ label: 'รับสินค้า', icon: 'pi pi-fw pi-download', routerLink: ['/app/receive_product'] });
+                itemsMenu4.push({ label: 'รายการรับสินค้า', icon: 'pi pi-fw pi-list', routerLink: ['/app/product_lot'] });
+
+                let itemsMenu5 = [];
+                itemsMenu5.push({ label: 'เพิ่มคำสั่งซื้อ', icon: 'pi pi-fw pi-cart-plus', routerLink: ['/app/new_order'] });
+                itemsMenu5.push({ label: 'รายการคำสั่งซื้อ', icon: 'pi pi-fw pi-list', routerLink: ['/app/order'] });
 
                 let itemsMenu6 = [];
-                itemsMenu6.push({ label: 'เพิ่มคำสั่งซื้อ', icon: 'pi pi-fw pi-cart-plus', routerLink: ['/app/new_order'] });
-                itemsMenu6.push({ label: 'รายการคำสั่งซื้อ', icon: 'pi pi-fw pi-list', routerLink: ['/app/order'] });
+                itemsMenu6.push({ label: 'สาขา', icon: 'pi pi-fw pi-building', routerLink: ['/app/branch'] });
+
 
                 this.model = [
                     {
@@ -70,19 +71,19 @@ export class AppMenuComponent implements OnInit {
                         items: itemsMenu2,
                     },
                     {
-                        label: 'จัดการสาขา', icon: 'pi pi-fw pi-building',
+                        label: 'จัดการข้อมูล', icon: 'pi pi-fw pi-box',
                         items: itemsMenu3,
                     },
                     {
-                        label: 'จัดการข้อมูล', icon: 'pi pi-fw pi-box',
+                        label: 'คลังสินค้า', icon: 'pi pi-fw pi-warehouse',
                         items: itemsMenu4,
                     },
                     {
-                        label: 'คลังสินค้า', icon: 'pi pi-fw pi-th-large',
+                        label: 'คำสั่งซื้อ', icon: 'pi pi-fw pi-cart-plus',
                         items: itemsMenu5,
                     },
                     {
-                        label: 'คำสั่งซื้อ', icon: 'pi pi-fw pi-cart-plus',
+                        label: 'ตั้งค่า', icon: 'pi pi-fw pi-sliders-h',
                         items: itemsMenu6,
                     },
 

@@ -27,10 +27,11 @@ export class LoginComponent {
     this.loginForm = this._formBuilder.group({
       username: ["", Validators.required],
       password: ["", Validators.required],
+      branch_id: 0,
     });
 
     this.selectForm = this._formBuilder.group({
-      branch_id: ["", Validators.required],
+      branch_id: 0,
     });
   }
 
@@ -39,24 +40,29 @@ export class LoginComponent {
       this.showError("กรุณากำหนด Username และ Password");
     }
     else {
-      this._service.login(this.loginForm.value).subscribe({
+      this._service.pre_login(this.loginForm.value).subscribe({
         next: (resp: any) => {
           this.branchs = resp.data.branchs;
           if (this.branchs.length === 1) {
-            this._service.setToken(resp.token);
-            this._service.setName(resp.data.first_name + " " + resp.data.last_name);
-            localStorage.setItem('branch', resp.data.branchs[0].id);
-            localStorage.setItem('branch_name', resp.data.branchs[0].id);
-            this._router.navigate(['/app/user_group']);
+            this._service.login(this.loginForm.value).subscribe({
+              next: (resp2: any) => {
+                this._service.setToken(resp2.token);
+                this._service.setName(resp2.data.first_name + " " + resp2.data.last_name);
+                localStorage.setItem('branch', this.branchs[0].id);
+                localStorage.setItem('branch_name', this.branchs[0].name);
+                this._router.navigate(['/app/user_group']);
+              },
+              error: (err2) => {
+                this.showError(err2.error.message);
+              },
+            });
           }
           else {
-            this._service.setToken(resp.token);
-            this._service.setName(resp.data.first_name + " " + resp.data.last_name);
+            this.step = 2;
             this.selectForm.patchValue({
               branch_id: resp.data.branchs[0].id,
             })
           }
-          this.step = 2;
         },
         error: (err) => {
           this.showError(err.error.message);
@@ -66,10 +72,22 @@ export class LoginComponent {
   }
 
   select_branch() {
+    this.loginForm.patchValue({
+      branch_id: this.selectForm.value.branch_id,
+    })
     const branch = this.branchs.find(x => x.id == this.selectForm.value.branch_id);
-    localStorage.setItem('branch', this.selectForm.value.branch_id);
-    localStorage.setItem('branch_name', branch?.name ?? '');
-    this._router.navigate(['/app/user_group']);
+    this._service.login(this.loginForm.value).subscribe({
+      next: (resp2: any) => {
+        this._service.setToken(resp2.token);
+        this._service.setName(resp2.data.first_name + " " + resp2.data.last_name);
+        localStorage.setItem('branch', this.selectForm.value.branch_id);
+        localStorage.setItem('branch_name', branch?.name ?? '');
+        this._router.navigate(['/app/user_group']);
+      },
+      error: (err2) => {
+        this.showError(err2.error.message);
+      },
+    });
   }
 
   showError(massage: string) {

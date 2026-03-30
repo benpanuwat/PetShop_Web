@@ -46,7 +46,9 @@ export class ProductComponent {
     private _router: Router,
     private _route: ActivatedRoute,
     private _messageService: MessageService,
-  ) { this.permissions = JSON.parse(localStorage.getItem('permissions')); }
+  ) {
+    this.permissions = JSON.parse(localStorage.getItem('permissions'));
+  }
 
   ngOnInit() {
     this._route.queryParamMap.subscribe(params => {

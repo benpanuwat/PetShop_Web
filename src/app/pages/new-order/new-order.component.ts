@@ -254,7 +254,6 @@ export class NewOrderComponent {
   }
 
   confirmPrice() {
-
     let number = Number(this._editNumber)
     if (number > 9999)
       number = 9999;
@@ -289,7 +288,6 @@ export class NewOrderComponent {
   }
 
   confirmQty() {
-
     let number = Number(this._editNumber)
     if (number > 9999)
       number = 9999;
@@ -397,41 +395,21 @@ export class NewOrderComponent {
   }
 
   calAmount(product_cart) {
-    product_cart.total = product_cart.price * product_cart.qty;
-    product_cart.net_total = product_cart.total;
+    let pack_count = Math.floor(product_cart.qty / product_cart.pack_count);
+    let pack_over = product_cart.qty % product_cart.pack_count;
+
+    if (pack_count == 0) {
+      product_cart.total = product_cart.price * product_cart.qty;
+      product_cart.net_total = product_cart.total;
+      product_cart.noti_discount = "";
+    }
+    else {
+      product_cart.total = product_cart.price * product_cart.qty;
+      product_cart.net_total = (pack_count * product_cart.pack_price) + (pack_over * product_cart.price);
+      product_cart.discount = ((product_cart.qty * product_cart.price) - product_cart.net_total);
+      product_cart.noti_discount = `ลดแล้ว ${product_cart.discount}`;
+    }
     this.calSum();
-
-    // let pack_count = Math.floor(product_cart.qty / product_cart.pack_count);
-    // let pack_over = product_cart.qty % product_cart.pack_count;
-    // let to_pack_count = product_cart.pack_count - (product_cart.qty % product_cart.pack_count);
-
-    // if (pack_count == 0) {
-    //   product_cart.total = product_cart.price * product_cart.qty;
-    //   product_cart.net_total = product_cart.total;
-    // product_cart.noti_discount = "";
-
-    // if (to_pack_count != product_cart.pack_count) {
-    //   let add_discount = (product_cart.price * product_cart.pack_count) - product_cart.pack_price;
-    //   product_cart.noti_add_qty = `เพิ่ม ${to_pack_count} ชิ้น ลด ${add_discount}`;
-    // }
-    // else {
-    //   product_cart.noti_add_qty = "";
-    // }
-    // }
-    // else {
-    //   console.log(product_cart);
-    //   product_cart.total = product_cart.price * product_cart.qty;
-    //   product_cart.net_total = (pack_count * product_cart.pack_price) + (pack_over * product_cart.price);
-    //product_cart.discount = ((product_cart.qty * product_cart.price) - product_cart.net_total);
-    // product_cart.noti_discount = `ลดแล้ว ${product_cart.discount}`;
-    // if (to_pack_count != product_cart.pack_count) {
-    //   let add_discount = (product_cart.price * product_cart.pack_count) - product_cart.pack_price;
-    //   product_cart.noti_add_qty = `เพิ่ม ${to_pack_count} ชิ้น ลด ${add_discount.toFixed(2)}`;
-    // }
-    // else {
-    //   product_cart.noti_add_qty = "";
-    // }
-    // }
   }
 
   calSum() {
@@ -467,32 +445,13 @@ export class NewOrderComponent {
     else {
       this.showError("ไม่พบรายการสินค้า");
     }
-
-    // this._service.getProductByBarcode(this.formSetting.value.barcode).subscribe({
-    //   next: (resp: any) => {
-    //     const product = this.product_type_groups
-    //       .flatMap(t => t.product_brands)
-    //       .flatMap(b => b.products)
-    //       .find(p => p.id === resp.data.id);
-
-    //     if (product) {
-    //       this.selectProduct(product);
-    //       this.calSum();
-    //     }
-    //     this.formSetting.reset();
-    //   },
-    //   error: (err) => {
-    //     this.showError(err.error.message);
-    //     this.formSetting.reset();
-    //   },
-    // });
   }
 
   scrollToLastRow() {
     const tableBody = this.table.el.nativeElement.querySelector('.p-datatable-wrapper');
     if (tableBody) {
-      tableBody.scrollTop = tableBody.scrollHeight; // scroll แนวตั้ง
-      tableBody.scrollLeft = tableBody.scrollWidth; // scroll แนวนอน (ถ้ามี)
+      tableBody.scrollTop = tableBody.scrollHeight;
+      tableBody.scrollLeft = tableBody.scrollWidth;
     }
   }
 

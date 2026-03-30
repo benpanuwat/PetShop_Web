@@ -14,7 +14,6 @@ import { OrderService } from '../order/order.service';
 })
 export class OrderComponent {
   public permissions: string[] = [];
-  public branch_id: number;
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;
@@ -39,7 +38,6 @@ export class OrderComponent {
     private _messageService: MessageService,
   ) {
     this.permissions = JSON.parse(localStorage.getItem('permissions'));
-    this.branch_id = Number(localStorage.getItem('branch'));
   }
 
   ngOnInit() {
@@ -82,7 +80,7 @@ export class OrderComponent {
           const date_end = this.formSetting.value.date_end.toISOString();
 
 
-          this._service.page({ branchId: this.branch_id, perPage: rows, page: page, search: query, date_start: date_start, date_end: date_end })
+          this._service.page({ perPage: rows, page: page, search: query, date_start: date_start, date_end: date_end })
             .subscribe((resp: any) => {
               this.data = resp.data;
               this.data = this.data.map((item, index) => ({ ...item, order: index + 1 }));
@@ -116,7 +114,7 @@ export class OrderComponent {
     );
     const date_end = this.formSetting.value.date_end.toISOString();
 
-    this._service.page({ branchId: this.branch_id, perPage: event.rows, page, search: this.search.value, date_start: date_start, date_end: date_end })
+    this._service.page({ perPage: event.rows, page, search: this.search.value, date_start: date_start, date_end: date_end })
       .subscribe((resp: any) => {
         this.data = resp.data;
         this.totalRecords = resp.totalRecords;
