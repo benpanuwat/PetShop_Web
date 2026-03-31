@@ -44,6 +44,9 @@ export class LoginComponent {
         next: (resp: any) => {
           this.branchs = resp.data.branchs;
           if (this.branchs.length === 1) {
+            this.loginForm.patchValue({
+              branch_id: this.branchs[0].id,
+            })
             this._service.login(this.loginForm.value).subscribe({
               next: (resp2: any) => {
                 this._service.setToken(resp2.token);
@@ -80,7 +83,7 @@ export class LoginComponent {
       next: (resp2: any) => {
         this._service.setToken(resp2.token);
         this._service.setName(resp2.data.first_name + " " + resp2.data.last_name);
-        localStorage.setItem('branch', this.selectForm.value.branch_id);
+        localStorage.setItem('branch', branch.id);
         localStorage.setItem('branch_name', branch?.name ?? '');
         this._router.navigate(['/app/user_group']);
       },

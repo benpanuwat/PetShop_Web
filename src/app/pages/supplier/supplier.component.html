@@ -1,7 +1,7 @@
 <div class="grid">
     <div class="col-12">
         <div class="card">
-            <h5>รายการประเภทสินค้า</h5>
+            <h5>รายการผู้ขาย</h5>
             <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
                 [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines action-menu-table"
                 [rowsPerPageOptions]="[10, 25, 50]">
@@ -13,9 +13,10 @@
                             <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" class="w-full" />
                         </span>
 
-                        <div class="pt-1 flex align-items-center" *ngIf="permissions?.manag_product_type">
-
-                            <button (click)="openAdd()" pButton icon="pi pi-plus" label="เพิ่มประเภทสินค้า"
+                        <div class="pt-1" style="
+                                display: flex;
+                                align-items: center;" *ngIf="permissions?.manag_user">
+                            <button (click)="openAdd()" pButton icon="pi pi-plus" label="เพิ่มผู้ขาย"
                                 style="width:auto;"></button>
                         </div>
                     </div>
@@ -29,14 +30,9 @@
                                 ลำดับ
                             </div>
                         </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center  align-items-center">
-                                รูปภาพ
-                            </div>
-                        </th>
                         <th style="width: auto;">
                             <div class="flex justify-content-start align-items-center">
-                                ชื่อประเภทสินค้า
+                                ผู้ขาย
                             </div>
                         </th>
                         <th style="width: 70px;">
@@ -51,27 +47,22 @@
                 <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
                     <tr>
 
-                        <td class="text-center">
+                        <td style="text-align: center;">
                             {{ rowIndex + 1 }}
                         </td>
-                        <td class="text-center">
-                            <img class="icon-img" [src]="item.image">
-                        </td>
-                        <td class="text-left">
+
+                        <td style="text-align: start;">
                             {{item.name}}
                         </td>
 
-                        <td class="text-center">
+                        <td style="text-align: center;">
                             <div class="dropdown">
                                 <button pButton type="button" class="p-button-secondary p-button-text"><span></span>
                                     <i class="pi pi-bars"></i>
                                 </button>
-                                <div class="dropdown-content" tabindex="0" style="cursor: pointer;">
-                                    <a [routerLink]="['/app/product_brand']"
-                                        [queryParams]="{product_type_id:item.id}"><i class="pi pi-list pr-2"
-                                            *ngIf="permissions?.view_product_brand"></i>รายการแบรน์สินค้า</a>
-                                    <button type="button" class="dropdown-action" (click)="openEdit(item.id)" *ngIf="permissions?.manag_product_type"><i
-                                            class="pi pi-file-edit pr-2"></i>แก้ไข</button>
+                                <div class="dropdown-content" tabindex="0">
+                                    <a href="javascript:void(0);" (click)="openEdit(item.id)"><i
+                                            class="pi pi-file-edit pr-2"></i>แก้ไข</a>
                                     <a href="javascript:void(0);" (click)="openDelete(item.id)"><i
                                             class="pi pi-trash pr-2"></i>ลบ</a>
                                 </div>
@@ -79,10 +70,10 @@
                         </td>
 
                     </tr>
-                </ng-template>
-                <ng-template pTemplate="emptyMessage" let-columns>
-                    <tr>
-                        <td [attr.colspan]="4" class="text-center">ไม่มีข้อมูล</td>
+                    <tr *ngIf="data.length == 0">
+                        <td colspan="3" style="text-align: center;">
+                            ไม่มีข้อมูล
+                        </td>
                     </tr>
                 </ng-template>
             </p-table>
@@ -90,24 +81,14 @@
     </div>
 </div>
 
-<p-dialog header="เพิ่มประเภทสินค้า" [(visible)]="displayAdd" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
+<p-dialog header="เพิ่มผู้ขาย" [(visible)]="displayAdd" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
     [breakpoints]="{'960px': '75vw'}">
     <form [formGroup]="formAdd">
         <div class="card p-fluid">
             <div class="grid">
-                <div class="col-12 py-0 pb-5" style="text-align: center;">
-                    <img *ngIf="!formAdd.get('upload_image_status')!.value" class="img" src="assets/images/product.png"
-                        width="100" height="100" style="cursor: pointer;" (click)="fileinputadd.click()">
-
-                    <img *ngIf="formAdd.get('upload_image_status')!.value" class="img"
-                        [src]="formAdd.get('image')!.value" width="100" height="100" style="cursor: pointer;"
-                        (click)="fileinputadd.click()">
-
-                    <input #fileinputadd type="file" (change)="onSelectImageProfile($event)" accept="image/*" hidden />
-                </div>
                 <div class="col-12 py-0">
                     <div class="field">
-                        <label htmlFor="name">ชื่อประเภทสินค้า</label>
+                        <label htmlFor="name">ชื่อผู้ขาย</label>
                         <input pInputText type="text" formControlName="name" maxlength="200" />
                     </div>
                 </div>
@@ -116,28 +97,21 @@
     </form>
 
     <ng-template pTemplate="footer">
-        <button pButton icon="pi pi-check" (click)="addConfirm()" label="ยืนยัน"
+        <button pButton icon="pi pi-check" (click)="confirmAdd()" label="ยืนยัน" [disabled]="disabledAddSupplier"
             class="p-button-success mr-2 outline"></button>
-        <button pButton icon="pi pi-times" (click)="addCancel()" label="ยกเลิก"
+        <button pButton icon="pi pi-times" (click)="cancelAdd()" label="ยกเลิก"
             class="p-button-danger mr-2 outline"></button>
     </ng-template>
 </p-dialog>
 
-<p-dialog header="แก้ไขประเภทสินค้า" [(visible)]="displayEdit" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
+<p-dialog header="แก้ไขผู้ขาย" [(visible)]="displayEdit" modal="modal" showEffect="fade" [style]="{width: '40vw'}"
     [breakpoints]="{'960px': '75vw'}">
     <form [formGroup]="formEdit">
         <div class="card p-fluid">
             <div class="grid">
-                <div class="col-12 py-0 pb-5" style="text-align: center;">
-                    <img class="img" [src]="formEdit.get('image')!.value" width="100" height="100"
-                        style="cursor: pointer;" (click)="fileinputedit.click()">
-
-                    <input #fileinputedit type="file" (change)="onSelectImageProfileEdit($event)" accept="image/*"
-                        hidden />
-                </div>
                 <div class="col-12 py-0">
                     <div class="field">
-                        <label htmlFor="name">ชื่อประเภทสินค้า</label>
+                        <label htmlFor="name">ชื่อผู้ขาย</label>
                         <input pInputText type="text" formControlName="name" maxlength="200" />
                     </div>
                 </div>
@@ -153,12 +127,12 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog header="ลบประเภทสินค้า" [(visible)]="displayDelete" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
+<p-dialog header="ลบผู้ขาย" [(visible)]="displayDelete" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
     [breakpoints]="{'960px': '75vw'}">
     <div class="card p-fluid">
         <div class="grid">
             <div class="col-12 py-0">
-                <h5>ต้องการลบประเภทสินค้านี้ใช่หรือไม่?</h5>
+                <h5>ต้องการลบผู้ขายนี้ใช่หรือไม่?</h5>
             </div>
         </div>
     </div>
@@ -171,6 +145,6 @@
     </ng-template>
 </p-dialog>
 
-<p-toast position="bottom-center"></p-toast>
 
 
+<p-toast position="top-right"></p-toast>

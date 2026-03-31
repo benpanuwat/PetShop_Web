@@ -1,0 +1,333 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h5>ปิดยอดเงินสดประจำวัน</h5>
+            <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
+                [loading]="loading" [rows]="10" [totalRecords]="totalRecords"
+                styleClass="p-datatable-gridlines action-menu-table" [rowsPerPageOptions]="[10, 25, 50]">
+                <ng-template pTemplate="caption">
+                    <div class="flex justify-content-between flex-column sm:flex-row gap-2">
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" class="w-full" />
+                        </span>
+
+                        <div class="pt-1 flex align-items-center">
+                            <button (click)="openAdd()" pButton icon="pi pi-plus" label="ปิดยอดวันนี้"
+                                style="width:auto;"></button>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 80px;">
+                            <div class="flex justify-content-center align-items-center">ลำดับ</div>
+                        </th>
+                        <th style="width: 140px;">
+                            <div class="flex justify-content-center align-items-center">วันที่ปิดยอด</div>
+                        </th>
+                        <th style="width: 140px;">
+                            <div class="flex justify-content-center align-items-center">เงินยกมา</div>
+                        </th>
+                        <th style="width: 140px;">
+                            <div class="flex justify-content-center align-items-center">เงินสดรับวันนี้</div>
+                        </th>
+                        <th style="width: 140px;">
+                            <div class="flex justify-content-center align-items-center">ยอดที่ควรมี</div>
+                        </th>
+                        <th style="width: 140px;">
+                            <div class="flex justify-content-center align-items-center">เงินนับจริง</div>
+                        </th>
+                        <th style="width: 140px;">
+                            <div class="flex justify-content-center align-items-center">ส่วนต่าง</div>
+                        </th>
+                        <th style="width: 70px;">
+                            <div class="flex justify-content-center align-items-center">จัดการ</div>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                    <tr>
+                        <td class="text-center">{{ rowIndex + 1 }}</td>
+                        <td class="text-center">{{ item.closing_date | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td class="text-center">{{ item.opening_amount | number:'1.2-2' }}</td>
+                        <td class="text-center">{{ item.cash_sales | number:'1.2-2' }}</td>
+                        <td class="text-center">{{ item.expected_amount | number:'1.2-2' }}</td>
+                        <td class="text-center">{{ item.actual_amount | number:'1.2-2' }}</td>
+                        <td class="text-center">{{ item.diff_amount | number:'1.2-2' }}</td>
+                        <td style="text-align: center;">
+                            <div class="dropdown">
+                                <button pButton type="button" class="p-button-secondary p-button-text"><span></span>
+                                    <i class="pi pi-bars"></i>
+                                </button>
+                                <div class="dropdown-content" tabindex="0">
+                                    <a href="javascript:void(0);" (click)="openEdit(item.id)"><i
+                                            class="pi pi-file-edit pr-2"></i>แก้ไข</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptyMessage">
+                    <tr>
+                        <td [attr.colspan]="9" class="text-center">ไม่มีข้อมูล</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<p-dialog header="ปิดยอดเงินสดประจำวัน" [(visible)]="displayAdd" modal="modal" showEffect="fade"
+    [style]="{width: '700px'}" [breakpoints]="{'960px': '75vw'}">
+    <form [formGroup]="formAdd">
+        <div class="card p-fluid">
+            <div class="grid">
+                <div class="col-12 md:col-6 py-0">
+                    <div class="field">
+                        <label for="opening_amount">เงินยกมา</label>
+                        <p-inputNumber formControlName="opening_amount" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6 py-0">
+                    <div class="field">
+                        <label for="cash_sales">เงินสดรับวันนี้</label>
+                        <p-inputNumber formControlName="cash_sales" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="cash-grid">
+                        <div class="cash-card">
+                            <label>แบงค์ 1000</label>
+                            <p-inputNumber formControlName="cash_1000" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right"
+                                (onInput)="changePrice()"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>แบงค์ 500</label>
+                            <p-inputNumber formControlName="cash_500" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right"
+                                (onInput)="changePrice()"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>แบงค์ 100</label>
+                            <p-inputNumber formControlName="cash_100" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right"
+                                (onInput)="changePrice()"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>แบงค์ 50</label>
+                            <p-inputNumber formControlName="cash_50" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right"
+                                (onInput)="changePrice()"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>แบงค์ 20</label>
+                            <p-inputNumber formControlName="cash_20" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right"
+                                (onInput)="changePrice()"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>เหรียญ 10</label>
+                            <p-inputNumber formControlName="cash_10" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right"
+                                (onInput)="changePrice()"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>เหรียญ 5</label>
+                            <p-inputNumber formControlName="cash_5" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right"
+                                (onInput)="changePrice()"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>เหรียญ 2</label>
+                            <p-inputNumber formControlName="cash_2" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right"
+                                (onInput)="changePrice()"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>เหรียญ 1</label>
+                            <p-inputNumber formControlName="cash_1" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right"
+                                (onInput)="changePrice()"></p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-4 py-0">
+                    <div class="field">
+                        <label for="expected_amount">ยอดที่ควรมี</label>
+                        <p-inputNumber formControlName="expected_amount" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+                <div class="col-12 md:col-4 py-0">
+                    <div class="field">
+                        <label for="actual_amount">เงินที่นับจริง</label>
+                        <p-inputNumber formControlName="actual_amount" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+                <div class="col-12 md:col-4 py-0">
+                    <div class="field">
+                        <label for="diff_amount">ส่วนต่าง</label>
+                        <p-inputNumber formControlName="diff_amount" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label for="remark">หมายเหตุ</label>
+                        <textarea pInputTextarea formControlName="remark" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="addConfirm()" label="ยืนยัน" [disabled]="disabledAddMember"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="addCancel()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="ปิดยอดเงินสดประจำวัน" [(visible)]="displayEdit" modal="modal" showEffect="fade"
+    [style]="{width: '700px'}" [breakpoints]="{'960px': '75vw'}">
+    <form [formGroup]="formEdit">
+        <div class="card p-fluid">
+            <div class="grid">
+                <div class="col-12 md:col-6 py-0">
+                    <div class="field">
+                        <label for="opening_amount">เงินยกมา</label>
+                        <p-inputNumber formControlName="opening_amount" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6 py-0">
+                    <div class="field">
+                        <label for="cash_sales">เงินสดรับวันนี้</label>
+                        <p-inputNumber formControlName="cash_sales" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="cash-grid">
+                        <div class="cash-card">
+                            <label>แบงค์ 1000</label>
+                            <p-inputNumber formControlName="cash_1000" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right" (onInput)="changePriceEdit()"
+                                [readonly]="!formEdit.value?.last_status"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>แบงค์ 500</label>
+                            <p-inputNumber formControlName="cash_500" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right" (onInput)="changePriceEdit()"
+                                [readonly]="!formEdit.value?.last_status"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>แบงค์ 100</label>
+                            <p-inputNumber formControlName="cash_100" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right" (onInput)="changePriceEdit()"
+                                [readonly]="!formEdit.value?.last_status"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>แบงค์ 50</label>
+                            <p-inputNumber formControlName="cash_50" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right" (onInput)="changePriceEdit()"
+                                [readonly]="!formEdit.value?.last_status"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>แบงค์ 20</label>
+                            <p-inputNumber formControlName="cash_20" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right" (onInput)="changePriceEdit()"
+                                [readonly]="!formEdit.value?.last_status"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>เหรียญ 10</label>
+                            <p-inputNumber formControlName="cash_10" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right" (onInput)="changePriceEdit()"
+                                [readonly]="!formEdit.value?.last_status"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>เหรียญ 5</label>
+                            <p-inputNumber formControlName="cash_5" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right" (onInput)="changePriceEdit()"
+                                [readonly]="!formEdit.value?.last_status"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>เหรียญ 2</label>
+                            <p-inputNumber formControlName="cash_2" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right" (onInput)="changePriceEdit()"
+                                [readonly]="!formEdit.value?.last_status"></p-inputNumber>
+                        </div>
+                        <div class="cash-card">
+                            <label>เหรียญ 1</label>
+                            <p-inputNumber formControlName="cash_1" mode="decimal" [minFractionDigits]="0"
+                                [maxFractionDigits]="0" inputStyleClass="w-full text-right" (onInput)="changePriceEdit()"
+                                [readonly]="!formEdit.value?.last_status"></p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-4 py-0">
+                    <div class="field">
+                        <label for="expected_amount">ยอดที่ควรมี</label>
+                        <p-inputNumber formControlName="expected_amount" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+                <div class="col-12 md:col-4 py-0">
+                    <div class="field">
+                        <label for="actual_amount">เงินที่นับจริง</label>
+                        <p-inputNumber formControlName="actual_amount" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+                <div class="col-12 md:col-4 py-0">
+                    <div class="field">
+                        <label for="diff_amount">ส่วนต่าง</label>
+                        <p-inputNumber formControlName="diff_amount" mode="decimal" [minFractionDigits]="2"
+                            [maxFractionDigits]="2" inputStyleClass="w-full text-right"
+                            [readonly]="true"></p-inputNumber>
+                    </div>
+                </div>
+
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label for="remark">หมายเหตุ</label>
+                        <textarea pInputTextarea formControlName="remark" rows="3"
+                            [readonly]="!formEdit.value?.last_status"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmEdit()" label="ยืนยัน" [disabled]="!formEdit.value?.last_status"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelEdit()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-toast position="top-right"></p-toast>

@@ -398,17 +398,17 @@ export class NewOrderComponent {
     let pack_count = Math.floor(product_cart.qty / product_cart.pack_count);
     let pack_over = product_cart.qty % product_cart.pack_count;
 
-    if (pack_count == 0) {
+    // if (pack_count == 0) {
       product_cart.total = product_cart.price * product_cart.qty;
       product_cart.net_total = product_cart.total;
       product_cart.noti_discount = "";
-    }
-    else {
-      product_cart.total = product_cart.price * product_cart.qty;
-      product_cart.net_total = (pack_count * product_cart.pack_price) + (pack_over * product_cart.price);
-      product_cart.discount = ((product_cart.qty * product_cart.price) - product_cart.net_total);
-      product_cart.noti_discount = `ลดแล้ว ${product_cart.discount}`;
-    }
+    // }
+    // else {
+    //   product_cart.total = product_cart.price * product_cart.qty;
+    //   product_cart.net_total = (pack_count * product_cart.pack_price) + (pack_over * product_cart.price);
+    //   product_cart.discount = ((product_cart.qty * product_cart.price) - product_cart.net_total);
+    //   product_cart.noti_discount = `ลดแล้ว ${product_cart.discount}`;
+    // }
     this.calSum();
   }
 
