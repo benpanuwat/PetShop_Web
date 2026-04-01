@@ -42,7 +42,7 @@
 
                 <ng-template pTemplate="header">
                     <tr>
-                        <th style="width: 100px;">
+                        <th style="width: 80px;">
                             <div class="flex justify-content-center align-items-center">
                                 ลำดับ
                             </div>
@@ -54,12 +54,7 @@
                         </th>
                         <th style="width: auto;">
                             <div class="flex justify-content-start align-items-center">
-                                ประเภทสินค้า
-                            </div>
-                        </th>
-                        <th style="width: auto;">
-                            <div class="flex justify-content-start align-items-center">
-                                ชื่อแบรนด์สินค้า
+                                ประเภท/แบรนด์
                             </div>
                         </th>
                         <th style="width: auto;">
@@ -67,19 +62,14 @@
                                 ชื่อสินค้า
                             </div>
                         </th>
-                        <th style="width: 100px;">
+                         <th style="width: 80px;">
                             <div class="flex justify-content-center align-items-center">
                                 ราคา
                             </div>
                         </th>
                         <th style="width: 100px;">
                             <div class="flex justify-content-center align-items-center">
-                                จำนวนคงเหลือ
-                            </div>
-                        </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center align-items-center">
-                                จำนวนจัดเก็บ
+                                คงเหลือ/จัดเก็บ
                             </div>
                         </th>
                         <th style="width: 70px;" *ngIf="permissions.manag_stock">
@@ -98,23 +88,17 @@
                         <td class="text-center">
                             <img class="icon-img" [src]="item.image">
                         </td>
-                        <td class="text-left">
-                            {{ item.product_type_name }}
-                        </td>
-                        <td class="text-left">
-                            {{ item.product_brand_name }}
+                         <td class="text-left">
+                            {{ item.product_type_name }}/ {{ item.product_brand_name }}
                         </td>
                         <td class="text-left">
                             {{ item.name }}
                         </td>
-                        <td class="text-center">
+                         <td class="text-center">
                             {{ item.price | number }}.-
                         </td>
                         <td class="text-center">
-                            {{ item.count | number }}
-                        </td>
-                        <td class="text-center">
-                            {{ item.max | number }}
+                            {{ item.count | number }}/ {{ item.max | number }}
                         </td>
                         <td class="text-center" *ngIf="permissions.manag_stock">
                             <div class="dropdown">

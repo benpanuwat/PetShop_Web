@@ -13,6 +13,55 @@ import { NewOrderService } from '../new-order/new-order.service';
   styleUrls: ['./new-order.component.scss']
 })
 export class NewOrderComponent {
+  private readonly thaiToEnglishBarcodeMap: Record<string, string> = {
+    'ๅ': '1',
+    '/': '2',
+    '-': '3',
+    'ภ': '4',
+    'ถ': '5',
+    'ุ': '6',
+    'ึ': '7',
+    'ค': '8',
+    'ต': '9',
+    'จ': '0',
+    'ข': '-',
+    'ช': '=',
+    'ๆ': 'q',
+    'ไ': 'w',
+    'ำ': 'e',
+    'พ': 'r',
+    'ะ': 't',
+    'ั': 'y',
+    'ี': 'u',
+    'ร': 'i',
+    'น': 'o',
+    'ย': 'p',
+    'บ': '[',
+    'ล': ']',
+    'ฃ': '\\',
+    'ฟ': 'a',
+    'ห': 's',
+    'ก': 'd',
+    'ด': 'f',
+    'เ': 'g',
+    '้': 'h',
+    '่': 'j',
+    'า': 'k',
+    'ส': 'l',
+    'ว': ';',
+    'ง': '\'',
+    'ผ': 'z',
+    'ป': 'x',
+    'แ': 'c',
+    'อ': 'v',
+    'ิ': 'b',
+    'ื': 'n',
+    'ท': 'm',
+    'ม': ',',
+    'ใ': '.',
+    'ฝ': '/',
+  };
+
   @ViewChild('dt') table!: Table;
   public permissions: string[] = [];
   public branch_id: number;
@@ -399,9 +448,9 @@ export class NewOrderComponent {
     let pack_over = product_cart.qty % product_cart.pack_count;
 
     // if (pack_count == 0) {
-      product_cart.total = product_cart.price * product_cart.qty;
-      product_cart.net_total = product_cart.total;
-      product_cart.noti_discount = "";
+    product_cart.total = product_cart.price * product_cart.qty;
+    product_cart.net_total = product_cart.total;
+    product_cart.noti_discount = "";
     // }
     // else {
     //   product_cart.total = product_cart.price * product_cart.qty;
@@ -430,21 +479,31 @@ export class NewOrderComponent {
   }
 
   onEnterBracode() {
+    const barcode = this.normalizeBarcode(this.formSetting.value.barcode);
     const product = this.product_type_groups
       .flatMap(t => t.product_brands)
       .flatMap(b => b.products)
-      .find(p => p.code === this.formSetting.value.barcode);
+      .find(p => this.normalizeBarcode(p.code) === barcode);
 
     if (product) {
       this.selectProduct(product);
       this.calSum();
 
-      this.formSetting.reset();
+      this.formSetting.reset({ barcode: '' });
       setTimeout(() => this.scrollToLastRow(), 100);
     }
     else {
       this.showError("ไม่พบรายการสินค้า");
     }
+  }
+
+  private normalizeBarcode(barcode: any): string {
+    return String(barcode ?? '')
+      .trim()
+      .split('')
+      .map((char) => this.thaiToEnglishBarcodeMap[char] ?? char)
+      .join('')
+      .toUpperCase();
   }
 
   scrollToLastRow() {

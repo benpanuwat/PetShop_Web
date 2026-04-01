@@ -28,9 +28,6 @@
                             <div class="flex justify-content-center align-items-center">วันที่ปิดยอด</div>
                         </th>
                         <th style="width: 140px;">
-                            <div class="flex justify-content-center align-items-center">เงินยกมา</div>
-                        </th>
-                        <th style="width: 140px;">
                             <div class="flex justify-content-center align-items-center">เงินสดรับวันนี้</div>
                         </th>
                         <th style="width: 140px;">
@@ -52,7 +49,6 @@
                     <tr>
                         <td class="text-center">{{ rowIndex + 1 }}</td>
                         <td class="text-center">{{ item.closing_date | date:'dd/MM/yyyy HH:mm' }}</td>
-                        <td class="text-center">{{ item.opening_amount | number:'1.2-2' }}</td>
                         <td class="text-center">{{ item.cash_sales | number:'1.2-2' }}</td>
                         <td class="text-center">{{ item.expected_amount | number:'1.2-2' }}</td>
                         <td class="text-center">{{ item.actual_amount | number:'1.2-2' }}</td>
