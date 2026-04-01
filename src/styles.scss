@@ -68,17 +68,6 @@ textarea {
     display: block;
 }
 
-.action-menu-table .p-datatable-wrapper,
-.action-menu-table .p-datatable-table,
-.action-menu-table .p-datatable-tbody > tr,
-.action-menu-table .p-datatable-tbody > tr > td {
-    overflow: visible !important;
-}
-
-.action-menu-table .p-datatable-tbody > tr > td:last-child {
-    position: relative;
-}
-
 .disabled {
     background-color: #f4f4f4;
 }

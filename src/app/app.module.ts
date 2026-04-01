@@ -115,8 +115,6 @@ import { OrderComponent } from './pages/order/order.component';
 import { StockComponent } from './pages/stock/stock.component';
 import { ReceiveProductComponent } from './pages/receive-product/receive-product.component';
 import { ProductLotComponent } from './pages/product-lot/product-lot.component';
-import { DailyCashClosingComponent } from './pages/daily-cash-closing/daily-cash-closing.component';
-import { SupplierComponent } from './pages/supplier/supplier.component';
 
 import { SlipPrintComponent } from './slip-print/slip-print.component';
 
@@ -232,9 +230,7 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
         StockComponent,
         ProductLotComponent,
         ReceiveProductComponent,
-        DailyCashClosingComponent,
         BranchComponent,
-        SupplierComponent,
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

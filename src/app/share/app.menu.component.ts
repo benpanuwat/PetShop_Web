@@ -29,10 +29,12 @@ export class AppMenuComponent implements OnInit {
                     itemsMenu1.push({ label: 'กลุ่มสิทธิ', icon: 'pi pi-fw pi-lock', routerLink: ['/app/user_group'] });
                 }
 
+
                 let itemsMenu2 = [];
                 if (this.permissions.view_member) {
                     itemsMenu2.push({ label: 'สมาชิก', icon: 'pi pi-fw pi-users', routerLink: ['/app/member'] });
                 }
+
 
                 let itemsMenu3 = [];
                 if (this.permissions.view_product_type) {
@@ -45,6 +47,7 @@ export class AppMenuComponent implements OnInit {
                     itemsMenu3.push({ label: 'สินค้า', icon: 'pi pi-fw pi-box', routerLink: ['/app/product'] });
                 }
 
+
                 let itemsMenu4 = [];
                 if (this.permissions.view_stock) {
                     itemsMenu4.push({ label: 'คลังสินค้า', icon: 'pi pi-fw pi-th-large', routerLink: ['/app/stock'] });
@@ -52,60 +55,59 @@ export class AppMenuComponent implements OnInit {
                 itemsMenu4.push({ label: 'รับสินค้า', icon: 'pi pi-fw pi-download', routerLink: ['/app/receive_product'] });
                 itemsMenu4.push({ label: 'รายการรับสินค้า', icon: 'pi pi-fw pi-list', routerLink: ['/app/product_lot'] });
 
+
                 let itemsMenu5 = [];
                 itemsMenu5.push({ label: 'เพิ่มคำสั่งซื้อ', icon: 'pi pi-fw pi-cart-plus', routerLink: ['/app/new_order'] });
                 itemsMenu5.push({ label: 'รายการคำสั่งซื้อ', icon: 'pi pi-fw pi-list', routerLink: ['/app/order'] });
-                itemsMenu5.push({ label: 'ปิดยอดเงินสดประจำวัน', icon: 'pi pi-fw pi-wallet', routerLink: ['/app/daily_cash_closing'] });
+
 
                 let itemsMenu6 = [];
                 itemsMenu6.push({ label: 'สาขา', icon: 'pi pi-fw pi-building', routerLink: ['/app/branch'] });
-                itemsMenu6.push({ label: 'ผู้ขาย', icon: 'pi pi-fw pi-truck', routerLink: ['/app/supplier'] });
+
+
 
                 this.model = [];
 
-                if (itemsMenu1.length > 0) {
+                if (this.permissions.view_user || this.permissions.view_user_group) {
                     this.model.push({
                         label: 'ผู้ใช้งาน/สิทธิ', icon: 'pi pi-fw pi-user',
                         items: itemsMenu1,
                     });
                 }
 
-                if (itemsMenu2.length > 0) {
+                if (this.permissions.view_member) {
                     this.model.push({
                         label: 'สมาชิก', icon: 'pi pi-fw pi-users',
                         items: itemsMenu2,
                     });
                 }
 
-                if (itemsMenu3.length > 0) {
+                if (this.permissions.view_product_type || this.permissions.view_product_brand || this.permissions.view_product) {
                     this.model.push({
                         label: 'จัดการข้อมูล', icon: 'pi pi-fw pi-box',
                         items: itemsMenu3,
                     });
                 }
 
-                if (itemsMenu4.length > 0) {
-                    this.model.push({
-                        label: 'คลังสินค้า', icon: 'pi pi-fw pi-th-large',
-                        items: itemsMenu4,
-                    });
-                }
+                this.model.push({
+                    label: 'คลังสินค้า', icon: 'pi pi-fw pi-th-large',
+                    items: itemsMenu4,
+                });
 
-                if (itemsMenu5.length > 0) {
-                    this.model.push({
-                        label: 'คำสั่งซื้อ', icon: 'pi pi-fw pi-cart-plus',
-                        items: itemsMenu5,
-                    });
-                }
+                this.model.push({
+                    label: 'คำสั่งซื้อ', icon: 'pi pi-fw pi-cart-plus',
+                    items: itemsMenu5,
+                });
 
-                if (this.permissions.manag_setting && itemsMenu6.length > 0) {
+
+                if (this.permissions.manag_setting) {
                     this.model.push({
                         label: 'ตั้งค่า', icon: 'pi pi-fw pi-sliders-h',
                         items: itemsMenu6,
                     });
                 }
             },
-            error: () => {
+            error: (err) => {
                 localStorage.clear();
                 this.router.navigate(['/login']);
             },

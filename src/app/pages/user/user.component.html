@@ -3,7 +3,7 @@
         <div class="card">
             <h5>รายการผู้ใช้งาน</h5>
             <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
-                [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines action-menu-table"
+                [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines"
                 [rowsPerPageOptions]="[10, 25, 50]">
                 <!-- เปิด ng-template -->
                 <ng-template pTemplate="caption">

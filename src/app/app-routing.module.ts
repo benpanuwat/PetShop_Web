@@ -19,8 +19,6 @@ import { OrderComponent } from './pages/order/order.component';
 import { StockComponent } from './pages/stock/stock.component';
 import { ProductLotComponent } from './pages/product-lot/product-lot.component';
 import { ReceiveProductComponent } from './pages/receive-product/receive-product.component';
-import { DailyCashClosingComponent } from './pages/daily-cash-closing/daily-cash-closing.component';
-import { SupplierComponent } from './pages/supplier/supplier.component';
 
 import { SlipPrintComponent } from './slip-print/slip-print.component';
 
@@ -42,8 +40,6 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
                     { path: 'stock', component: StockComponent, canActivate: [AuthGuard] },
                     { path: 'product_lot', component: ProductLotComponent, canActivate: [AuthGuard] },
                     { path: 'receive_product', component: ReceiveProductComponent, canActivate: [AuthGuard] },
-                    { path: 'daily_cash_closing', component: DailyCashClosingComponent, canActivate: [AuthGuard] },
-                    { path: 'supplier', component: SupplierComponent, canActivate: [AuthGuard] },
                     { path: 'slip', component: SlipPrintComponent, canActivate: [AuthGuard] },
                 ]
             },
