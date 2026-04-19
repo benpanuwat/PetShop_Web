@@ -133,6 +133,10 @@ export class OrderComponent {
     this.cancelForm.reset()
   }
 
+  openDetail(id: number) {
+    this._router.navigate(['/app/order/detail', id]);
+  }
+
   confirmCancel() {
     this._service.cancelOrder(this.cancelId, this.cancelForm.value).subscribe({
       next: (resp: any) => {

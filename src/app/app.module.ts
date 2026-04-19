@@ -102,6 +102,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { AccessdeniedComponent } from './pages/accessdenied/accessdenied.component';
 import { ErrorComponent } from './pages/error/error.component';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 import { UserComponent } from './pages/user/user.component';
 import { UserGroupComponent } from './pages/user-group/user-group.component';
@@ -112,9 +113,13 @@ import { ProductBrandComponent } from './pages/product_brand/product_brand.compo
 import { ProductComponent } from './pages/product/product.component';
 import { NewOrderComponent } from './pages/new-order/new-order.component';
 import { OrderComponent } from './pages/order/order.component';
+import { OrderDetailComponent } from './pages/order-detail/order-detail.component';
 import { StockComponent } from './pages/stock/stock.component';
 import { ReceiveProductComponent } from './pages/receive-product/receive-product.component';
 import { ProductLotComponent } from './pages/product-lot/product-lot.component';
+import { DailyCashClosingComponent } from './pages/daily-cash-closing/daily-cash-closing.component';
+import { SupplierComponent } from './pages/supplier/supplier.component';
+import { DashboardService } from './pages/dashboard/dashboard.service';
 
 import { SlipPrintComponent } from './slip-print/slip-print.component';
 
@@ -218,6 +223,7 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
         AccessdeniedComponent,
         ErrorComponent,
         NotfoundComponent,
+        DashboardComponent,
         UserComponent,
         UserGroupComponent,
         MemberComponent,
@@ -226,16 +232,20 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
         ProductComponent,
         NewOrderComponent,
         OrderComponent,
+        OrderDetailComponent,
         SlipPrintComponent,
         StockComponent,
         ProductLotComponent,
         ReceiveProductComponent,
         BranchComponent,
+        SupplierComponent,
+        DailyCashClosingComponent,
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
         { provide: LocationStrategy, useClass: HashLocationStrategy },
         AppService,
+        DashboardService,
         MessageService,
     ],
     bootstrap: [AppComponent]

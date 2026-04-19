@@ -65,6 +65,7 @@ export class NewOrderComponent {
   @ViewChild('dt') table!: Table;
   public permissions: string[] = [];
   public branch_id: number;
+  public branch: any;
 
   public displayAddMember: boolean = false;
   public displayAddProduct: boolean = false;
@@ -129,6 +130,7 @@ export class NewOrderComponent {
       cash_return: 0,
       branch_id: this.branch_id,
     });
+    this.loadBranch();
     this.loadPaymentType();
     this.loadProduct();
   }
@@ -141,6 +143,13 @@ export class NewOrderComponent {
     this.formSetting = this._fb.group({
       barcode: "",
     });
+  }
+
+  loadBranch() {
+    this._service.getBranch(this.branch_id)
+      .subscribe((resp: any) => {
+        this.branch = resp.data;
+      });
   }
 
   loadPaymentType() {
@@ -233,8 +242,6 @@ export class NewOrderComponent {
         name: 'อื่นๆ',
         qty: 1,
         price: 0,
-        pack_count: 1,
-        pack_price: 0,
         total: 0,
         discount: 0,
         net_total: 0,
@@ -260,8 +267,6 @@ export class NewOrderComponent {
             image: selectProduct.image,
             qty: 1,
             price: selectProduct.price,
-            pack_count: selectProduct.pack_count,
-            pack_price: selectProduct.pack_price,
             total: selectProduct.price,
             discount: 0,
             net_total: selectProduct.price,
@@ -444,20 +449,9 @@ export class NewOrderComponent {
   }
 
   calAmount(product_cart) {
-    let pack_count = Math.floor(product_cart.qty / product_cart.pack_count);
-    let pack_over = product_cart.qty % product_cart.pack_count;
-
-    // if (pack_count == 0) {
     product_cart.total = product_cart.price * product_cart.qty;
     product_cart.net_total = product_cart.total;
     product_cart.noti_discount = "";
-    // }
-    // else {
-    //   product_cart.total = product_cart.price * product_cart.qty;
-    //   product_cart.net_total = (pack_count * product_cart.pack_price) + (pack_over * product_cart.price);
-    //   product_cart.discount = ((product_cart.qty * product_cart.price) - product_cart.net_total);
-    //   product_cart.noti_discount = `ลดแล้ว ${product_cart.discount}`;
-    // }
     this.calSum();
   }
 

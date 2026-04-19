@@ -71,9 +71,6 @@ export class ProductComponent {
       upload_image_status: false,
       image: '',
       price: 0,
-      pack_count: 0,
-      pack_price: 0,
-      // prices: this._fb.array([]),
     });
 
     this.formEdit = this._fb.group({
@@ -85,9 +82,6 @@ export class ProductComponent {
       upload_image_status: false,
       image: '',
       price: 0,
-      pack_count: 0,
-      pack_price: 0,
-      // prices: this._fb.array([]),
     });
 
 
@@ -129,42 +123,6 @@ export class ProductComponent {
         this.loading = false;
       });
   }
-
-  // get prices(): FormArray {
-  //   return this.formAdd.get('prices') as FormArray;
-  // }
-
-  // get edit_prices(): FormArray {
-  //   return this.formEdit.get('prices') as FormArray;
-  // }
-
-  // addPrice() {
-  //   const itemGroup = this._fb.group({
-  //     id: 0,
-  //     count: 1,
-  //     price: 0,
-  //   });
-  //   this.prices.push(itemGroup);
-  // }
-
-  // removePrice(index: number) {
-  //   if (this.prices.length > 1)
-  //     this.prices.removeAt(index);
-  // }
-
-  // addEditPrice() {
-  //   const itemGroup = this._fb.group({
-  //     id: 0,
-  //     count: 1,
-  //     price: 0,
-  //   });
-  //   this.edit_prices.push(itemGroup);
-  // }
-
-  // removeEditPrice(index: number) {
-  //   if (this.edit_prices.length > 1)
-  //     this.edit_prices.removeAt(index);
-  // }
 
   loadProductTypeFilter() {
     this._service.getProductType()
@@ -232,11 +190,7 @@ export class ProductComponent {
       upload_image_status: false,
       image: '',
       price: 0,
-      pack_count: 0,
-      pack_price: 0,
-      // prices: this._fb.array([]),
     });
-    // this.addPrice();
     this.displayAdd = true
   }
 
@@ -268,9 +222,6 @@ export class ProductComponent {
       upload_image_status: false,
       image: '',
       price: 0,
-      pack_count: 0,
-      pack_price: 0,
-      // prices: this._fb.array([]),
     });
     this._service.getProduct(this.editId)
       .subscribe({
@@ -278,19 +229,6 @@ export class ProductComponent {
           this.formEdit.patchValue({
             ...resp.data
           })
-
-          // this.edit_prices.clear();
-          // if (resp.data.prices != null) {
-          //   for (let price of resp.data.prices) {
-          //     const itemGroup = this._fb.group({
-          //       id: [price.id],
-          //       count: [price.count],
-          //       price: [price.price],
-          //     });
-
-          //     this.edit_prices.push(itemGroup);
-          //   };
-          // }
           this.selectProductType(this.formEdit.value.product_type_id);
           this.displayEdit = true;
         },

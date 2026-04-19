@@ -4,14 +4,14 @@ import { FormBuilder, FormControl, FormGroup, FormArray, Validators } from '@ang
 import { LazyLoadEvent } from 'primeng/api';
 import { Subject, debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs';
 import { MessageService } from 'primeng/api';
-import { BranchService } from '../branch/branch.service';
+import { SupplierService } from './supplier.service';
 
 @Component({
-  selector: 'app-branch',
-  templateUrl: './branch.component.html',
-  styleUrls: ['./branch.component.scss']
+  selector: 'app-supplier',
+  templateUrl: './supplier.component.html',
+  styleUrls: ['./supplier.component.scss']
 })
-export class BranchComponent {
+export class SupplierComponent {
   public permissions: string[] = [];
 
   public displayAdd: boolean = false;
@@ -38,21 +38,18 @@ export class BranchComponent {
 
   constructor(
     private _fb: FormBuilder,
-    private _service: BranchService,
+    private _service: SupplierService,
     private _messageService: MessageService,
   ) { this.permissions = JSON.parse(localStorage.getItem('permissions')); }
 
   ngOnInit() {
+
     this.formAdd = this._fb.group({
       name: "",
-      address: "",
-      tel: "",
     });
 
     this.formEdit = this._fb.group({
       name: "",
-      address: "",
-      tel: "",
     });
 
 
@@ -97,8 +94,8 @@ export class BranchComponent {
     this.formAdd.reset();
     this.formAdd = this._fb.group({
       name: "",
-      address: "",
-      tel: "",
+      phone: "",
+      discount: 0,
     });
     this.displayAdd = true
     this.disabledAddBranch = false;
@@ -127,8 +124,8 @@ export class BranchComponent {
     this.formEdit.reset();
     this.formEdit = this._fb.group({
       name: "",
-      address: "",
-      tel: "",
+      phone: "",
+      discount: 0,
     });
     this._service.getBranch(this.editId)
       .subscribe((resp: any) => {

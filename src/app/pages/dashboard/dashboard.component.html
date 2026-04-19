@@ -1,1 +1,194 @@
-<p>dashboard works!</p>
+<div class="dashboard-page">
+    <div class="hero-card">
+        <div>
+            <div class="hero-eyebrow">POS Dashboard</div>
+            <h2 class="hero-title">ภาพรวมการขายและสต๊อกของวันนี้</h2>
+            <p class="hero-subtitle">ดูยอดขายล่าสุด ตรวจบิลที่เกิดขึ้น และเช็กสินค้าที่ควรเติมก่อนกระทบการขาย</p>
+        </div>
+        <div class="hero-actions">
+            <a pButton routerLink="/app/new_order" icon="pi pi-plus" label="ขายสินค้า" class="p-button-success"></a>
+            <a pButton routerLink="/app/order" icon="pi pi-list" label="รายการขาย" class="p-button-outlined"></a>
+        </div>
+    </div>
+
+    <div class="loading-card" *ngIf="loading">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+
+    <ng-container *ngIf="!loading">
+        <div class="stats-grid">
+            <a class="stat-card" *ngFor="let item of stats" [routerLink]="item.route" [ngClass]="'tone-' + item.tone">
+                <div>
+                    <div class="stat-label">{{ item.label }}</div>
+                    <div class="stat-value">
+                        <ng-container *ngIf="item.label === 'ยอดขายวันนี้'; else amountCount">
+                            {{ item.value | number:'1.2-2' }}
+                        </ng-container>
+                        <ng-template #amountCount>{{ item.value | number }}</ng-template>
+                    </div>
+                </div>
+                <div class="stat-icon">
+                    <i [class]="item.icon"></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="content-grid">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">สรุปที่ต้องรู้</div>
+                        <div class="panel-subtitle">ตัวเลขสำคัญสำหรับพนักงานหน้าร้าน</div>
+                    </div>
+                </div>
+                <div class="quick-metrics">
+                    <div class="quick-metric">
+                        <span>ค่าเฉลี่ยต่อบิล</span>
+                        <strong>{{ averageBill | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="quick-metric">
+                        <span>เงินสดรับจากปิดยอดล่าสุด</span>
+                        <strong>{{ (cashClosing?.cash_sales || 0) | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="quick-metric">
+                        <span>ยอดเงินที่ควรมี</span>
+                        <strong>{{ (cashClosing?.expected_amount || 0) | number:'1.2-2' }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">สถานะปิดยอดเงินสด</div>
+                        <div class="panel-subtitle">ข้อมูลการปิดยอดล่าสุด</div>
+                    </div>
+                    <a pButton routerLink="/app/daily_cash_closing" icon="pi pi-wallet" label="ไปหน้าปิดยอด"
+                        class="p-button-text"></a>
+                </div>
+
+                <div class="cash-summary" *ngIf="cashClosing; else noCashClosing">
+                    <div class="cash-row">
+                        <span>เงินยกมา</span>
+                        <strong>{{ cashClosing.opening_amount | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="cash-row">
+                        <span>เงินสดรับ</span>
+                        <strong>{{ cashClosing.cash_sales | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="cash-row">
+                        <span>เงินนับจริง</span>
+                        <strong>{{ cashClosing.actual_amount | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="cash-row total" [ngClass]="closingDifferenceTone">
+                        <span>ส่วนต่าง</span>
+                        <strong>{{ cashClosing.diff_amount | number:'1.2-2' }}</strong>
+                    </div>
+                </div>
+
+                <ng-template #noCashClosing>
+                    <div class="empty-state">
+                        <i class="pi pi-wallet"></i>
+                        <span>ยังไม่มีข้อมูลปิดยอดล่าสุด</span>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">รายการขายล่าสุด</div>
+                        <div class="panel-subtitle">5 บิลล่าสุดของวันนี้</div>
+                    </div>
+                    <a pButton routerLink="/app/order" icon="pi pi-arrow-right" label="ดูทั้งหมด"
+                        class="p-button-text"></a>
+                </div>
+
+                <div class="order-list" *ngIf="todayOrders.length > 0; else noOrders">
+                    <div class="order-item" *ngFor="let item of todayOrders">
+                        <div class="order-main">
+                            <strong>{{ item.code }}</strong>
+                            <span>{{ item.member_name || 'ลูกค้าทั่วไป' }}</span>
+                        </div>
+                        <div class="order-meta">
+                            <span>{{ item.payment_type }}</span>
+                            <strong>{{ item.net_total | number:'1.2-2' }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <ng-template #noOrders>
+                    <div class="empty-state">
+                        <i class="pi pi-inbox"></i>
+                        <span>วันนี้ยังไม่มีรายการขาย</span>
+                    </div>
+                </ng-template>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">การชำระเงินวันนี้</div>
+                        <div class="panel-subtitle">สรุปตามรูปแบบการชำระเงิน</div>
+                    </div>
+                </div>
+
+                <div class="payment-list" *ngIf="paymentSummary.length > 0; else noPayments">
+                    <div class="payment-item" *ngFor="let item of paymentSummary">
+                        <div>
+                            <strong>{{ item.label }}</strong>
+                            <div class="panel-subtitle">{{ item.count | number }} บิล</div>
+                        </div>
+                        <strong>{{ item.amount | number:'1.2-2' }}</strong>
+                    </div>
+                </div>
+
+                <ng-template #noPayments>
+                    <div class="empty-state">
+                        <i class="pi pi-credit-card"></i>
+                        <span>ยังไม่มีข้อมูลการชำระเงินวันนี้</span>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">สินค้าใกล้หมด</div>
+                    <div class="panel-subtitle">สินค้าที่คงเหลือน้อยกว่าหรือเท่าจุดจัดเก็บ</div>
+                </div>
+                <a pButton routerLink="/app/stock" icon="pi pi-box" label="เปิดคลังสินค้า" class="p-button-text"></a>
+            </div>
+
+            <div class="stock-list" *ngIf="lowStockItems.length > 0; else noLowStock">
+                <div class="stock-list-item" *ngFor="let item of lowStockItems; let i = index">
+                    <div class="stock-index">{{ i + 1 }}</div>
+                    <div class="stock-content">
+                        <div class="stock-name">{{ item.name }}</div>
+                        <div class="stock-brand">{{ item.product_type_name }} / {{ item.product_brand_name }}</div>
+                    </div>
+                    <div class="stock-metric">
+                        <span>คงเหลือ</span>
+                        <strong>{{ item.count | number }}</strong>
+                    </div>
+                    <div class="stock-metric">
+                        <span>จุดจัดเก็บ</span>
+                        <strong>{{ item.max | number }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <ng-template #noLowStock>
+                <div class="empty-state">
+                    <i class="pi pi-check-circle"></i>
+                    <span>ยังไม่พบสินค้าใกล้หมด</span>
+                </div>
+            </ng-template>
+        </div>
+    </ng-container>
+</div>
+
+<p-toast position="top-right"></p-toast>

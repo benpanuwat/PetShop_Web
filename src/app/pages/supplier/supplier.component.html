@@ -1,7 +1,7 @@
 <div class="grid">
     <div class="col-12">
         <div class="card">
-            <h5>รายการสาขา</h5>
+            <h5>รายการผู้ขาย</h5>
             <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
                 [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines"
                 [rowsPerPageOptions]="[10, 25, 50]">
@@ -16,7 +16,7 @@
                         <div class="pt-1" style="
                                 display: flex;
                                 align-items: center;" *ngIf="permissions?.manag_user">
-                            <button (click)="openAdd()" pButton icon="pi pi-plus" label="เพิ่มสาขา"
+                            <button (click)="openAdd()" pButton icon="pi pi-plus" label="เพิ่มผู้ขาย"
                                 style="width:auto;"></button>
                         </div>
                     </div>
@@ -32,17 +32,7 @@
                         </th>
                         <th style="width: auto;">
                             <div class="flex justify-content-start align-items-center">
-                                สาขา
-                            </div>
-                        </th>
-                        <th style="width: auto;">
-                            <div class="flex justify-content-start align-items-center">
-                                ที่อยู่
-                            </div>
-                        </th>
-                        <th style="width: auto;">
-                            <div class="flex justify-content-start align-items-center">
-                                เบอร์โทร
+                                ผู้ขาย
                             </div>
                         </th>
                         <th style="width: 70px;">
@@ -60,15 +50,11 @@
                         <td style="text-align: center;">
                             {{ rowIndex + 1 }}
                         </td>
+
                         <td style="text-align: start;">
                             {{item.name}}
                         </td>
-                        <td style="text-align: start;">
-                            {{item.address}}
-                        </td>
-                        <td style="text-align: start;">
-                            {{item.tel}}
-                        </td>
+
                         <td style="text-align: center;">
                             <div class="dropdown">
                                 <button pButton type="button" class="p-button-secondary p-button-text"><span></span>
@@ -95,27 +81,15 @@
     </div>
 </div>
 
-<p-dialog header="เพิ่มสาขา" [(visible)]="displayAdd" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
+<p-dialog header="เพิ่มผู้ขาย" [(visible)]="displayAdd" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
     [breakpoints]="{'960px': '75vw'}">
     <form [formGroup]="formAdd">
         <div class="card p-fluid">
             <div class="grid">
                 <div class="col-12 py-0">
                     <div class="field">
-                        <label htmlFor="name">ชื่อสาขา</label>
+                        <label htmlFor="name">ชื่อผู้ขาย</label>
                         <input pInputText type="text" formControlName="name" maxlength="200" />
-                    </div>
-                </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">ที่อยู่</label>
-                        <input pInputText type="text" formControlName="address" maxlength="300" />
-                    </div>
-                </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">เบอร์โทร</label>
-                        <input pInputText type="text" formControlName="tel" maxlength="20" />
                     </div>
                 </div>
             </div>
@@ -130,27 +104,15 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog header="แก้ไขสาขา" [(visible)]="displayEdit" modal="modal" showEffect="fade" [style]="{width: '40vw'}"
+<p-dialog header="แก้ไขผู้ขาย" [(visible)]="displayEdit" modal="modal" showEffect="fade" [style]="{width: '40vw'}"
     [breakpoints]="{'960px': '75vw'}">
     <form [formGroup]="formEdit">
         <div class="card p-fluid">
             <div class="grid">
                 <div class="col-12 py-0">
                     <div class="field">
-                        <label htmlFor="name">ชื่อสาขา</label>
+                        <label htmlFor="name">ชื่อผู้ขาย</label>
                         <input pInputText type="text" formControlName="name" maxlength="200" />
-                    </div>
-                </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">ที่อยู่</label>
-                        <input pInputText type="text" formControlName="address" maxlength="300" />
-                    </div>
-                </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">เบอร์โทร</label>
-                        <input pInputText type="text" formControlName="tel" maxlength="20" />
                     </div>
                 </div>
             </div>
@@ -165,12 +127,12 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog header="ลบสาขา" [(visible)]="displayDelete" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
+<p-dialog header="ลบผู้ขาย" [(visible)]="displayDelete" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
     [breakpoints]="{'960px': '75vw'}">
     <div class="card p-fluid">
         <div class="grid">
             <div class="col-12 py-0">
-                <h5>ต้องการลบสาขานี้ใช่หรือไม่?</h5>
+                <h5>ต้องการลบผู้ขายนี้ใช่หรือไม่?</h5>
             </div>
         </div>
     </div>

@@ -34,4 +34,8 @@ export class NewOrderService {
     return this.http.post(environment.url + `/add_order`, formData);
   }
 
+  getBranch(id: any) {
+    return this.http.get(environment.url + `/get_branch/${id}`);
+  }
+
 }

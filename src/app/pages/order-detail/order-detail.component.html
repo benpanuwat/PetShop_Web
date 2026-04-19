@@ -1,0 +1,157 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="page-header">
+                <div>
+                    <h5 class="mb-2">รายละเอียดรายการขาย</h5>
+                    <div class="page-subtitle" *ngIf="order">
+                        เลขที่บิล {{ order.code }} | วันที่ {{ order.created_date }}
+                    </div>
+                </div>
+                <button pButton type="button" icon="pi pi-arrow-left" label="กลับ" class="p-button-secondary"
+                    (click)="back()"></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12" *ngIf="loading">
+        <div class="card loading-card">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </div>
+
+    <ng-container *ngIf="!loading && order">
+        <div class="col-12 lg:col-8">
+            <div class="card">
+                <h5>ข้อมูลรายการขาย</h5>
+                <div class="grid summary-grid">
+                    <div class="col-12 md:col-6">
+                        <div class="summary-item">
+                            <span class="summary-label">เลขที่บิล</span>
+                            <span class="summary-value">{{ order.code }}</span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <div class="summary-item">
+                            <span class="summary-label">วันที่ขาย</span>
+                            <span class="summary-value">{{ order.created_date }}</span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <div class="summary-item">
+                            <span class="summary-label">สมาชิก</span>
+                            <span class="summary-value">{{ order.member_name || '-' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <div class="summary-item">
+                            <span class="summary-label">เบอร์โทร</span>
+                            <span class="summary-value">{{ order.member_phone || '-' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <div class="summary-item">
+                            <span class="summary-label">ชำระเงิน</span>
+                            <span class="summary-value">{{ order.payment_type || '-' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <div class="summary-item">
+                            <span class="summary-label">สถานะ</span>
+                            <span class="summary-value">
+                                <span class="status-badge status-open" *ngIf="order.status === 'normal'">ปกติ</span>
+                                <span class="status-badge status-edit" *ngIf="order.status === 'edit'">แก้ไข</span>
+                                <span class="status-badge status-cancel" *ngIf="order.status === 'cancel'">ยกเลิก</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-12" *ngIf="order.remark">
+                        <div class="summary-item">
+                            <span class="summary-label">หมายเหตุ</span>
+                            <span class="summary-value">{{ order.remark }}</span>
+                        </div>
+                    </div>
+                    <div class="col-12" *ngIf="order.cancel_date">
+                        <div class="summary-item">
+                            <span class="summary-label">วันที่ยกเลิก</span>
+                            <span class="summary-value">{{ order.cancel_date }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-header">
+                    <h5 class="mb-0">รายการสินค้า</h5>
+                    <span class="item-count">{{ itemCount | number }} ชิ้น</span>
+                </div>
+
+                <p-table [value]="items" responsiveLayout="scroll" styleClass="p-datatable-gridlines">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 120px;">รหัสสินค้า</th>
+                            <th>สินค้า</th>
+                            <th style="width: 90px;" class="text-center">จำนวน</th>
+                            <th style="width: 120px;" class="text-right">ราคา</th>
+                            <th style="width: 120px;" class="text-right">ส่วนลด</th>
+                            <th style="width: 140px;" class="text-right">สุทธิ</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-item>
+                        <tr>
+                            <td>{{ item.product_code || '-' }}</td>
+                            <td>{{ item.product_name }}</td>
+                            <td class="text-center">{{ item.qty | number }}</td>
+                            <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
+                            <td class="text-right">{{ item.discount | number:'1.2-2' }}</td>
+                            <td class="text-right">{{ item.net_total | number:'1.2-2' }}</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptyMessage">
+                        <tr>
+                            <td colspan="6" class="text-center">ไม่พบรายการสินค้า</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+
+        <div class="col-12 lg:col-4">
+            <div class="card">
+                <h5>สรุปยอดเงิน</h5>
+                <div class="total-list">
+                    <div class="total-row">
+                        <span>ยอดรวม</span>
+                        <strong>{{ order.total | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>ส่วนลด (%)</span>
+                        <strong>{{ order.discount_per | number:'1.0-2' }}</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>ส่วนลด</span>
+                        <strong>{{ order.discount | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="total-row total-row-net">
+                        <span>ยอดสุทธิ</span>
+                        <strong>{{ order.net_total | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>ยอดโอน</span>
+                        <strong>{{ order.cash_transfer | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>รับเงินสด</span>
+                        <strong>{{ order.cash_received | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>เงินทอน</span>
+                        <strong>{{ order.cash_return | number:'1.2-2' }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+<p-toast position="bottom-center"></p-toast>

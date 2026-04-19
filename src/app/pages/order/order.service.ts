@@ -31,4 +31,8 @@ export class OrderService {
   cancelOrder(id: any, data: any) {
     return this.http.put(environment.url + `/cancel_order/${id}`, data);
   }
+
+  detail(id: number) {
+    return this.http.get(environment.url + `/order/detail/${id}`);
+  }
 }

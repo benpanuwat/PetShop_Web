@@ -149,6 +149,7 @@
                                     <i class="pi pi-bars"></i>
                                 </button>
                                 <div class="dropdown-content" tabindex="0" style="cursor: pointer;">
+                                    <button type="button" class="dropdown-action" (click)="openDetail(item.id)"><i class="pi pi-eye pr-2"></i>ดูรายละเอียด</button>
                                     <!-- <button type="button" class="dropdown-action" (click)="openedit(item.id)" *ngIf="permissions?.manag_product_type"><i
                                             class="pi pi-file-edit pr-2"></i>แก้ไข</button> -->
                                     <button type="button" class="dropdown-action" (click)="openCancel(item.id)"><i class="pi pi-trash pr-2"></i>ลบ</button>

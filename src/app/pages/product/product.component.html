@@ -67,12 +67,7 @@
                         </th>
                         <th style="width: auto;">
                             <div class="flex justify-content-start align-items-center">
-                                ประเภทสินค้า
-                            </div>
-                        </th>
-                        <th style="width: auto;">
-                            <div class="flex justify-content-start align-items-center">
-                                ชื่อแบรน์สินค้า
+                                ประเภท/แบรน์
                             </div>
                         </th>
                         <th style="width: auto;">
@@ -106,10 +101,7 @@
                             {{item.code}}
                         </td>
                         <td class="text-left">
-                            {{ item.product_type_name }}
-                        </td>
-                        <td class="text-left">
-                            {{ item.product_brand_name }}
+                            {{ item.product_type_name }}/{{ item.product_brand_name }}
                         </td>
                         <td class="text-left">
                             {{item.name}}
@@ -192,22 +184,10 @@
                         </p-dropdown>
                     </div>
                 </div>
-                <div class="col-4 pb-0">
+                <div class="col-12 pb-0">
                     <div class="field">
                         <label htmlFor="name">ราคา</label>
                         <input pInputText type="number" formControlName="price" min="0" max="99999" />
-                    </div>
-                </div>
-                <div class="col-4 pb-0">
-                    <div class="field">
-                        <label htmlFor="name">จำนวน/แพ็ค</label>
-                        <input pInputText type="number" formControlName="pack_count" min="0" max="99999" />
-                    </div>
-                </div>
-                <div class="col-4 pb-0">
-                    <div class="field">
-                        <label htmlFor="name">ราคาแพ็ค</label>
-                        <input pInputText type="number" formControlName="pack_price" min="0" max="99999" />
                     </div>
                 </div>
             </div>
@@ -270,22 +250,10 @@
                         </p-dropdown>
                     </div>
                 </div>
-                <div class="col-4 pb-0">
+                <div class="col-12 pb-0">
                     <div class="field">
                         <label htmlFor="name">ราคา</label>
                         <input pInputText type="number" formControlName="price" min="0" max="99999" />
-                    </div>
-                </div>
-                <div class="col-4 pb-0">
-                    <div class="field">
-                        <label htmlFor="name">จำนวน/แพ็ค</label>
-                        <input pInputText type="number" formControlName="pack_count" min="0" max="99999" />
-                    </div>
-                </div>
-                <div class="col-4 pb-0">
-                    <div class="field">
-                        <label htmlFor="name">ราคาแพ็ค</label>
-                        <input pInputText type="number" formControlName="pack_price" min="0" max="99999" />
                     </div>
                 </div>
             </div>

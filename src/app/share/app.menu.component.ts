@@ -21,6 +21,16 @@ export class AppMenuComponent implements OnInit {
                 this.permissions = resp.data;
                 localStorage.setItem('permissions', JSON.stringify(this.permissions));
 
+                this.model = [
+                    {
+                        label: 'Dashboard',
+                        icon: 'pi pi-fw pi-home',
+                        items: [
+                            { label: 'ภาพรวมระบบ', icon: 'pi pi-fw pi-chart-line', routerLink: ['/app/dashboard'] }
+                        ]
+                    }
+                ];
+
                 let itemsMenu1 = [];
                 if (this.permissions.view_user) {
                     itemsMenu1.push({ label: 'ผู้ใช้งาน', icon: 'pi pi-fw pi-user', routerLink: ['/app/user'] });
@@ -59,14 +69,12 @@ export class AppMenuComponent implements OnInit {
                 let itemsMenu5 = [];
                 itemsMenu5.push({ label: 'เพิ่มคำสั่งซื้อ', icon: 'pi pi-fw pi-cart-plus', routerLink: ['/app/new_order'] });
                 itemsMenu5.push({ label: 'รายการคำสั่งซื้อ', icon: 'pi pi-fw pi-list', routerLink: ['/app/order'] });
+                itemsMenu5.push({ label: 'ปิดยอดเงินสดประจำวัน', icon: 'pi pi-money-bill', routerLink: ['/app/daily_cash_closing'] });
 
 
                 let itemsMenu6 = [];
                 itemsMenu6.push({ label: 'สาขา', icon: 'pi pi-fw pi-building', routerLink: ['/app/branch'] });
-
-
-
-                this.model = [];
+                itemsMenu6.push({ label: 'ผู้ขาย', icon: 'pi pi-fw pi-truck', routerLink: ['/app/supplier'] });
 
                 if (this.permissions.view_user || this.permissions.view_user_group) {
                     this.model.push({

@@ -6,6 +6,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { AccessdeniedComponent } from './pages/accessdenied/accessdenied.component';
 import { ErrorComponent } from './pages/error/error.component';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 import { UserComponent } from './pages/user/user.component';
 import { UserGroupComponent } from './pages/user-group/user-group.component';
@@ -16,9 +17,12 @@ import { ProductBrandComponent } from './pages/product_brand/product_brand.compo
 import { ProductComponent } from './pages/product/product.component';
 import { NewOrderComponent } from './pages/new-order/new-order.component';
 import { OrderComponent } from './pages/order/order.component';
+import { OrderDetailComponent } from './pages/order-detail/order-detail.component';
 import { StockComponent } from './pages/stock/stock.component';
 import { ProductLotComponent } from './pages/product-lot/product-lot.component';
 import { ReceiveProductComponent } from './pages/receive-product/receive-product.component';
+import { DailyCashClosingComponent } from './pages/daily-cash-closing/daily-cash-closing.component';
+import { SupplierComponent } from './pages/supplier/supplier.component';
 
 import { SlipPrintComponent } from './slip-print/slip-print.component';
 
@@ -28,6 +32,7 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
             {
                 path: 'app', component: AppMainComponent,
                 children: [
+                    { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
                     { path: 'user', component: UserComponent, canActivate: [AuthGuard] },
                     { path: 'user_group', component: UserGroupComponent, canActivate: [AuthGuard] },
                     { path: 'member', component: MemberComponent, canActivate: [AuthGuard] },
@@ -37,10 +42,14 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
                     { path: 'product', component: ProductComponent, canActivate: [AuthGuard] },
                     { path: 'new_order', component: NewOrderComponent, canActivate: [AuthGuard] },
                     { path: 'order', component: OrderComponent, canActivate: [AuthGuard] },
+                    { path: 'order/detail/:id', component: OrderDetailComponent, canActivate: [AuthGuard] },
                     { path: 'stock', component: StockComponent, canActivate: [AuthGuard] },
                     { path: 'product_lot', component: ProductLotComponent, canActivate: [AuthGuard] },
                     { path: 'receive_product', component: ReceiveProductComponent, canActivate: [AuthGuard] },
+                    { path: 'daily_cash_closing', component: DailyCashClosingComponent, canActivate: [AuthGuard] },
+                    { path: 'supplier', component: SupplierComponent, canActivate: [AuthGuard] },
                     { path: 'slip', component: SlipPrintComponent, canActivate: [AuthGuard] },
+                    { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
                 ]
             },
             { path: 'error', component: ErrorComponent },
