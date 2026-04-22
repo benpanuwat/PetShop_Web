@@ -14,7 +14,11 @@ platformBrowserDynamic().bootstrapModule(AppModule)
 
 document.addEventListener("DOMContentLoaded", function () {
     const dropdown = document.querySelector(".dropdown");
-    const button = dropdown.querySelector(".dropbtn");
+    const button = dropdown?.querySelector(".dropbtn");
+
+    if (!dropdown || !button) {
+        return;
+    }
 
     button.addEventListener("click", function (event) {
         event.stopPropagation();

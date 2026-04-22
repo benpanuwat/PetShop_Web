@@ -37,10 +37,14 @@
                 <!-- เปิด ng-template -->
                 <ng-template pTemplate="caption">
                     <div class="flex justify-content-between flex-column sm:flex-row">
-                        <div class="p-inputgroup" style="width: fit-content;">
-                            <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
-                            <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" />
-                            <button *ngIf="search.value" pButton type="button" icon="pi pi-times" class="p-button-danger" (click)="search.reset()"></button>
+                        <div style="width: 100%; max-width: 20rem;">
+                            <span class="p-input-icon-left p-input-icon-right" style="display: block; width: 100%;">
+                                <i class="pi pi-search"></i>
+                                <i *ngIf="search.value" class="pi pi-times cursor-pointer"
+                                    (click)="search.setValue('')"></i>
+                                <input pInputText type="text" [formControl]="search" placeholder="ค้นหา"
+                                    class="w-full" style="padding-right: 2.5rem;" />
+                            </span>
                         </div>
 
                     </div>
