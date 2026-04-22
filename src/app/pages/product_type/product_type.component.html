@@ -8,10 +8,11 @@
                 <!-- เปิด ng-template -->
                 <ng-template pTemplate="caption">
                     <div class="flex justify-content-between flex-column sm:flex-row">
-                        <span class="p-input-icon-left">
-                            <i class="pi pi-search"></i>
-                            <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" class="w-full" />
-                        </span>
+                        <div class="p-inputgroup" style="width: fit-content;">
+                            <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
+                            <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" />
+                            <button *ngIf="search.value" pButton type="button" icon="pi pi-times" class="p-button-danger" (click)="search.reset()"></button>
+                        </div>
 
                         <div class="pt-1 flex align-items-center" *ngIf="permissions?.manag_product_type">
 
