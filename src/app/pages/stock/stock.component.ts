@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { Table } from 'primeng/table';
 import { FormBuilder, FormControl, FormGroup, FormArray, Validators } from '@angular/forms';
 import { LazyLoadEvent } from 'primeng/api';
@@ -24,10 +24,16 @@ export class StockComponent {
   };
 
   @ViewChild('dt') table: Table;
+  @ViewChild('scannerVideo') scannerVideo: ElementRef<HTMLVideoElement>;
   public loading: boolean;
   public totalRecords: number = 0;
   public search: FormControl = new FormControl('');
   public data: any[];
+
+  public displayScanner: boolean = false;
+  public scannerError: string = '';
+  private _stream: MediaStream = null;
+  private _scanInterval: any = null;
 
   public formSetting: FormGroup;
   public formEdit: FormGroup;
@@ -45,6 +51,7 @@ export class StockComponent {
     private _router: Router,
     private _route: ActivatedRoute,
     private _messageService: MessageService,
+    private _zone: NgZone,
   ) {
     this.permissions = JSON.parse(localStorage.getItem('permissions'));
   }
@@ -197,6 +204,47 @@ export class StockComponent {
 
   cancelEdit() {
     this.displayEdit = false
+  }
+
+  openScanner() {
+    this.scannerError = '';
+    this.displayScanner = true;
+    setTimeout(() => this._startCamera(), 300);
+  }
+
+  private async _startCamera() {
+    if (!('BarcodeDetector' in window)) {
+      this.scannerError = 'เบราว์เซอร์นี้ไม่รองรับการสแกน Barcode';
+      return;
+    }
+    try {
+      this._stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      this.scannerVideo.nativeElement.srcObject = this._stream;
+      const detector = new (window as any).BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code', 'upc_a', 'upc_e'] });
+      this._scanInterval = setInterval(async () => {
+        try {
+          const barcodes = await detector.detect(this.scannerVideo.nativeElement);
+          if (barcodes.length > 0) {
+            this._zone.run(() => {
+              this.search.setValue(barcodes[0].rawValue);
+              this.stopScanner();
+            });
+          }
+        } catch {}
+      }, 300);
+    } catch {
+      this.scannerError = 'ไม่สามารถเข้าถึงกล้องได้';
+    }
+  }
+
+  stopScanner() {
+    clearInterval(this._scanInterval);
+    this._scanInterval = null;
+    if (this._stream) {
+      this._stream.getTracks().forEach(t => t.stop());
+      this._stream = null;
+    }
+    this.displayScanner = false;
   }
 
   showError(massage: string) {

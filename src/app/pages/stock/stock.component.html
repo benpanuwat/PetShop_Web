@@ -37,9 +37,17 @@
                             <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
                             <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" />
                             <button *ngIf="search.value" pButton type="button" icon="pi pi-times" class="p-button-danger" (click)="search.reset()"></button>
+                            <button pButton type="button" icon="pi pi-camera" class="p-button-secondary" pTooltip="สแกน Barcode" (click)="openScanner()"></button>
                         </div>
                     </div>
                 </ng-template>
+
+                <p-dialog header="สแกน Barcode" [(visible)]="displayScanner" [modal]="true" [style]="{width: '400px'}" (onHide)="stopScanner()">
+                    <div class="flex flex-column align-items-center gap-3">
+                        <video #scannerVideo autoplay playsinline style="width: 100%; border-radius: 8px;"></video>
+                        <span *ngIf="scannerError" class="text-red-500 text-sm">{{ scannerError }}</span>
+                    </div>
+                </p-dialog>
 
                 <ng-template pTemplate="header">
                     <tr>
