@@ -53,4 +53,16 @@ export class ProductService {
     formData.append('file', file, file.name);
     return this.http.post(environment.url + `/upload_image`, formData);
   }
+
+  getSuppliers() {
+    return this.http.get(environment.url + `/supplier/list`);
+  }
+
+  getSupplierPriceLists(productId: any) {
+    return this.http.get(environment.url + `/supplier_price_list/list/${productId}`);
+  }
+
+  addSupplierPriceItem(data: { product_id: any; supplier_id: number; cost: number }) {
+    return this.http.post(environment.url + `/supplier_price_list`, data);
+  }
 }

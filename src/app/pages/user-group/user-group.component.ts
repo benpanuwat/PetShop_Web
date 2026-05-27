@@ -44,6 +44,17 @@ export class UserGroupComponent {
       manag_user: 0,
       view_user_group: 0,
       manag_user_group: 0,
+      view_member: 0,
+      manag_member: 0,
+      view_product_type: 0,
+      manag_product_type: 0,
+      view_product_brand: 0,
+      manag_product_brand: 0,
+      view_product: 0,
+      manag_product: 0,
+      view_stock: 0,
+      manag_stock: 0,
+      manag_setting: 0,
     });
 
     this.formEdit = this._fb.group({
@@ -52,6 +63,17 @@ export class UserGroupComponent {
       manag_user: 0,
       view_user_group: 0,
       manag_user_group: 0,
+      view_member: 0,
+      manag_member: 0,
+      view_product_type: 0,
+      manag_product_type: 0,
+      view_product_brand: 0,
+      manag_product_brand: 0,
+      view_product: 0,
+      manag_product: 0,
+      view_stock: 0,
+      manag_stock: 0,
+      manag_setting: 0,
     });
 
 
@@ -100,6 +122,17 @@ export class UserGroupComponent {
       manag_user: 0,
       view_user_group: 0,
       manag_user_group: 0,
+      view_member: 0,
+      manag_member: 0,
+      view_product_type: 0,
+      manag_product_type: 0,
+      view_product_brand: 0,
+      manag_product_brand: 0,
+      view_product: 0,
+      manag_product: 0,
+      view_stock: 0,
+      manag_stock: 0,
+      manag_setting: 0,
     });
     this.displayAdd = true
   }

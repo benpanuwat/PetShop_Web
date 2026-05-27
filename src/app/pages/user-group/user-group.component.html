@@ -98,96 +98,50 @@
                         <label htmlFor="name">สิทธิ</label>
                         <table>
                             <tr>
-                                <td class="text-left">เมนู</td>
-                                <td class="text-center">มองเห็น</td>
-                                <td class="text-center">จัดการ</td>
+                                <td class="text-left" style="min-width: 150px;">เมนู</td>
+                                <td class="text-center" style="width: 80px;">มองเห็น</td>
+                                <td class="text-center" style="width: 80px;">จัดการ</td>
                             </tr>
                             <tr>
                                 <td class="text-left">ผู้ใช้งาน</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_user" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_user" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-center"><p-checkbox formControlName="view_user" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_user" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
                                 <td class="text-left">กลุ่มผู้ใช้งาน</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_user_group" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_user_group" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                            </tr>
-                            <!-- <tr>
-                                <td class="text-left">สถานที่ตรวจ</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_location" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_location" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-center"><p-checkbox formControlName="view_user_group" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_user_group" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
-                                <td class="text-left">ห้องตรวจ</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_room" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_room" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-left">สมาชิก</td>
+                                <td class="text-center"><p-checkbox formControlName="view_member" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_member" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
-                                <td class="text-left">คนไข้</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_patient" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_patient" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-left">ประเภทสินค้า</td>
+                                <td class="text-center"><p-checkbox formControlName="view_product_type" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_product_type" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
-                                <td class="text-left">ตรวจฟัน</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_dental" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_dental" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-left">แบรนด์สินค้า</td>
+                                <td class="text-center"><p-checkbox formControlName="view_product_brand" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_product_brand" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
-                                <td class="text-left">รายงาน</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_report" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                            </tr> -->
+                                <td class="text-left">สินค้า</td>
+                                <td class="text-center"><p-checkbox formControlName="view_product" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_product" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">คลังสินค้า</td>
+                                <td class="text-center"><p-checkbox formControlName="view_stock" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_stock" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ตั้งค่า</td>
+                                <td class="text-center">—</td>
+                                <td class="text-center"><p-checkbox formControlName="manag_setting" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -219,96 +173,50 @@
                         <label htmlFor="name">สิทธิ</label>
                         <table>
                             <tr>
-                                <td class="text-left">เมนู</td>
-                                <td class="text-center">มองเห็น</td>
-                                <td class="text-center">จัดการ</td>
+                                <td class="text-left" style="min-width: 150px;">เมนู</td>
+                                <td class="text-center" style="width: 80px;">มองเห็น</td>
+                                <td class="text-center" style="width: 80px;">จัดการ</td>
                             </tr>
                             <tr>
                                 <td class="text-left">ผู้ใช้งาน</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_user" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_user" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-center"><p-checkbox formControlName="view_user" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_user" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
                                 <td class="text-left">กลุ่มผู้ใช้งาน</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_user_group" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_user_group" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                            </tr>
-                            <!-- <tr>
-                                <td class="text-left">สถานที่ตรวจ</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_location" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_location" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-center"><p-checkbox formControlName="view_user_group" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_user_group" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
-                                <td class="text-left">ห้องตรวจ</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_room" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_room" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-left">สมาชิก</td>
+                                <td class="text-center"><p-checkbox formControlName="view_member" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_member" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
-                                <td class="text-left">คนไข้</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_patient" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_patient" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-left">ประเภทสินค้า</td>
+                                <td class="text-center"><p-checkbox formControlName="view_product_type" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_product_type" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
-                                <td class="text-left">ตรวจฟัน</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_dental" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="manag_dental" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
+                                <td class="text-left">แบรนด์สินค้า</td>
+                                <td class="text-center"><p-checkbox formControlName="view_product_brand" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_product_brand" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
                             </tr>
                             <tr>
-                                <td class="text-left">รายงาน</td>
-                                <td class="text-center">
-                                    <p-checkbox formControlName="view_report" binary="true" [trueValue]="1"
-                                        [falseValue]="0">
-                                    </p-checkbox>
-                                </td>
-                            </tr> -->
+                                <td class="text-left">สินค้า</td>
+                                <td class="text-center"><p-checkbox formControlName="view_product" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_product" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">คลังสินค้า</td>
+                                <td class="text-center"><p-checkbox formControlName="view_stock" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                                <td class="text-center"><p-checkbox formControlName="manag_stock" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left">ตั้งค่า</td>
+                                <td class="text-center">—</td>
+                                <td class="text-center"><p-checkbox formControlName="manag_setting" binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox></td>
+                            </tr>
                         </table>
                     </div>
                 </div>

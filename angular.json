@@ -37,6 +37,9 @@
                         "scripts": [
                             "node_modules/prismjs/prism.js",
                             "node_modules/prismjs/components/prism-typescript.js"
+                        ],
+                        "allowedCommonJsDependencies": [
+                            "@zxing/library"
                         ]
                     },
                     "configurations": {

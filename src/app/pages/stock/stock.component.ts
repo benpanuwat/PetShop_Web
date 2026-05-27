@@ -6,6 +6,8 @@ import { Subject, debounceTime, distinctUntilChanged, map, switchMap, tap } from
 import { Router, ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { StockService } from '../stock/stock.service';
+import { ProductService } from '../product/product.service';
+import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 
 @Component({
   selector: 'app-stock',
@@ -17,6 +19,12 @@ export class StockComponent {
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;
+  public displayEditProduct: boolean = false;
+  public displaySupplierPrice: boolean = false;
+  public displayScanner: boolean = false;
+  public scannerStatus: string = '';
+  private scannerTargetForm: 'search' = 'search';
+  private scannerControls: IScannerControls | null = null;
 
   public urlData: any = {
     product_type_id: '',
@@ -24,19 +32,15 @@ export class StockComponent {
   };
 
   @ViewChild('dt') table: Table;
-  @ViewChild('scannerVideo') scannerVideo: ElementRef<HTMLVideoElement>;
+  @ViewChild('scannerVideo') scannerVideoEl: ElementRef<HTMLVideoElement>;
   public loading: boolean;
   public totalRecords: number = 0;
   public search: FormControl = new FormControl('');
   public data: any[];
 
-  public displayScanner: boolean = false;
-  public scannerError: string = '';
-  private _stream: MediaStream = null;
-  private _scanInterval: any = null;
-
   public formSetting: FormGroup;
   public formEdit: FormGroup;
+  public formEditProduct: FormGroup;
 
   public filter_product_types: any = [];
   public filter_product_brands: any = [];
@@ -44,10 +48,17 @@ export class StockComponent {
   public product_brands: any = [];
 
   public editId: string;
+  public editProductId: string;
+  public supplierPriceProductId: any;
+  public supplierPriceProductName: string = '';
+  public supplierPriceRows: { supplier_id: number; supplier_name: string; cost: number }[] = [];
+  public suppliers: any[] = [];
+  public newSupplierItem: { supplier_id: number; cost: number } = { supplier_id: 0, cost: 0 };
 
   constructor(
     private _fb: FormBuilder,
     private _service: StockService,
+    private _productService: ProductService,
     private _router: Router,
     private _route: ActivatedRoute,
     private _messageService: MessageService,
@@ -61,7 +72,6 @@ export class StockComponent {
       this.urlData.product_type_id = params.get('product_type_id');
     });
 
-
     this.formSetting = this._fb.group({
       product_type: '',
       product_brand: '',
@@ -72,6 +82,16 @@ export class StockComponent {
       max: 0,
     });
 
+    this.formEditProduct = this._fb.group({
+      product_type_id: 0,
+      product_brand_id: 0,
+      code: '',
+      name: '',
+      description: '',
+      upload_image_status: false,
+      image: '',
+      price: 0,
+    });
 
     this.search.valueChanges
       .pipe(
@@ -82,10 +102,9 @@ export class StockComponent {
 
           const first = this.table.first;
           const rows = this.table.rows;
-
           const page = first / rows + 1;
 
-          this._service.page({ perPage: rows, page: page, search: query, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id })
+          this._service.page({ perPage: rows, page, search: query, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id })
             .subscribe((resp: any) => {
               this.data = resp.data;
               this.data = this.data.map((item, index) => ({ ...item, order: index + 1 }));
@@ -112,7 +131,6 @@ export class StockComponent {
       });
   }
 
-
   loadProductTypeFilter() {
     this._service.getProductType()
       .subscribe((resp: any) => {
@@ -120,7 +138,7 @@ export class StockComponent {
         this.product_types = resp.data;
         if (this.urlData.product_type_id != null) {
           const product_type = this.filter_product_types.find(item => item.id == this.urlData.product_type_id);
-          this.formSetting.patchValue({ product_type: product_type });
+          this.formSetting.patchValue({ product_type });
         }
 
         if (this.urlData.product_type_id != null) {
@@ -147,7 +165,7 @@ export class StockComponent {
         this.filter_product_brands = resp.data;
         if (this.urlData.product_brand_id != null) {
           const product_brand = this.filter_product_brands.find(item => item.id == this.urlData.product_brand_id);
-          this.formSetting.patchValue({ product_brand: product_brand });
+          this.formSetting.patchValue({ product_brand });
         }
       });
   }
@@ -170,7 +188,7 @@ export class StockComponent {
   }
 
   openEdit(Id: any) {
-    this.editId = Id
+    this.editId = Id;
     this.formEdit = this._fb.group({
       count: 0,
       max: 0,
@@ -180,7 +198,7 @@ export class StockComponent {
         next: (resp: any) => {
           this.formEdit.patchValue({
             ...resp.data
-          })
+          });
           this.displayEdit = true;
         },
         error: (err) => {
@@ -192,7 +210,7 @@ export class StockComponent {
   confirmEdit() {
     this._service.updateStock(this.editId, this.formEdit.value).subscribe({
       next: (resp: any) => {
-        this.displayEdit = false
+        this.displayEdit = false;
         this.showSuccess(resp.message);
         this.table.reset();
       },
@@ -203,55 +221,143 @@ export class StockComponent {
   }
 
   cancelEdit() {
-    this.displayEdit = false
+    this.displayEdit = false;
   }
 
-  openScanner() {
-    this.scannerError = '';
+  openEditProduct(item: any) {
+    this.editProductId = item.id;
+    this.formEditProduct = this._fb.group({
+      product_type_id: 0,
+      product_brand_id: 0,
+      code: '',
+      name: '',
+      description: '',
+      upload_image_status: false,
+      image: '',
+      price: 0,
+    });
+    this._productService.getProduct(this.editProductId).subscribe({
+      next: (resp: any) => {
+        this.formEditProduct.patchValue({ ...resp.data });
+        this._productService.getProductBrand(this.formEditProduct.value.product_type_id)
+          .subscribe((r: any) => { this.product_brands = r.data; });
+        this.displayEditProduct = true;
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'ไม่สามารถโหลดข้อมูลสินค้าได้'),
+    });
+  }
+
+  confirmEditProduct() {
+    this._productService.updateProduct(this.editProductId, this.formEditProduct.value).subscribe({
+      next: (resp: any) => {
+        this.displayEditProduct = false;
+        this.showSuccess(resp.message);
+        this.table.reset();
+      },
+      error: (err) => this.showError(err.error.message),
+    });
+  }
+
+  cancelEditProduct() {
+    this.displayEditProduct = false;
+  }
+
+  openSupplierPrice(item: any) {
+    this.supplierPriceProductId = item.id;
+    this.supplierPriceProductName = item.name;
+    this.supplierPriceRows = [];
+    this.newSupplierItem = { supplier_id: 0, cost: 0 };
+
+    this._productService.getSuppliers().subscribe({
+      next: (suppResp: any) => {
+        this.suppliers = suppResp.data;
+        this._loadSupplierPriceRows();
+        this.displaySupplierPrice = true;
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'โหลดรายชื่อผู้ขายไม่สำเร็จ'),
+    });
+  }
+
+  private _loadSupplierPriceRows() {
+    this._productService.getSupplierPriceLists(this.supplierPriceProductId).subscribe({
+      next: (priceResp: any) => {
+        const rows: any[] = priceResp.data ?? [];
+        this.supplierPriceRows = rows.map(e => ({
+          supplier_id: e.supplier_id,
+          supplier_name: e.supplier_name ?? (this.suppliers.find(s => s.id === e.supplier_id)?.name ?? ''),
+          cost: e.cost,
+        }));
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'โหลดราคาต้นทุนไม่สำเร็จ'),
+    });
+  }
+
+  addSupplierPrice() {
+    if (!this.newSupplierItem.supplier_id) return;
+    const payload = {
+      product_id: this.supplierPriceProductId,
+      supplier_id: this.newSupplierItem.supplier_id,
+      cost: this.newSupplierItem.cost,
+    };
+    this._productService.addSupplierPriceItem(payload).subscribe({
+      next: (resp: any) => {
+        this.showSuccess(resp.message ?? 'เพิ่มสำเร็จ');
+        this.newSupplierItem = { supplier_id: 0, cost: 0 };
+        this._loadSupplierPriceRows();
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'เพิ่มไม่สำเร็จ'),
+    });
+  }
+
+  openScanner(form: 'search' = 'search') {
+    this.scannerTargetForm = form;
     this.displayScanner = true;
-    setTimeout(() => this._startCamera(), 300);
   }
 
-  private async _startCamera() {
-    if (!('BarcodeDetector' in window)) {
-      this.scannerError = 'เบราว์เซอร์นี้ไม่รองรับการสแกน Barcode';
-      return;
-    }
+  async startScanner() {
+    this.scannerStatus = 'กำลังเปิดกล้อง...';
+    const codeReader = new BrowserMultiFormatReader();
     try {
-      this._stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      this.scannerVideo.nativeElement.srcObject = this._stream;
-      const detector = new (window as any).BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code', 'upc_a', 'upc_e'] });
-      this._scanInterval = setInterval(async () => {
-        try {
-          const barcodes = await detector.detect(this.scannerVideo.nativeElement);
-          if (barcodes.length > 0) {
+      this.scannerControls = await codeReader.decodeFromVideoDevice(
+        undefined,
+        this.scannerVideoEl.nativeElement,
+        (result, _err) => {
+          if (result) {
             this._zone.run(() => {
-              this.search.setValue(barcodes[0].rawValue);
-              this.stopScanner();
+              const code = result.getText();
+              if (this.scannerTargetForm === 'search') {
+                this.search.setValue(code);
+              }
+              this.closeScanner();
             });
+          } else {
+            this.scannerStatus = 'กำลังสแกน...';
           }
-        } catch {}
-      }, 300);
+        }
+      );
     } catch {
-      this.scannerError = 'ไม่สามารถเข้าถึงกล้องได้';
+      this.scannerStatus = 'ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้งานกล้อง';
     }
   }
 
   stopScanner() {
-    clearInterval(this._scanInterval);
-    this._scanInterval = null;
-    if (this._stream) {
-      this._stream.getTracks().forEach(t => t.stop());
-      this._stream = null;
+    if (this.scannerControls) {
+      this.scannerControls.stop();
+      this.scannerControls = null;
     }
+  }
+
+  closeScanner() {
+    this.stopScanner();
     this.displayScanner = false;
+    this.scannerStatus = '';
   }
 
   showError(massage: string) {
     this._messageService.add({ severity: 'error', summary: 'แจ้งเตือน', detail: massage });
   }
+
   showSuccess(massage: string) {
     this._messageService.add({ severity: 'success', summary: 'แจ้งเตือน', detail: massage });
   }
-
 }

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { Table } from 'primeng/table';
 import { FormBuilder, FormControl, FormGroup, FormArray, Validators } from '@angular/forms';
 import { LazyLoadEvent } from 'primeng/api';
@@ -6,6 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, map, switchMap, tap } from
 import { Router, ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ProductService } from '../product/product.service';
+import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 
 @Component({
   selector: 'app-product',
@@ -17,6 +18,13 @@ export class ProductComponent {
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;
+  public displaySupplierPrice: boolean = false;
+  public displayScanner: boolean = false;
+  public scannerStatus: string = '';
+  private scannerTargetForm: 'add' | 'edit' | 'search' = 'add';
+  private scannerControls: IScannerControls | null = null;
+
+  @ViewChild('scannerVideo') scannerVideoEl: ElementRef<HTMLVideoElement>;
 
   public urlData: any = {
     product_type_id: '',
@@ -39,6 +47,11 @@ export class ProductComponent {
   public product_brands: any = [];
 
   public editId: string;
+  public supplierPriceProductId: any;
+  public supplierPriceProductName: string = '';
+  public supplierPriceRows: { supplier_id: number; supplier_name: string; cost: number }[] = [];
+  public suppliers: any[] = [];
+  public newSupplierItem: { supplier_id: number; cost: number } = { supplier_id: 0, cost: 0 };
 
   constructor(
     private _fb: FormBuilder,
@@ -46,6 +59,7 @@ export class ProductComponent {
     private _router: Router,
     private _route: ActivatedRoute,
     private _messageService: MessageService,
+    private _zone: NgZone,
   ) {
     this.permissions = JSON.parse(localStorage.getItem('permissions'));
   }
@@ -287,6 +301,101 @@ export class ProductComponent {
         },
       });
     }
+  }
+
+  openSupplierPrice(item: any) {
+    this.supplierPriceProductId = item.id;
+    this.supplierPriceProductName = item.name;
+    this.supplierPriceRows = [];
+    this.newSupplierItem = { supplier_id: 0, cost: 0 };
+
+    this._service.getSuppliers().subscribe({
+      next: (suppResp: any) => {
+        this.suppliers = suppResp.data;
+        this.loadSupplierPriceRows();
+        this.displaySupplierPrice = true;
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'โหลดรายชื่อผู้ขายไม่สำเร็จ'),
+    });
+  }
+
+  private loadSupplierPriceRows() {
+    this._service.getSupplierPriceLists(this.supplierPriceProductId).subscribe({
+      next: (priceResp: any) => {
+        const rows: any[] = priceResp.data ?? [];
+        this.supplierPriceRows = rows.map(e => ({
+          supplier_id: e.supplier_id,
+          supplier_name: e.supplier_name ?? (this.suppliers.find(s => s.id === e.supplier_id)?.name ?? ''),
+          cost: e.cost,
+        }));
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'โหลดราคาต้นทุนไม่สำเร็จ'),
+    });
+  }
+
+  addSupplierPrice() {
+    if (!this.newSupplierItem.supplier_id) return;
+    const payload = {
+      product_id: this.supplierPriceProductId,
+      supplier_id: this.newSupplierItem.supplier_id,
+      cost: this.newSupplierItem.cost,
+    };
+    this._service.addSupplierPriceItem(payload).subscribe({
+      next: (resp: any) => {
+        this.showSuccess(resp.message ?? 'เพิ่มสำเร็จ');
+        this.newSupplierItem = { supplier_id: 0, cost: 0 };
+        this.loadSupplierPriceRows();
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'เพิ่มไม่สำเร็จ'),
+    });
+  }
+
+  openScanner(form: 'add' | 'edit' | 'search') {
+    this.scannerTargetForm = form;
+    this.displayScanner = true;
+  }
+
+  async startScanner() {
+    this.scannerStatus = 'กำลังเปิดกล้อง...';
+    const codeReader = new BrowserMultiFormatReader();
+    try {
+      this.scannerControls = await codeReader.decodeFromVideoDevice(
+        undefined,
+        this.scannerVideoEl.nativeElement,
+        (result, _err) => {
+          if (result) {
+            this._zone.run(() => {
+              const code = result.getText();
+              if (this.scannerTargetForm === 'add') {
+                this.formAdd.patchValue({ code });
+              } else if (this.scannerTargetForm === 'edit') {
+                this.formEdit.patchValue({ code });
+              } else {
+                this.search.setValue(code);
+              }
+              this.closeScanner();
+            });
+          } else {
+            this.scannerStatus = 'กำลังสแกน...';
+          }
+        }
+      );
+    } catch {
+      this.scannerStatus = 'ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้งานกล้อง';
+    }
+  }
+
+  stopScanner() {
+    if (this.scannerControls) {
+      this.scannerControls.stop();
+      this.scannerControls = null;
+    }
+  }
+
+  closeScanner() {
+    this.stopScanner();
+    this.displayScanner = false;
+    this.scannerStatus = '';
   }
 
   showError(massage: string) {

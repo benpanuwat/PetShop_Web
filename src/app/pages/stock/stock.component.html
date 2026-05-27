@@ -29,25 +29,20 @@
         <div class="card">
             <h5>รายการสินค้า</h5>
             <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
-                [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines action-menu-table"
-                [rowsPerPageOptions]="[10, 25, 50]">
+                [loading]="loading" [rows]="10" [totalRecords]="totalRecords"
+                styleClass="p-datatable-gridlines action-menu-table" [rowsPerPageOptions]="[10, 25, 50]">
                 <ng-template pTemplate="caption">
                     <div class="flex justify-content-between flex-column sm:flex-row">
                         <div class="p-inputgroup" style="width: fit-content;">
                             <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
                             <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" />
-                            <button *ngIf="search.value" pButton type="button" icon="pi pi-times" class="p-button-danger" (click)="search.reset()"></button>
-                            <button pButton type="button" icon="pi pi-camera" class="p-button-secondary" pTooltip="สแกน Barcode" (click)="openScanner()"></button>
+                            <button *ngIf="search.value" pButton type="button" icon="pi pi-times"
+                                class="p-button-danger" (click)="search.reset()"></button>
+                            <button pButton type="button" icon="pi pi-camera" class="p-button-secondary"
+                                pTooltip="สแกน Barcode" (click)="openScanner('search')"></button>
                         </div>
                     </div>
                 </ng-template>
-
-                <p-dialog header="สแกน Barcode" [(visible)]="displayScanner" [modal]="true" [style]="{width: '400px'}" (onHide)="stopScanner()">
-                    <div class="flex flex-column align-items-center gap-3">
-                        <video #scannerVideo autoplay playsinline style="width: 100%; border-radius: 8px;"></video>
-                        <span *ngIf="scannerError" class="text-red-500 text-sm">{{ scannerError }}</span>
-                    </div>
-                </p-dialog>
 
                 <ng-template pTemplate="header">
                     <tr>
@@ -71,7 +66,7 @@
                                 ชื่อสินค้า
                             </div>
                         </th>
-                         <th style="width: 80px;">
+                        <th style="width: 80px;">
                             <div class="flex justify-content-center align-items-center">
                                 ราคา
                             </div>
@@ -97,13 +92,13 @@
                         <td class="text-center">
                             <img class="icon-img" [src]="item.image">
                         </td>
-                         <td class="text-left">
+                        <td class="text-left">
                             {{ item.product_type_name }}/ {{ item.product_brand_name }}
                         </td>
                         <td class="text-left">
                             {{ item.name }}
                         </td>
-                         <td class="text-center">
+                        <td class="text-center">
                             {{ item.price | number }}.-
                         </td>
                         <td class="text-center">
@@ -115,8 +110,14 @@
                                     <i class="pi pi-bars"></i>
                                 </button>
                                 <div class="dropdown-content" tabindex="0" style="cursor: pointer;">
-                                    <button type="button" class="dropdown-action" (click)="openEdit(item.id)" *ngIf="permissions?.manag_stock"><i
+                                    <button type="button" class="dropdown-action" (click)="openEdit(item.id)"
+                                        *ngIf="permissions?.manag_stock"><i
+                                            class="pi pi-database pr-2"></i>คลัง</button>
+                                    <button type="button" class="dropdown-action" (click)="openEditProduct(item)"
+                                        *ngIf="permissions?.manag_product"><i
                                             class="pi pi-file-edit pr-2"></i>แก้ไข</button>
+                                    <button type="button" class="dropdown-action" (click)="openSupplierPrice(item)"><i
+                                            class="pi pi-tag pr-2"></i>ราคาต้นทุน</button>
                                 </div>
                             </div>
                         </td>
@@ -131,7 +132,6 @@
         </div>
     </div>
 </div>
-
 
 <p-dialog header="แก้ไขคลัง" [(visible)]="displayEdit" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
     [breakpoints]="{'960px': '75vw'}">
@@ -159,6 +159,127 @@
             class="p-button-success mr-2 outline"></button>
         <button pButton icon="pi pi-times" (click)="cancelEdit()" label="ยกเลิก"
             class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="แก้ไขสินค้า" [(visible)]="displayEditProduct" modal="modal" showEffect="fade"
+    [style]="{width: '30vw'}" [breakpoints]="{'960px': '75vw'}">
+    <form [formGroup]="formEditProduct">
+        <div class="card p-fluid">
+            <div class="grid">
+                <div class="col-12 py-0 pb-5" style="text-align: center;">
+                    <img class="img" [src]="formEditProduct?.get('image')?.value" width="100" height="100">
+                </div>
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label>รหัสสินค้า</label>
+                        <input pInputText type="text" formControlName="code" maxlength="50" />
+                    </div>
+                </div>
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label>ชื่อสินค้า</label>
+                        <input pInputText type="text" formControlName="name" maxlength="200" />
+                    </div>
+                </div>
+                <div class="col-12 py-0">
+                    <div class="field">
+                        <label>รายละเอียดสินค้า</label>
+                        <textarea pInputTextarea formControlName="description" maxlength="1000" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="col-12 pb-0">
+                    <div class="field">
+                        <label>ประเภทสินค้า</label>
+                        <p-dropdown [options]="product_types" optionLabel="name" optionValue="id" [filter]="true"
+                            filterBy="name" placeholder="เลือกประเภทสินค้า" formControlName="product_type_id"
+                            (onChange)="selectProductType(formEditProduct.get('product_type_id').value)"
+                            appendTo="body">
+                        </p-dropdown>
+                    </div>
+                </div>
+                <div class="col-12 pb-0">
+                    <div class="field">
+                        <label>แบรนด์สินค้า</label>
+                        <p-dropdown [options]="product_brands" optionLabel="name" optionValue="id" [filter]="true"
+                            filterBy="name" placeholder="เลือกแบรนด์สินค้า" formControlName="product_brand_id"
+                            appendTo="body">
+                        </p-dropdown>
+                    </div>
+                </div>
+                <div class="col-12 pb-0">
+                    <div class="field">
+                        <label>ราคา</label>
+                        <input pInputText type="number" formControlName="price" min="0" max="99999" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" (click)="confirmEditProduct()" label="ยืนยัน"
+            class="p-button-success mr-2 outline"></button>
+        <button pButton icon="pi pi-times" (click)="cancelEditProduct()" label="ยกเลิก"
+            class="p-button-danger mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [header]="'ราคาต้นทุน - ' + supplierPriceProductName" [(visible)]="displaySupplierPrice" modal="modal"
+    showEffect="fade" [style]="{width: '45vw'}" [breakpoints]="{'960px': '75vw'}">
+    <div class="card p-fluid">
+        <div class="grid mb-3 align-items-end">
+            <div class="col-5">
+                <label>ผู้ขาย</label>
+                <p-dropdown [options]="suppliers" optionLabel="name" optionValue="id"
+                    [(ngModel)]="newSupplierItem.supplier_id" placeholder="เลือกผู้ขาย" appendTo="body"
+                    [style]="{'width':'100%'}">
+                </p-dropdown>
+            </div>
+            <div class="col-4">
+                <label>ราคาต้นทุน (บาท)</label>
+                <input pInputText type="number" [(ngModel)]="newSupplierItem.cost" min="0" style="text-align: right;" />
+            </div>
+            <div class="col-3">
+                <button pButton icon="pi pi-plus" label="เพิ่ม" class="p-button-primary outline" style="width:100%;"
+                    [disabled]="!newSupplierItem.supplier_id" (click)="addSupplierPrice()"></button>
+            </div>
+        </div>
+        <p-table [value]="supplierPriceRows" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>ผู้ขาย</th>
+                    <th style="width: 160px; text-align: right;">ราคาต้นทุนล่าสุด (บาท)</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+                <tr>
+                    <td>{{row.supplier_name}}</td>
+                    <td style="text-align: right;">{{row.cost | number:'1.2-2'}}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptyMessage">
+                <tr>
+                    <td colspan="2" class="text-center">ยังไม่มีรายการ</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-times" (click)="displaySupplierPrice = false" label="ปิด"
+            class="p-button-secondary mr-2 outline"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="สแกน Barcode" [(visible)]="displayScanner" [modal]="true" showEffect="fade"
+    [style]="{width: '95vw', maxWidth: '480px'}" [breakpoints]="{'960px': '95vw'}"
+    (onShow)="startScanner()" (onHide)="stopScanner()">
+    <div style="text-align: center; padding: 0.5rem 0;">
+        <video #scannerVideo style="width: 100%; border-radius: 8px; background: #000;" autoplay playsinline></video>
+        <p style="margin-top: 0.75rem; color: #666; font-size: 0.875rem;">{{ scannerStatus }}</p>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-times" (click)="closeScanner()" label="ยกเลิก"
+            class="p-button-danger"></button>
     </ng-template>
 </p-dialog>
 

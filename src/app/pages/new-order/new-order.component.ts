@@ -139,6 +139,10 @@ export class NewOrderComponent {
     return this.formCart.get('products') as FormArray;
   }
 
+  get totalQty(): number {
+    return (this.formCart.value.products as any[]).reduce((sum, p) => sum + (p.qty || 0), 0);
+  }
+
   deleteBracode() {
     this.formSetting = this._fb.group({
       barcode: "",
