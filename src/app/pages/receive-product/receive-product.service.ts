@@ -17,8 +17,8 @@ export class ReceiveProductService {
   }
 
 
-  addProductLot(formData: FormData) {
-    return this.http.post(environment.url + `/add_product_lot`, formData);
+  addProductLot(data: any) {
+    return this.http.post(environment.url + `/add_product_lot`, data);
   }
 
 }

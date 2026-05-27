@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Force)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api\" -Recurse -Directory | ForEach-Object { $_.FullName.Replace\\('C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api', '.'\\) })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api\" -File | ForEach-Object { $_.Name })"
+    ]
+  }
+}

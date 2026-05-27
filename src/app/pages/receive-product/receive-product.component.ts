@@ -118,7 +118,9 @@ export class ReceiveProductComponent {
   }
 
   addProductLot() {
-    this._service.addProductLot(this.formProductLot.value).subscribe({
+    const branch_id = parseInt(localStorage.getItem('branch') || '0');
+    const payload = { ...this.formProductLot.value, branch_id };
+    this._service.addProductLot(payload).subscribe({
       next: (resp: any) => {
         window.location.reload();
         this.showSuccess(resp.message);
