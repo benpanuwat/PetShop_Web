@@ -118,6 +118,8 @@
                                             class="pi pi-file-edit pr-2"></i>แก้ไข</button>
                                     <button type="button" class="dropdown-action" (click)="openSupplierPrice(item)"><i
                                             class="pi pi-tag pr-2"></i>ราคาต้นทุน</button>
+                                    <button type="button" class="dropdown-action" (click)="openLog(item)"><i
+                                            class="pi pi-history pr-2"></i>ประวัติ stock</button>
                                 </div>
                             </div>
                         </td>
@@ -280,6 +282,45 @@
     <ng-template pTemplate="footer">
         <button pButton type="button" icon="pi pi-times" (click)="closeScanner()" label="ยกเลิก"
             class="p-button-danger"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [header]="'ประวัติ stock - ' + logProductName" [(visible)]="displayLog" modal="modal"
+    showEffect="fade" [style]="{width: '70vw'}" [breakpoints]="{'960px': '95vw'}">
+    <p-table [value]="logData" [loading]="logLoading" responsiveLayout="scroll"
+        styleClass="p-datatable-gridlines p-datatable-sm">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 160px;">วันที่</th>
+                <th style="width: 150px;">การกระทำ</th>
+                <th style="width: 100px; text-align: right;">ก่อน</th>
+                <th style="width: 120px; text-align: center;">เปลี่ยนแปลง</th>
+                <th style="width: 100px; text-align: right;">หลัง</th>
+                <th>ผู้ดำเนินการ</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+            <tr>
+                <td>{{ row.created_date }}</td>
+                <td>{{ getActionLabel(row.action) }}</td>
+                <td style="text-align: right;">{{ row.qty_before | number }}</td>
+                <td style="text-align: center;"
+                    [ngStyle]="{'color': row.qty_change > 0 ? '#22c55e' : row.qty_change < 0 ? '#ef4444' : '#6b7280', 'font-weight': '600'}">
+                    {{ row.qty_change > 0 ? '+' : '' }}{{ row.qty_change | number }}
+                </td>
+                <td style="text-align: right;">{{ row.qty_after | number }}</td>
+                <td>{{ row.created_by }}</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptyMessage">
+            <tr>
+                <td colspan="6" class="text-center">ไม่มีประวัติ</td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-times" (click)="displayLog = false" label="ปิด"
+            class="p-button-secondary outline"></button>
     </ng-template>
 </p-dialog>
 

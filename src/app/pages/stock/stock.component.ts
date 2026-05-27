@@ -22,6 +22,10 @@ export class StockComponent {
   public displayEditProduct: boolean = false;
   public displaySupplierPrice: boolean = false;
   public displayScanner: boolean = false;
+  public displayLog: boolean = false;
+  public logProductName: string = '';
+  public logData: any[] = [];
+  public logLoading: boolean = false;
   public scannerStatus: string = '';
   private scannerTargetForm: 'search' = 'search';
   private scannerControls: IScannerControls | null = null;
@@ -185,6 +189,33 @@ export class StockComponent {
       .subscribe((resp: any) => {
         this.product_brands = resp.data;
       });
+  }
+
+  openLog(item: any) {
+    this.logProductName = item.name;
+    this.logData = [];
+    this.logLoading = true;
+    this.displayLog = true;
+    this._service.getStockLogs(item.id).subscribe({
+      next: (resp: any) => {
+        this.logData = resp.data;
+        this.logLoading = false;
+      },
+      error: (err) => {
+        this.logLoading = false;
+        this.showError(err?.error?.message ?? 'โหลด log ไม่สำเร็จ');
+      },
+    });
+  }
+
+  getActionLabel(action: string): string {
+    const map: Record<string, string> = {
+      order: 'ขาย',
+      cancel_order: 'ยกเลิกออเดอร์',
+      receive_product: 'รับสินค้า',
+      manual: 'แก้ไขด้วยตนเอง',
+    };
+    return map[action] ?? action;
   }
 
   openEdit(Id: any) {

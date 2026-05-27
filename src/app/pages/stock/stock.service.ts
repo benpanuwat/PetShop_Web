@@ -44,4 +44,8 @@ export class StockService {
     return this.http.put(environment.url + `/update_stock/${id}`, data);
   }
 
+  getStockLogs(productId: any) {
+    return this.http.get(environment.url + `/stock_log/list/${productId}`);
+  }
+
 }
