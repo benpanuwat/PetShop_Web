@@ -12,4 +12,12 @@ export class DashboardService {
   getSummary() {
     return this.http.get(environment.url + `/dashboard/summary`);
   }
+
+  getChartDaily(year: number, month: number) {
+    return this.http.get(environment.url + `/dashboard/chart/daily`, { params: { year, month } });
+  }
+
+  getChartMonthly(year: number) {
+    return this.http.get(environment.url + `/dashboard/chart/monthly`, { params: { year } });
+  }
 }

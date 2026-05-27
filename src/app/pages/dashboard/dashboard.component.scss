@@ -260,6 +260,33 @@
   font-size: 1.8rem;
 }
 
+.chart-card {
+  .panel-header {
+    flex-wrap: wrap;
+  }
+}
+
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.chart-body {
+  width: 100%;
+  height: 340px;
+}
+
+.chart-empty {
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #98a2b3;
+  font-size: 0.95rem;
+}
+
 @media screen and (max-width: 1200px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

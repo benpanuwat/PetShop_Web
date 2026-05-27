@@ -154,6 +154,38 @@
             </div>
         </div>
 
+        <div class="panel-card chart-card">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">กราฟยอดขาย</div>
+                    <div class="panel-subtitle">เปรียบเทียบยอดขายตามช่วงเวลา (เฉพาะบิลปกติ)</div>
+                </div>
+                <div class="chart-controls">
+                    <p-selectButton [options]="chartModeOptions" [(ngModel)]="chartMode" optionLabel="label"
+                        optionValue="value" (onChange)="loadChart()">
+                    </p-selectButton>
+                    <p-dropdown *ngIf="chartMode === 'daily'" [options]="monthOptions" [(ngModel)]="chartMonth"
+                        optionLabel="label" optionValue="value" (onChange)="loadChart()"
+                        [style]="{'width':'140px'}">
+                    </p-dropdown>
+                    <p-dropdown [options]="yearOptions" [(ngModel)]="chartYear" optionLabel="label"
+                        optionValue="value" (onChange)="loadChart()" [style]="{'width':'100px'}">
+                    </p-dropdown>
+                </div>
+            </div>
+            <div class="chart-body" *ngIf="!chartLoading && chartData; else chartPlaceholder">
+                <p-chart type="bar" [data]="chartData" [options]="chartOptions" width="100%" height="340px">
+                </p-chart>
+            </div>
+            <ng-template #chartPlaceholder>
+                <div class="chart-empty">
+                    <p-progressSpinner *ngIf="chartLoading" strokeWidth="3" [style]="{'width':'48px','height':'48px'}">
+                    </p-progressSpinner>
+                    <span *ngIf="!chartLoading">ไม่มีข้อมูล</span>
+                </div>
+            </ng-template>
+        </div>
+
         <div class="panel-card">
             <div class="panel-header">
                 <div>
