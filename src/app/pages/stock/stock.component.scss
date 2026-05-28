@@ -104,6 +104,16 @@
     margin-left: 0.15rem;
 }
 
+.stock-alert-hint {
+    margin-top: 0.2rem;
+    font-size: 0.72rem;
+    color: #b45309;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    i { font-size: 0.7rem; }
+}
+
 /* ── Actions ─────────────────────────────────────── */
 .action-btns {
     display: flex;

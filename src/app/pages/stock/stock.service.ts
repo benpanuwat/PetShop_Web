@@ -48,4 +48,8 @@ export class StockService {
     return this.http.get(environment.url + `/stock_log/list/${productId}`);
   }
 
+  getPurchaseExport() {
+    return this.http.get(environment.url + `/stock/purchase_export`);
+  }
+
 }

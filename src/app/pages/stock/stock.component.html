@@ -26,6 +26,10 @@
                     <button pButton type="button" icon="pi pi-camera" class="p-button-secondary"
                         pTooltip="สแกน Barcode" (click)="openScanner('search')"></button>
                 </div>
+                <button *ngIf="permissions?.manag_stock" pButton type="button"
+                    [icon]="exporting ? 'pi pi-spin pi-spinner' : 'pi pi-file-excel'"
+                    label="สั่งซื้อเข้าคลัง" class="p-button-success" [disabled]="exporting"
+                    pTooltip="ส่งออก Excel จำนวนที่ต้องสั่งซื้อแต่ละสาขา" (click)="exportPurchase()"></button>
             </div>
         </div>
 
@@ -40,7 +44,7 @@
                     <th style="width:24%;">ประเภท / แบรนด์</th>
                     <th>ชื่อสินค้า</th>
                     <th style="width:100px; text-align:right;">ราคา</th>
-                    <th style="width:120px; text-align:center;">คงเหลือ / จัดเก็บ</th>
+                    <th style="width:140px; text-align:center;">คงเหลือ / สูงสุด</th>
                     <th *ngIf="permissions?.manag_stock" style="width:130px; text-align:center;">จัดการ</th>
                 </tr>
             </ng-template>
@@ -60,8 +64,12 @@
                     <td><span class="product-name">{{ item.name }}</span></td>
                     <td class="text-right"><span class="price-text">{{ item.price | number }}.-</span></td>
                     <td class="text-center">
-                        <span class="stock-count" [class.low]="item.count == 0">{{ item.count | number }}</span>
-                        <span class="stock-max">/ {{ item.max | number }}</span>
+                        <span class="stock-count"
+                            [class.low]="item.alert_count > 0 && item.count <= item.alert_count">{{ item.count | number }}</span>
+                        <span class="stock-max">/ {{ item.max_count | number }}</span>
+                        <div *ngIf="item.alert_count > 0" class="stock-alert-hint">
+                            <i class="pi pi-bell"></i> แจ้งเตือน ≤ {{ item.alert_count | number }}
+                        </div>
                     </td>
                     <td *ngIf="permissions?.manag_stock" class="text-center">
                         <div class="action-btns">
@@ -102,14 +110,18 @@
     [style]="{width:'400px'}" [breakpoints]="{'640px':'95vw'}">
     <form [formGroup]="formEdit">
         <div class="dialog-form">
+            <div class="field">
+                <label>จำนวนคงเหลือ</label>
+                <input pInputText type="number" formControlName="count" min="0" max="99999" class="w-full" />
+            </div>
             <div class="field-row">
                 <div class="field">
-                    <label>จำนวนคงเหลือ</label>
-                    <input pInputText type="number" formControlName="count" min="0" max="99999" class="w-full" />
+                    <label>แจ้งเตือนเมื่อเหลือ ≤</label>
+                    <input pInputText type="number" formControlName="alert_count" min="0" max="99999" class="w-full" />
                 </div>
                 <div class="field">
-                    <label>จำนวนจัดเก็บ</label>
-                    <input pInputText type="number" formControlName="max" min="0" max="99999" class="w-full" />
+                    <label>จำนวนสูงสุดที่เก็บได้</label>
+                    <input pInputText type="number" formControlName="max_count" min="0" max="99999" class="w-full" />
                 </div>
             </div>
         </div>

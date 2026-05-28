@@ -190,7 +190,7 @@
             <div class="panel-header">
                 <div>
                     <div class="panel-title">สินค้าใกล้หมด</div>
-                    <div class="panel-subtitle">สินค้าที่คงเหลือน้อยกว่าหรือเท่าจุดจัดเก็บ</div>
+                    <div class="panel-subtitle">สินค้าที่คงเหลือน้อยกว่าหรือเท่าจุดแจ้งเตือน</div>
                 </div>
                 <a pButton routerLink="/app/stock" icon="pi pi-box" label="เปิดคลังสินค้า" class="p-button-text"></a>
             </div>
@@ -207,8 +207,8 @@
                         <strong>{{ item.count | number }}</strong>
                     </div>
                     <div class="stock-metric">
-                        <span>จุดจัดเก็บ</span>
-                        <strong>{{ item.max | number }}</strong>
+                        <span>จุดแจ้งเตือน</span>
+                        <strong>{{ item.alert_count | number }}</strong>
                     </div>
                 </div>
             </div>

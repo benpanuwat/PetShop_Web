@@ -26,6 +26,7 @@ export class StockComponent {
   public logProductName: string = '';
   public logData: any[] = [];
   public logLoading: boolean = false;
+  public exporting: boolean = false;
   public scannerStatus: string = '';
   private scannerTargetForm: 'search' = 'search';
   private scannerControls: IScannerControls | null = null;
@@ -83,7 +84,8 @@ export class StockComponent {
 
     this.formEdit = this._fb.group({
       count: 0,
-      max: 0,
+      alert_count: 0,
+      max_count: 0,
     });
 
     this.formEditProduct = this._fb.group({
@@ -191,6 +193,74 @@ export class StockComponent {
       });
   }
 
+  exportPurchase() {
+    this.exporting = true;
+    this._service.getPurchaseExport().subscribe({
+      next: (resp: any) => {
+        this.exporting = false;
+        const data = resp?.data ?? { branches: [], rows: [] };
+        if (!data.rows || data.rows.length === 0) {
+          this.showError('ไม่มีสินค้าที่ต้องสั่งซื้อเข้าคลัง (ทุกสาขามีของเต็มแล้ว)');
+          return;
+        }
+        this.buildPurchaseExcel(data);
+      },
+      error: (err) => {
+        this.exporting = false;
+        this.showError(err?.error?.message ?? 'ไม่สามารถดึงข้อมูลส่งออกได้');
+      },
+    });
+  }
+
+  private buildPurchaseExcel(data: { branches: any[], rows: any[] }) {
+    const branches = data.branches ?? [];
+    const rows = data.rows ?? [];
+    const today = new Date().toLocaleDateString('th-TH');
+    const esc = (v: any) => String(v ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    const colspan = 4 + branches.length * 3 + 1;
+    let html = '<table border="1" cellspacing="0" cellpadding="4">';
+    html += `<tr><th colspan="${colspan}" style="font-size:16px;">รายการสั่งซื้อสินค้าเข้าคลัง (${today})</th></tr>`;
+
+    // header row 1: base columns (rowspan) + branch name groups (colspan 3)
+    html += '<tr style="background:#e2e8f0;">';
+    html += '<th rowspan="2">รหัส</th><th rowspan="2">สินค้า</th>';
+    html += '<th rowspan="2">ประเภท</th><th rowspan="2">แบรนด์</th>';
+    for (const b of branches) html += `<th colspan="3">${esc(b.name)}</th>`;
+    html += '<th rowspan="2">รวมสั่งซื้อ</th></tr>';
+
+    // header row 2: sub columns per branch
+    html += '<tr style="background:#f1f5f9;">';
+    for (const _ of branches) {
+      html += '<th>คงเหลือ</th><th>เก็บได้</th><th>สั่งซื้อ</th>';
+    }
+    html += '</tr>';
+
+    for (const r of rows) {
+      html += '<tr>';
+      html += `<td>${esc(r.code)}</td><td>${esc(r.name)}</td>`;
+      html += `<td>${esc(r.product_type_name)}</td><td>${esc(r.product_brand_name)}</td>`;
+      for (const c of (r.cells ?? [])) {
+        html += `<td style="text-align:right;">${c.count || 0}</td>`;
+        html += `<td style="text-align:right;">${c.max_count || 0}</td>`;
+        html += `<td style="text-align:right; background:#fef9c3;"><b>${c.buy || 0}</b></td>`;
+      }
+      html += `<td style="text-align:right;"><b>${r.total_buy || 0}</b></td>`;
+      html += '</tr>';
+    }
+    html += '</table>';
+
+    const content = `<html><head><meta charset="UTF-8"></head><body>${html}</body></html>`;
+    const blob = new Blob(['﻿' + content], { type: 'application/vnd.ms-excel' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ใบสั่งซื้อเข้าคลัง_${today}.xls`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   openLog(item: any) {
     this.logProductName = item.name;
     this.logData = [];
@@ -222,7 +292,8 @@ export class StockComponent {
     this.editId = Id;
     this.formEdit = this._fb.group({
       count: 0,
-      max: 0,
+      alert_count: 0,
+      max_count: 0,
     });
     this._service.getStock(this.editId)
       .subscribe({
