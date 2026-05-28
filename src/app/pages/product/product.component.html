@@ -384,4 +384,30 @@
     </ng-template>
 </p-dialog>
 
+<p-dialog header="ครอปรูปภาพ" [(visible)]="displayCrop" [modal]="true" showEffect="fade"
+    [style]="{width: '95vw', maxWidth: '480px'}" [breakpoints]="{'960px': '95vw'}"
+    [closable]="false">
+    <div class="crop-wrapper">
+        <image-cropper
+            [imageFile]="cropImageFile"
+            [maintainAspectRatio]="true"
+            [aspectRatio]="1"
+            [resizeToWidth]="1024"
+            [resizeToHeight]="1024"
+            format="jpeg"
+            [imageQuality]="82"
+            (imageCropped)="imageCropped($event)"
+            [cropperMinWidth]="64"
+            backgroundColor="#ffffff"
+            output="blob">
+        </image-cropper>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton icon="pi pi-check" label="ยืนยัน" class="p-button-success mr-2"
+            [disabled]="!croppedBlob" (click)="cropConfirm()"></button>
+        <button pButton icon="pi pi-times" label="ยกเลิก" class="p-button-danger"
+            (click)="cropCancel()"></button>
+    </ng-template>
+</p-dialog>
+
 <p-toast position="bottom-center"></p-toast>

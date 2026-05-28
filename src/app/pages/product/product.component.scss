@@ -75,6 +75,21 @@
     font-size: 0;
 }
 
+.crop-wrapper {
+    width: 100%;
+    max-height: 70vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    border-radius: 8px;
+}
+
+:host ::ng-deep image-cropper {
+    max-height: 70vh;
+}
+
 :host ::ng-deep .action-menu-panel {
     background-color: #f9f9f9;
     min-width: 160px;

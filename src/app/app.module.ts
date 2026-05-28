@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { ImageCropperModule } from 'ngx-image-cropper';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
@@ -126,6 +127,7 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
 @NgModule({
     imports: [
         BrowserModule,
+        ImageCropperModule,
         FormsModule,
         ReactiveFormsModule,
         AppRoutingModule,

@@ -7,6 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ProductService } from '../product/product.service';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
+import { ImageCroppedEvent } from 'ngx-image-cropper';
 
 @Component({
   selector: 'app-product',
@@ -22,6 +23,11 @@ export class ProductComponent {
   public displayScanner: boolean = false;
   public imageUploadLoadingAdd: boolean = false;
   public imageUploadLoadingEdit: boolean = false;
+
+  public displayCrop: boolean = false;
+  public cropImageFile: File | null = null;
+  public croppedBlob: Blob | null = null;
+  private cropTargetForm: 'add' | 'edit' = 'add';
   public scannerStatus: string = '';
   private scannerTargetForm: 'add' | 'edit' | 'search' = 'add';
   private scannerControls: IScannerControls | null = null;
@@ -271,72 +277,62 @@ export class ProductComponent {
     this.displayEdit = false
   }
 
-  private compressImage(file: File, maxSize = 1024, quality = 0.82): Promise<File> {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        const img = new Image();
-        img.src = e.target!.result as string;
-        img.onload = () => {
-          let { width, height } = img;
-          if (width > maxSize || height > maxSize) {
-            const ratio = Math.min(maxSize / width, maxSize / height);
-            width = Math.round(width * ratio);
-            height = Math.round(height * ratio);
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
-          canvas.toBlob((blob) => {
-            resolve(new File([blob!], file.name.replace(/\.[^.]+$/, '.jpg'), {
-              type: 'image/jpeg',
-              lastModified: Date.now(),
-            }));
-          }, 'image/jpeg', quality);
-        };
-      };
-    });
-  }
-
   onSelectImageProfile(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
-    this.imageUploadLoadingAdd = true;
-    this.compressImage(input.files[0]).then(compressed => {
-      this._service.uploadImage(compressed).subscribe({
-        next: (resp: any) => {
-          this.formAdd.patchValue({ upload_image_status: true, image: resp.url });
-          this.imageUploadLoadingAdd = false;
-          input.value = '';
-        },
-        error: (err) => {
-          this.imageUploadLoadingAdd = false;
-          this.showError(err?.error?.message ?? 'อัปโหลดรูปภาพไม่สำเร็จ');
-          input.value = '';
-        },
-      });
-    });
+    this.cropTargetForm = 'add';
+    this.cropImageFile = input.files[0];
+    this.croppedBlob = null;
+    this.displayCrop = true;
+    input.value = '';
   }
 
   onSelectImageProfileEdit(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
-    this.imageUploadLoadingEdit = true;
-    this.compressImage(input.files[0]).then(compressed => {
-      this._service.uploadImage(compressed).subscribe({
-        next: (resp: any) => {
+    this.cropTargetForm = 'edit';
+    this.cropImageFile = input.files[0];
+    this.croppedBlob = null;
+    this.displayCrop = true;
+    input.value = '';
+  }
+
+  imageCropped(event: ImageCroppedEvent) {
+    this.croppedBlob = event.blob ?? null;
+  }
+
+  cropCancel() {
+    this.displayCrop = false;
+    this.cropImageFile = null;
+    this.croppedBlob = null;
+  }
+
+  cropConfirm() {
+    if (!this.croppedBlob) return;
+    const isAdd = this.cropTargetForm === 'add';
+    if (isAdd) this.imageUploadLoadingAdd = true;
+    else this.imageUploadLoadingEdit = true;
+
+    const file = new File([this.croppedBlob], 'product.jpg', { type: 'image/jpeg' });
+    this.displayCrop = false;
+
+    this._service.uploadImage(file).subscribe({
+      next: (resp: any) => {
+        if (isAdd) {
+          this.formAdd.patchValue({ upload_image_status: true, image: resp.url });
+          this.imageUploadLoadingAdd = false;
+        } else {
           this.formEdit.patchValue({ upload_image_status: true, image: resp.url });
           this.imageUploadLoadingEdit = false;
-          input.value = '';
-        },
-        error: (err) => {
-          this.imageUploadLoadingEdit = false;
-          this.showError(err?.error?.message ?? 'อัปโหลดรูปภาพไม่สำเร็จ');
-          input.value = '';
-        },
-      });
+        }
+        this.croppedBlob = null;
+      },
+      error: (err) => {
+        if (isAdd) this.imageUploadLoadingAdd = false;
+        else this.imageUploadLoadingEdit = false;
+        this.showError(err?.error?.message ?? 'อัปโหลดรูปภาพไม่สำเร็จ');
+        this.croppedBlob = null;
+      },
     });
   }
 
