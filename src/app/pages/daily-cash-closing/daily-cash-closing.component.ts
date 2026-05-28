@@ -15,6 +15,21 @@ export class DailyCashClosingComponent {
   public permissions: any = {};
   public branchId: number = Number(localStorage.getItem('branch')) || 0;
 
+  public readonly denomBanknotes = [
+    { label: '1,000 บาท', field: 'cash_1000', value: 1000 },
+    { label: '500 บาท',   field: 'cash_500',  value: 500  },
+    { label: '100 บาท',   field: 'cash_100',  value: 100  },
+    { label: '50 บาท',    field: 'cash_50',   value: 50   },
+    { label: '20 บาท',    field: 'cash_20',   value: 20   },
+  ];
+
+  public readonly denomCoins = [
+    { label: '10 บาท', field: 'cash_10', value: 10 },
+    { label: '5 บาท',  field: 'cash_5',  value: 5  },
+    { label: '2 บาท',  field: 'cash_2',  value: 2  },
+    { label: '1 บาท',  field: 'cash_1',  value: 1  },
+  ];
+
   public displayAdd = false;
   public displayEdit = false;
 
