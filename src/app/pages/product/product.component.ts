@@ -271,21 +271,52 @@ export class ProductComponent {
     this.displayEdit = false
   }
 
+  private compressImage(file: File, maxSize = 1024, quality = 0.82): Promise<File> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target!.result as string;
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxSize || height > maxSize) {
+            const ratio = Math.min(maxSize / width, maxSize / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            resolve(new File([blob!], file.name.replace(/\.[^.]+$/, '.jpg'), {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            }));
+          }, 'image/jpeg', quality);
+        };
+      };
+    });
+  }
+
   onSelectImageProfile(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
     this.imageUploadLoadingAdd = true;
-    this._service.uploadImage(input.files[0]).subscribe({
-      next: (resp: any) => {
-        this.formAdd.patchValue({ upload_image_status: true, image: resp.url });
-        this.imageUploadLoadingAdd = false;
-        input.value = '';
-      },
-      error: (err) => {
-        this.imageUploadLoadingAdd = false;
-        this.showError(err.error.message);
-        input.value = '';
-      },
+    this.compressImage(input.files[0]).then(compressed => {
+      this._service.uploadImage(compressed).subscribe({
+        next: (resp: any) => {
+          this.formAdd.patchValue({ upload_image_status: true, image: resp.url });
+          this.imageUploadLoadingAdd = false;
+          input.value = '';
+        },
+        error: (err) => {
+          this.imageUploadLoadingAdd = false;
+          this.showError(err?.error?.message ?? 'อัปโหลดรูปภาพไม่สำเร็จ');
+          input.value = '';
+        },
+      });
     });
   }
 
@@ -293,17 +324,19 @@ export class ProductComponent {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
     this.imageUploadLoadingEdit = true;
-    this._service.uploadImage(input.files[0]).subscribe({
-      next: (resp: any) => {
-        this.formEdit.patchValue({ upload_image_status: true, image: resp.url });
-        this.imageUploadLoadingEdit = false;
-        input.value = '';
-      },
-      error: (err) => {
-        this.imageUploadLoadingEdit = false;
-        this.showError(err.error.message);
-        input.value = '';
-      },
+    this.compressImage(input.files[0]).then(compressed => {
+      this._service.uploadImage(compressed).subscribe({
+        next: (resp: any) => {
+          this.formEdit.patchValue({ upload_image_status: true, image: resp.url });
+          this.imageUploadLoadingEdit = false;
+          input.value = '';
+        },
+        error: (err) => {
+          this.imageUploadLoadingEdit = false;
+          this.showError(err?.error?.message ?? 'อัปโหลดรูปภาพไม่สำเร็จ');
+          input.value = '';
+        },
+      });
     });
   }
 

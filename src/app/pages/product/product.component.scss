@@ -35,10 +35,44 @@
     display: flex;
     gap: 0.5rem;
     width: 100%;
+}
 
-    button {
-        flex: 1;
+.upload-btn-wrap {
+    position: relative;
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #6c757d;
+    border-radius: 6px;
+    color: #6c757d;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.875rem;
+    user-select: none;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover {
+        background: rgba(108, 117, 125, 0.08);
     }
+
+    &.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+}
+
+.upload-overlay-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    font-size: 0;
 }
 
 :host ::ng-deep .action-menu-panel {

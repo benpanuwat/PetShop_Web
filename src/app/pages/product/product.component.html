@@ -156,19 +156,21 @@
                             </div>
                         </div>
                         <div class="image-actions">
-                            <button pButton type="button" icon="pi pi-camera" label="ถ่ายรูป"
-                                class="p-button-outlined p-button-secondary"
-                                [disabled]="imageUploadLoadingAdd"
-                                (click)="fileinputAddCapture.click()"></button>
-                            <button pButton type="button" icon="pi pi-images" label="เลือกรูป"
-                                class="p-button-outlined p-button-secondary"
-                                [disabled]="imageUploadLoadingAdd"
-                                (click)="fileinputAddGallery.click()"></button>
+                            <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingAdd">
+                                <i class="pi pi-camera"></i> ถ่ายรูป
+                                <input type="file" accept="image/*" capture=""
+                                    (change)="onSelectImageProfile($event)"
+                                    [disabled]="imageUploadLoadingAdd"
+                                    class="upload-overlay-input" />
+                            </div>
+                            <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingAdd">
+                                <i class="pi pi-images"></i> เลือกรูป
+                                <input type="file" accept="image/*"
+                                    (change)="onSelectImageProfile($event)"
+                                    [disabled]="imageUploadLoadingAdd"
+                                    class="upload-overlay-input" />
+                            </div>
                         </div>
-                        <input #fileinputAddCapture type="file" accept="image/*" capture="environment"
-                            (change)="onSelectImageProfile($event)" hidden />
-                        <input #fileinputAddGallery type="file" accept="image/*"
-                            (change)="onSelectImageProfile($event)" hidden />
                     </div>
                 </div>
                 <div class="col-12 py-0">
@@ -244,19 +246,21 @@
                             </div>
                         </div>
                         <div class="image-actions">
-                            <button pButton type="button" icon="pi pi-camera" label="ถ่ายรูป"
-                                class="p-button-outlined p-button-secondary"
-                                [disabled]="imageUploadLoadingEdit"
-                                (click)="fileinputEditCapture.click()"></button>
-                            <button pButton type="button" icon="pi pi-images" label="เลือกรูป"
-                                class="p-button-outlined p-button-secondary"
-                                [disabled]="imageUploadLoadingEdit"
-                                (click)="fileinputEditGallery.click()"></button>
+                            <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingEdit">
+                                <i class="pi pi-camera"></i> ถ่ายรูป
+                                <input type="file" accept="image/*" capture=""
+                                    (change)="onSelectImageProfileEdit($event)"
+                                    [disabled]="imageUploadLoadingEdit"
+                                    class="upload-overlay-input" />
+                            </div>
+                            <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingEdit">
+                                <i class="pi pi-images"></i> เลือกรูป
+                                <input type="file" accept="image/*"
+                                    (change)="onSelectImageProfileEdit($event)"
+                                    [disabled]="imageUploadLoadingEdit"
+                                    class="upload-overlay-input" />
+                            </div>
                         </div>
-                        <input #fileinputEditCapture type="file" accept="image/*" capture="environment"
-                            (change)="onSelectImageProfileEdit($event)" hidden />
-                        <input #fileinputEditGallery type="file" accept="image/*"
-                            (change)="onSelectImageProfileEdit($event)" hidden />
                     </div>
                 </div>
                 <div class="col-12 py-0">
