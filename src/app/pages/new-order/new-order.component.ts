@@ -253,7 +253,6 @@ export class NewOrderComponent {
     );
     this.calSum();
     setTimeout(() => this.scrollToLastRow(), 100);
-    console.log(55);
   }
 
   selectProduct(selectProduct) {
@@ -278,8 +277,12 @@ export class NewOrderComponent {
         );
 
       } else {
-        product_cart.qty += 1;
-        this.calAmount(product_cart);
+        const idx = this.products.controls.findIndex(c => c.value.id === selectProduct.id);
+        if (idx !== -1) {
+          const ctrl = this.products.at(idx);
+          const newQty = ctrl.value.qty + 1;
+          ctrl.patchValue({ qty: newQty, total: ctrl.value.price * newQty, net_total: ctrl.value.price * newQty });
+        }
       }
       this.calSum();
       setTimeout(() => this.scrollToLastRow(), 100);
@@ -312,12 +315,13 @@ export class NewOrderComponent {
   }
 
   confirmPrice() {
-    let number = Number(this._editNumber)
-    if (number > 9999)
-      number = 9999;
-
-    this.itemSelect.price = number;
-    this.calAmount(this.itemSelect);
+    const number = Number(this._editNumber) || 0;
+    const idx = this.products.controls.findIndex(c => c.value === this.itemSelect);
+    if (idx !== -1) {
+      const ctrl = this.products.at(idx);
+      ctrl.patchValue({ price: number, total: number * ctrl.value.qty, net_total: number * ctrl.value.qty });
+    }
+    this.calSum();
     this.displayPrice = false;
   }
 
@@ -346,12 +350,13 @@ export class NewOrderComponent {
   }
 
   confirmQty() {
-    let number = Number(this._editNumber)
-    if (number > 9999)
-      number = 9999;
-
-    this.itemSelect.qty = number;
-    this.calAmount(this.itemSelect);
+    const number = Number(this._editNumber) || 0;
+    const idx = this.products.controls.findIndex(c => c.value === this.itemSelect);
+    if (idx !== -1) {
+      const ctrl = this.products.at(idx);
+      ctrl.patchValue({ qty: number, total: ctrl.value.price * number, net_total: ctrl.value.price * number });
+    }
+    this.calSum();
     this.displayQty = false;
   }
 
@@ -382,14 +387,8 @@ export class NewOrderComponent {
   }
 
   confirmCashTransfer() {
-    let number = Number(this._editNumber)
-    if (number > 9999)
-      number = 9999;
-
-    this.formCart.patchValue({
-      cash_transfer: number,
-    });
-
+    const number = Number(this._editNumber) || 0;
+    this.formCart.patchValue({ cash_transfer: number });
     this.displayCashTransfer = false;
   }
 
@@ -404,22 +403,14 @@ export class NewOrderComponent {
   }
 
   confirmCashReceived() {
-    let number = Number(this._editNumber)
-    if (number > 9999)
-      number = 9999;
+    const number = Number(this._editNumber) || 0;
+    this.formCart.patchValue({ cash_received: number });
 
-    this.formCart.patchValue({
-      cash_received: number,
-    });
-
-    if (this.formCart.value.payment_type == 'เงินสด') {
-      this.formCart.patchValue({
-        cash_return: this.formCart.value.cash_received - this.formCart.value.net_total,
-      });
-    } else if (this.formCart.value.payment_type == 'โอน' || this.formCart.value.payment_type == 'คนละครึ่ง') {
-      this.formCart.patchValue({
-        cash_return: this.formCart.value.cash_received - (this.formCart.value.net_total - this.formCart.value.cash_transfer),
-      });
+    const { payment_type, net_total, cash_transfer } = this.formCart.value;
+    if (payment_type === 'เงินสด') {
+      this.formCart.patchValue({ cash_return: number - net_total });
+    } else if (payment_type === 'โอน' || payment_type === 'คนละครึ่ง') {
+      this.formCart.patchValue({ cash_return: number - (net_total - cash_transfer) });
     }
 
     this.displayCashReceived = false;
@@ -434,7 +425,7 @@ export class NewOrderComponent {
     if (this.formCart.value.payment_type == 'เงินสด') {
       this.formCart.patchValue({
         cash_received: 0,
-        cash_return: this.formCart.value.cash_received - this.formCart.value.net_total,
+        cash_return: 0 - this.formCart.value.net_total,
       });
     }
     else if (this.formCart.value.payment_type == 'โอน' || this.formCart.value.payment_type == 'คนละครึ่ง') {
@@ -453,9 +444,12 @@ export class NewOrderComponent {
   }
 
   calAmount(product_cart) {
-    product_cart.total = product_cart.price * product_cart.qty;
-    product_cart.net_total = product_cart.total;
-    product_cart.noti_discount = "";
+    const idx = this.products.controls.findIndex(c => c.value === product_cart);
+    if (idx !== -1) {
+      const ctrl = this.products.at(idx);
+      const total = ctrl.value.price * ctrl.value.qty;
+      ctrl.patchValue({ total, net_total: total, noti_discount: '' });
+    }
     this.calSum();
   }
 

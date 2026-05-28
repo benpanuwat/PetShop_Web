@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { LazyLoadEvent } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { concatAll, debounceTime, distinctUntilChanged, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { DailyCashClosingService } from './daily-cash-closing.service';
 
 @Component({
@@ -80,24 +80,17 @@ export class DailyCashClosingComponent {
       .pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        tap((query) => {
+        switchMap((query) => {
           this.loading = true;
-
-          const first = this.table.first;
-          const rows = this.table.rows;
-
-          const page = first / rows + 1;
-
-          this._service.page({ perPage: rows, page: page, search: query })
-            .subscribe((resp: any) => {
-              this.data = this.extractRows(resp);
-              this.data = this.data.map((item, index) => ({ ...item, order: index + 1 }));
-              this.totalRecords = this.extractTotalRecords(resp, this.data.length);
-              this.loading = false;
-            });
+          const page = this.table.first / this.table.rows + 1;
+          return this._service.page({ perPage: this.table.rows, page, search: query });
         }),
       )
-      .subscribe();
+      .subscribe((resp: any) => {
+        this.data = this.extractRows(resp).map((item: any, index: number) => ({ ...item, order: index + 1 }));
+        this.totalRecords = this.extractTotalRecords(resp, this.data.length);
+        this.loading = false;
+      });
   }
 
   loadTable(event: LazyLoadEvent) {

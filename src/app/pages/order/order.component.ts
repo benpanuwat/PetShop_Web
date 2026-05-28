@@ -55,71 +55,39 @@ export class OrderComponent {
       .pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        tap((query) => {
+        switchMap((query) => {
           this.loading = true;
-
-          const first = this.table.first;
-          const rows = this.table.rows;
-
-          const page = first / rows + 1;
-
-          this.formSetting.value.date_start.setHours(
-            now.getHours(),
-            now.getMinutes(),
-            now.getSeconds(),
-            now.getMilliseconds()
-          );
-          const date_start = this.formSetting.value.date_start.toISOString();
-
-          this.formSetting.value.date_end.setHours(
-            now.getHours(),
-            now.getMinutes(),
-            now.getSeconds(),
-            now.getMilliseconds()
-          );
-          const date_end = this.formSetting.value.date_end.toISOString();
-
-
-          this._service.page({ perPage: rows, page: page, search: query, date_start: date_start, date_end: date_end })
-            .subscribe((resp: any) => {
-              this.data = resp.data;
-              this.data = this.data.map((item, index) => ({ ...item, order: index + 1 }));
-              this.totalRecords = resp.totalRecords;
-              this.loading = false;
-            });
+          const page = this.table.first / this.table.rows + 1;
+          return this._service.page({
+            perPage: this.table.rows,
+            page,
+            search: query,
+            date_start: new Date(this.formSetting.value.date_start).toISOString(),
+            date_end: new Date(this.formSetting.value.date_end).toISOString(),
+          });
         }),
       )
-      .subscribe();
+      .subscribe((resp: any) => {
+        this.data = (resp.data ?? []).map((item: any, index: number) => ({ ...item, order: index + 1 }));
+        this.totalRecords = resp.totalRecords;
+        this.loading = false;
+      });
   }
 
   loadTable(event: LazyLoadEvent) {
     this.loading = true;
-
     const page = event.first / event.rows + 1;
-
-    const now = new Date();
-    this.formSetting.value.date_start.setHours(
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds(),
-      now.getMilliseconds()
-    );
-    const date_start = this.formSetting.value.date_start.toISOString();
-
-    this.formSetting.value.date_end.setHours(
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds(),
-      now.getMilliseconds()
-    );
-    const date_end = this.formSetting.value.date_end.toISOString();
-
-    this._service.page({ perPage: event.rows, page, search: this.search.value, date_start: date_start, date_end: date_end })
-      .subscribe((resp: any) => {
-        this.data = resp.data;
-        this.totalRecords = resp.totalRecords;
-        this.loading = false;
-      });
+    this._service.page({
+      perPage: event.rows,
+      page,
+      search: this.search.value,
+      date_start: new Date(this.formSetting.value.date_start).toISOString(),
+      date_end: new Date(this.formSetting.value.date_end).toISOString(),
+    }).subscribe((resp: any) => {
+      this.data = resp.data;
+      this.totalRecords = resp.totalRecords;
+      this.loading = false;
+    });
   }
 
 
