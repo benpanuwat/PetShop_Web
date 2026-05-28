@@ -12,7 +12,7 @@ import { MemberService } from '../member/member.service';
   styleUrls: ['./member.component.scss']
 })
 export class MemberComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;

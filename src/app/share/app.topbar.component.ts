@@ -16,6 +16,8 @@ export class AppTopBarComponent {
     public profile: any = {};
     public displayEditProfile: boolean = false;
     public displayChangePass: boolean = false;
+    public userBranches: { id: number; name: string }[] = [];
+    public switchingBranch = false;
 
 
     public formResetPass: FormGroup;
@@ -55,6 +57,54 @@ export class AppTopBarComponent {
         });
 
         this.loadProfie();
+        this.loadUserBranches();
+    }
+
+    loadUserBranches() {
+        // โหลดจาก localStorage ก่อน (ตั้งค่าตอน login)
+        try {
+            const stored = localStorage.getItem('user_branches');
+            if (stored) {
+                this.userBranches = JSON.parse(stored) ?? [];
+                return;
+            }
+        } catch { }
+
+        // fallback: เรียก API ถ้า localStorage ว่าง
+        this._app_service.getUserBranches().subscribe({
+            next: (resp: any) => {
+                this.userBranches = resp.data ?? [];
+                localStorage.setItem('user_branches', JSON.stringify(this.userBranches));
+            },
+            error: () => { this.userBranches = []; }
+        });
+    }
+
+    selectBranch(branch: { id: number; name: string }, panel: any) {
+        const currentBranchId = Number(localStorage.getItem('branch'));
+        if (branch.id === currentBranchId) { panel.hide(); return; }
+
+        this.switchingBranch = true;
+        this._app_service.switchBranch(branch.id).subscribe({
+            next: (resp: any) => {
+                const d = resp.data;
+                localStorage.setItem('token', d.token);
+                localStorage.setItem('branch', String(d.branch_id));
+                localStorage.setItem('branch_name', d.branch_name);
+                this.branch_name = d.branch_name;
+                this.showSuccess(`เปลี่ยนสาขาเป็น "${d.branch_name}" สำเร็จ`);
+                panel.hide();
+                setTimeout(() => window.location.reload(), 600);
+            },
+            error: (err) => {
+                this.switchingBranch = false;
+                const msg = err?.error?.message
+                    ?? (typeof err?.error === 'string' ? err.error : null)
+                    ?? `เปลี่ยนสาขาไม่สำเร็จ (${err?.status ?? 'network error'})`;
+                this.showError(msg);
+                console.error('[switch_branch]', err);
+            }
+        });
     }
 
     loadProfie() {
@@ -146,6 +196,9 @@ export class AppTopBarComponent {
 
     logout() {
         localStorage.removeItem('permissions');
+        localStorage.removeItem('user_branches');
+        localStorage.removeItem('branch');
+        localStorage.removeItem('branch_name');
         this._service.logout();
         this._router.navigate(['/login']);
     }

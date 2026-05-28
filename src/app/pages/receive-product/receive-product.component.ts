@@ -9,7 +9,7 @@ import { ReceiveProductService } from '../receive-product/receive-product.servic
   styleUrls: ['./receive-product.component.scss']
 })
 export class ReceiveProductComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
 
@@ -37,6 +37,11 @@ export class ReceiveProductComponent {
 
   get products(): FormArray {
     return this.formProductLot.get('products') as FormArray;
+  }
+
+  get grandTotal(): number {
+    const items = this.formProductLot?.value?.products ?? [];
+    return items.reduce((sum: number, it: any) => sum + (Number(it.cost_total) || 0), 0);
   }
 
   loadProduct() {

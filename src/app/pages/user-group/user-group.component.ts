@@ -12,7 +12,18 @@ import { UserGroupService } from '../user-group/user-group.service';
   styleUrls: ['./user-group.component.scss']
 })
 export class UserGroupComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
+
+  public readonly permissionItems = [
+    { key: 'user',          label: 'ผู้ใช้งาน',       hasView: true  },
+    { key: 'user_group',    label: 'กลุ่มผู้ใช้งาน',   hasView: true  },
+    { key: 'member',        label: 'สมาชิก',           hasView: true  },
+    { key: 'product_type',  label: 'ประเภทสินค้า',     hasView: true  },
+    { key: 'product_brand', label: 'แบรนด์สินค้า',     hasView: true  },
+    { key: 'product',       label: 'สินค้า',           hasView: true  },
+    { key: 'stock',         label: 'คลังสินค้า',       hasView: true  },
+    { key: 'setting',       label: 'ตั้งค่า',           hasView: false },
+  ];
   
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;

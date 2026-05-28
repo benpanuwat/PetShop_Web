@@ -1,0 +1,189 @@
+/* ── Page ────────────────────────────────────────── */
+.pb-page { display: flex; flex-direction: column; gap: 1rem; }
+
+/* ── List card ───────────────────────────────────── */
+.pb-list-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(15,23,42,.06);
+    overflow: hidden;
+}
+
+.pb-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+}
+
+.pb-list-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    i { color: #4f46e5; }
+}
+
+.pb-list-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.search-box { width: 240px; }
+.type-filter { width: 220px; }
+
+/* ── Thumbnail ───────────────────────────────────── */
+.brand-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    vertical-align: middle;
+}
+
+.brand-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+/* ── Type chip ───────────────────────────────────── */
+.type-chip {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ── Actions ─────────────────────────────────────── */
+.action-btns {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+}
+
+.text-center { text-align: center; }
+.text-muted { color: #94a3b8; }
+
+/* ── Dialog form ─────────────────────────────────── */
+.dialog-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.25rem 0;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+    }
+}
+
+.required { color: #ef4444; }
+
+/* ── Image uploader ──────────────────────────────── */
+.uploader-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.image-uploader {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+
+    .upload-preview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .upload-overlay {
+        position: absolute;
+        right: 6px;
+        bottom: 6px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #6366f1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,.2);
+        i { color: #fff; font-size: 0.85rem; }
+    }
+
+    &:hover .upload-overlay { background: #4f46e5; }
+}
+
+.upload-hint {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+/* ── Delete confirm ──────────────────────────────── */
+.delete-confirm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 1rem 0.5rem;
+    gap: 0.75rem;
+}
+
+.delete-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #fff1f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    i { font-size: 1.8rem; color: #e11d48; }
+}
+
+.delete-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; }
+.delete-msg { font-size: 0.9rem; color: #64748b; line-height: 1.5; }
+
+.delete-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    width: 100%;
+    button { flex: 1; }
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media screen and (max-width: 640px) {
+    .pb-list-header { flex-direction: column; align-items: flex-start; }
+    .search-box, .type-filter { width: 100%; }
+    .pb-list-actions { width: 100%; }
+}

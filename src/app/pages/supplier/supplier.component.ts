@@ -12,7 +12,7 @@ import { SupplierService } from './supplier.service';
   styleUrls: ['./supplier.component.scss']
 })
 export class SupplierComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;

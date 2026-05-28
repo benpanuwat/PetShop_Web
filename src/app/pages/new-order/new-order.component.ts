@@ -93,6 +93,11 @@ export class NewOrderComponent {
   public itemSelect: any = {};
   public _editNumber: string = "";
 
+  public flashRowId: any = null;
+  public barcodeAlert: string = '';
+  private _flashTimer: any;
+  private _barcodeAlertTimer: any;
+
   constructor(
     private _fb: FormBuilder,
     private _service: NewOrderService,
@@ -252,7 +257,14 @@ export class NewOrderComponent {
       })
     );
     this.calSum();
+    this.flashRow(0);
     setTimeout(() => this.scrollToLastRow(), 100);
+  }
+
+  private flashRow(id: any) {
+    clearTimeout(this._flashTimer);
+    this.flashRowId = id;
+    this._flashTimer = setTimeout(() => { this.flashRowId = null; }, 900);
   }
 
   selectProduct(selectProduct) {
@@ -285,6 +297,7 @@ export class NewOrderComponent {
         }
       }
       this.calSum();
+      this.flashRow(selectProduct.id);
       setTimeout(() => this.scrollToLastRow(), 100);
     }
   }
@@ -471,13 +484,15 @@ export class NewOrderComponent {
   }
 
   onEnterBracode() {
-    const barcode = this.normalizeBarcode(this.formSetting.value.barcode);
+    const raw = this.formSetting.value.barcode;
+    const barcode = this.normalizeBarcode(raw);
     const product = this.product_type_groups
       .flatMap(t => t.product_brands)
       .flatMap(b => b.products)
       .find(p => this.normalizeBarcode(p.code) === barcode);
 
     if (product) {
+      this.barcodeAlert = '';
       this.selectProduct(product);
       this.calSum();
 
@@ -485,8 +500,34 @@ export class NewOrderComponent {
       setTimeout(() => this.scrollToLastRow(), 100);
     }
     else {
-      this.showError("ไม่พบรายการสินค้า");
+      this.showBarcodeNotFound(barcode || raw);
+      this.formSetting.reset({ barcode: '' });
     }
+  }
+
+  private showBarcodeNotFound(code: string) {
+    this.barcodeAlert = code || '-';
+    clearTimeout(this._barcodeAlertTimer);
+    this._barcodeAlertTimer = setTimeout(() => { this.barcodeAlert = ''; }, 4000);
+    this.playBeep();
+  }
+
+  private playBeep() {
+    try {
+      const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 300;
+      gain.gain.value = 0.12;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.28);
+      osc.onended = () => ctx.close();
+    } catch { }
   }
 
   private normalizeBarcode(barcode: any): string {

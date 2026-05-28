@@ -12,7 +12,7 @@ import { BranchService } from '../branch/branch.service';
   styleUrls: ['./branch.component.scss']
 })
 export class BranchComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;

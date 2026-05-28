@@ -1,8 +1,19 @@
 <div class="pos-page">
 
+    <!-- ===== BARCODE NOT FOUND ALERT ===== -->
+    <div class="barcode-alert" *ngIf="barcodeAlert">
+        <i class="pi pi-times-circle"></i>
+        <div class="barcode-alert-body">
+            <span class="barcode-alert-title">ไม่พบสินค้าในระบบ</span>
+            <span class="barcode-alert-sub">บาร์โค้ด: {{ barcodeAlert }}</span>
+        </div>
+        <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-plain barcode-alert-close"
+            (click)="barcodeAlert=''"></button>
+    </div>
+
     <!-- ===== TOOLBAR ===== -->
     <div class="pos-toolbar">
-        <form [formGroup]="formSetting" class="toolbar-barcode">
+        <form [formGroup]="formSetting" class="toolbar-barcode" [class.input-error]="barcodeAlert">
             <div class="p-inputgroup">
                 <span class="p-inputgroup-addon"><i class="pi pi-barcode"></i></span>
                 <input pInputText type="text" formControlName="barcode" placeholder="สแกน / พิมพ์ Barcode..."
@@ -42,7 +53,7 @@
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-                    <tr class="cart-item-animate">
+                    <tr class="cart-item-animate" [class.cart-flash]="item.id === flashRowId">
                         <td>
                             <img *ngIf="item.id!=0" class="cart-img" [src]="item.image">
                         </td>
@@ -167,17 +178,17 @@
             <!-- Actions -->
             <div class="panel-actions">
                 <ng-container *ngIf="step=='select'">
-                    <button pButton icon="pi pi-check" label="สร้างคำสั่งซื้อ"
+                    <button pButton type="button" icon="pi pi-check" label="สร้างคำสั่งซื้อ"
                         class="p-button-success action-btn"
                         [disabled]="disabledAddOrder" (click)="addOrder()"></button>
-                    <button pButton icon="pi pi-trash" label="ล้างข้อมูล"
+                    <button pButton type="button" icon="pi pi-trash" label="ล้างข้อมูล"
                         class="p-button-outlined p-button-danger action-btn-sm"
                         (click)="clearData()"></button>
                 </ng-container>
                 <ng-container *ngIf="step=='order'">
-                    <button pButton icon="pi pi-print" label="พิมพ์ใบเสร็จ"
+                    <button pButton type="button" icon="pi pi-print" label="พิมพ์ใบเสร็จ"
                         class="p-button-primary action-btn" (click)="printSlip()"></button>
-                    <button pButton icon="pi pi-plus" label="รายการสั่งซื้อใหม่"
+                    <button pButton type="button" icon="pi pi-plus" label="รายการสั่งซื้อใหม่"
                         class="p-button-outlined p-button-success action-btn-sm"
                         (click)="newCreate()"></button>
                 </ng-container>

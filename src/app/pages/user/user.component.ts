@@ -12,7 +12,7 @@ import { UserService } from '../user/user.service';
   styleUrls: ['./user.component.scss']
 })
 export class UserComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;

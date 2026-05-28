@@ -12,7 +12,7 @@ import { ProductTypeService } from '../product_type/product_type.service';
   styleUrls: ['./product_type.component.scss']
 })
 export class ProductTypeComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;

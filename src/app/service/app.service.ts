@@ -48,4 +48,12 @@ export class AppService {
     return this.http.put(environment.url + `/update_profile`, data);
   }
 
+  getUserBranches() {
+    return this.http.get(environment.url + `/user_branches`);
+  }
+
+  switchBranch(branchId: number) {
+    return this.http.post(environment.url + `/switch_branch/${branchId}`, {});
+  }
+
 }

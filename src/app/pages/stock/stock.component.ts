@@ -15,7 +15,7 @@ import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
   styleUrls: ['./stock.component.scss']
 })
 export class StockComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;

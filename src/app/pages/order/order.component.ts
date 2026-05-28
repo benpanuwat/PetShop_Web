@@ -13,7 +13,7 @@ import { OrderService } from '../order/order.service';
   styleUrls: ['./order.component.scss']
 })
 export class OrderComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;

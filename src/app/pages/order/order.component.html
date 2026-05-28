@@ -1,200 +1,130 @@
-<div class="grid">
-    <div class="col-12">
-        <div class="card p-fluid">
-            <form [formGroup]="formSetting">
-                <div class="grid">
-                    <div class="col-6 md:col-6 pb-0">
-                        <div class="field">
-                            <label htmlFor="date_start"><b>วันที่เริ่ม</b></label>
-                            <p-calendar [readonlyInput]="true" formControlName="date_start" [showIcon]="true"
-                                dateFormat="dd/mm/yy">
-                            </p-calendar>
-                        </div>
-                    </div>
-                    <div class="col-6 md:col-6">
-                        <div class="field">
-                            <label htmlFor="date_end"><b>ถึงวันที่</b></label>
-                            <p-calendar [readonlyInput]="true" formControlName="date_end" [showIcon]="true"
-                                dateFormat="dd/mm/yy">
-                            </p-calendar>
-                        </div>
-                    </div>
-                    <div class="m-2 w-2">
-                        <p-toast position="bottom-center" key="data"></p-toast>
-                        <button pButton icon="pi pi-search" (click)="filterData()" label="ค้นหา"
-                            class="p-button-warning mr-2 outline"></button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="col-12">
-        <div class="card">
-            <h5>รายการคำสั่งซื้อ</h5>
-            <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
-                [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines"
-                [rowsPerPageOptions]="[10, 25, 50]">
-                <!-- เปิด ng-template -->
-                <ng-template pTemplate="caption">
-                    <div class="flex justify-content-between flex-column sm:flex-row">
-                        <div style="width: 100%; max-width: 20rem;">
-                            <span class="p-input-icon-left p-input-icon-right" style="display: block; width: 100%;">
-                                <i class="pi pi-search"></i>
-                                <i *ngIf="search.value" class="pi pi-times cursor-pointer"
-                                    (click)="search.setValue('')"></i>
-                                <input pInputText type="text" [formControl]="search" placeholder="ค้นหา"
-                                    class="w-full" style="padding-right: 2.5rem;" />
-                            </span>
-                        </div>
+<div class="od-page">
 
-                    </div>
-                </ng-template>
-                <!-- ปิด ng-template -->
-
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center  align-items-center">
-                                ลำดับ
-                            </div>
-                        </th>
-                        <th style="width: 120px;">
-                            <div class="flex justify-content-center  align-items-center">
-                                เลขคำสั่งซื้อ
-                            </div>
-                        </th>
-                        <th style="width: 150px;">
-                            <div class="flex justify-content-center  align-items-center">
-                                วันที่
-                            </div>
-                        </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center align-items-center">
-                                รหัสสมาชิก
-                            </div>
-                        </th>
-                        <th style="width: auto;">
-                            <div class="flex justify-content-start align-items-center">
-                                ชื่อสมาชิก
-                            </div>
-                        </th>
-                        <th style="width: 150px;">
-                            <div class="flex justify-content-center align-items-center">
-                                รูปแบบชำระเงิน
-                            </div>
-                        </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center align-items-center">
-                                ยอดรวม
-                            </div>
-                        </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center align-items-center">
-                                ส่วนลด
-                            </div>
-                        </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center align-items-center">
-                                ยอดชำระ
-                            </div>
-                        </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center align-items-center">
-                                สถานะ
-                            </div>
-                        </th>
-                        <th style="width: 70px;">
-                            <div class="flex justify-content-center align-items-center">
-                                จัดการ
-                            </div>
-                        </th>
-                    </tr>
-                </ng-template>
-
-                <!-- open template button edit and delete  -->
-                <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-                    <tr>
-                        <td style="text-align: center;">
-                            {{ rowIndex + 1 }}
-                        </td>
-                        <td class="text-center">
-                            {{ item.code }}
-                        </td>
-                        <td class="text-center">
-                            {{ item.created_date }}
-                        </td>
-                        <td class="text-left">
-                            {{ item.member_phone }}
-                        </td>
-                        <td class="text-left">
-                            {{ item.member_name }}
-                        </td>
-                        <td class="text-center">
-                            {{ item.payment_type }}
-                        </td>
-                        <td class="text-right">
-                            {{ item.total | number }}
-                        </td>
-                        <td class="text-right">
-                            {{ item.discount | number }}
-                        </td>
-                        <td class="text-right">
-                            {{ item.net_total | number }}
-                        </td>
-
-                        <td style="text-align: center;" class="white-space-nowrap">
-                            <span class="status-badge status-open" *ngIf="item.status === 'normal'">ปกติ</span>
-                            <span class="status-badge status-edit" *ngIf="item.status === 'edit'">แก้ไข</span>
-                            <span class="status-badge status-cancel" *ngIf="item.status === 'cancel'">ลบ</span>
-                        </td>
-
-                        <td class="text-center">
-                            <div class="dropdown">
-                                <button pButton type="button" class="p-button-secondary p-button-text"><span></span>
-                                    <i class="pi pi-bars"></i>
-                                </button>
-                                <div class="dropdown-content" tabindex="0" style="cursor: pointer;">
-                                    <button type="button" class="dropdown-action" (click)="openDetail(item.id)"><i class="pi pi-eye pr-2"></i>ดูรายละเอียด</button>
-                                    <!-- <button type="button" class="dropdown-action" (click)="openedit(item.id)" *ngIf="permissions?.manag_product_type"><i
-                                            class="pi pi-file-edit pr-2"></i>แก้ไข</button> -->
-                                    <button type="button" class="dropdown-action" (click)="openCancel(item.id)"><i class="pi pi-trash pr-2"></i>ลบ</button>
-                                </div>
-                            </div>
-                        </td>
-
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="emptyMessage" let-columns>
-                    <tr>
-                        <td [attr.colspan]="11" class="text-center">ไม่มีข้อมูล</td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
-    </div>
-</div>
-
-<p-dialog header="ลบ" [(visible)]="cancelDisplay" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
-    [breakpoints]="{'960px': '75vw'}">
-    <form [formGroup]="cancelForm">
-        <div class="card p-fluid">
-            <div class="grid">
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">หมายเหตุ</label>
-                        <textarea pInputTextarea formControlName="remark" maxlength="1000" rows="4"></textarea>
-                    </div>
+    <!-- ===== LIST CARD ===== -->
+    <div class="od-list-card">
+        <div class="od-list-header">
+            <div class="od-list-title">
+                <i class="pi pi-shopping-bag"></i>
+                <span>รายการคำสั่งซื้อ</span>
+            </div>
+            <div class="od-list-actions">
+                <div class="p-inputgroup search-box">
+                    <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
+                    <input pInputText type="text" [formControl]="search" placeholder="ค้นหาเลขที่ / สมาชิก..." />
+                    <button *ngIf="search.value" pButton type="button" icon="pi pi-times"
+                        class="p-button-danger" (click)="search.setValue('')"></button>
                 </div>
             </div>
         </div>
-    </form>
 
-    <ng-template pTemplate="footer">
-        <button pButton icon="pi pi-check" (click)="confirmCancel()" label="ยืนยัน"
-            class="p-button-success mr-2 outline"></button>
-        <button pButton icon="pi pi-times" (click)="cencelCancel()" label="ยกเลิก"
-            class="p-button-danger mr-2 outline"></button>
-    </ng-template>
-</p-dialog>
+        <!-- ===== FILTER BAR ===== -->
+        <div class="od-filter-bar">
+            <form [formGroup]="formSetting" class="date-filter">
+                <div class="field">
+                    <label>วันที่เริ่ม</label>
+                    <p-calendar [readonlyInput]="true" formControlName="date_start" [showIcon]="true"
+                        dateFormat="dd/mm/yy" styleClass="w-full"></p-calendar>
+                </div>
+                <div class="field">
+                    <label>ถึงวันที่</label>
+                    <p-calendar [readonlyInput]="true" formControlName="date_end" [showIcon]="true"
+                        dateFormat="dd/mm/yy" styleClass="w-full"></p-calendar>
+                </div>
+                <div class="field filter-btn-field">
+                    <label class="hidden-label">ค้นหา</label>
+                    <button pButton type="button" icon="pi pi-search" (click)="filterData()" label="ค้นหา"
+                        class="p-button-warning"></button>
+                </div>
+            </form>
+        </div>
+
+        <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id"
+            [paginator]="true" [loading]="loading" [rows]="10" [totalRecords]="totalRecords"
+            styleClass="p-datatable-gridlines" [rowsPerPageOptions]="[10, 25, 50]">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width:56px; text-align:center;">#</th>
+                    <th style="width:130px;">เลขคำสั่งซื้อ</th>
+                    <th style="width:150px;">วันที่</th>
+                    <th>ลูกค้า</th>
+                    <th style="width:120px; text-align:center;">ชำระเงิน</th>
+                    <th style="width:100px; text-align:right;">ยอดรวม</th>
+                    <th style="width:90px; text-align:right;">ส่วนลด</th>
+                    <th style="width:110px; text-align:right;">ยอดชำระ</th>
+                    <th style="width:100px; text-align:center;">สถานะ</th>
+                    <th style="width:90px; text-align:center;">จัดการ</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                <tr>
+                    <td class="text-center text-muted">{{ rowIndex + 1 }}</td>
+                    <td><span class="code-chip">{{ item.code }}</span></td>
+                    <td class="text-muted-sm">{{ item.created_date }}</td>
+                    <td>
+                        <div class="cust-cell">
+                            <span class="cust-name">{{ item.member_name || 'ลูกค้าทั่วไป' }}</span>
+                            <span *ngIf="item.member_phone" class="cust-phone">{{ item.member_phone }}</span>
+                        </div>
+                    </td>
+                    <td class="text-center"><span class="pay-chip">{{ item.payment_type }}</span></td>
+                    <td class="text-right">{{ item.total | number }}</td>
+                    <td class="text-right discount-val">{{ item.discount | number }}</td>
+                    <td class="text-right"><span class="net-total">{{ item.net_total | number }}</span></td>
+                    <td class="text-center">
+                        <span class="status-badge status-open" *ngIf="item.status === 'normal'">ปกติ</span>
+                        <span class="status-badge status-edit" *ngIf="item.status === 'edit'">แก้ไข</span>
+                        <span class="status-badge status-cancel" *ngIf="item.status === 'cancel'">ยกเลิก</span>
+                    </td>
+                    <td class="text-center">
+                        <div class="action-btns">
+                            <button pButton type="button" icon="pi pi-eye"
+                                class="p-button-text p-button-sm p-button-info"
+                                pTooltip="ดูรายละเอียด" (click)="openDetail(item.id)"></button>
+                            <button pButton type="button" icon="pi pi-trash"
+                                class="p-button-text p-button-sm p-button-danger"
+                                pTooltip="ยกเลิก" (click)="openCancel(item.id)"
+                                [disabled]="item.status === 'cancel'"></button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td [attr.colspan]="10" class="text-center" style="padding:2.5rem; color:#94a3b8;">
+                        <i class="pi pi-shopping-bag" style="font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+                        ไม่พบคำสั่งซื้อในช่วงวันที่ที่เลือก
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
 
 <p-toast position="bottom-center"></p-toast>
+
+<!-- ===== DIALOG: ยกเลิกคำสั่งซื้อ ===== -->
+<p-dialog header="ยกเลิกคำสั่งซื้อ" [(visible)]="cancelDisplay" [modal]="true" showEffect="fade"
+    [style]="{width:'420px'}" [breakpoints]="{'640px':'95vw'}">
+    <form [formGroup]="cancelForm">
+        <div class="dialog-form">
+            <div class="cancel-note">
+                <i class="pi pi-exclamation-triangle"></i>
+                <span>การยกเลิกจะคืนสต็อกสินค้าในคำสั่งซื้อนี้ กรุณาระบุเหตุผล</span>
+            </div>
+            <div class="field">
+                <label>หมายเหตุ</label>
+                <textarea pInputTextarea formControlName="remark" maxlength="1000" rows="4"
+                    class="w-full" placeholder="ระบุเหตุผลการยกเลิก..."></textarea>
+            </div>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-check" (click)="confirmCancel()" label="ยืนยันยกเลิก"
+            class="p-button-danger mr-2"></button>
+        <button pButton type="button" icon="pi pi-times" (click)="cencelCancel()" label="ปิด"
+            class="p-button-outlined p-button-secondary"></button>
+    </ng-template>
+</p-dialog>

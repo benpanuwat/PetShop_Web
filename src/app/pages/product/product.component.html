@@ -1,376 +1,288 @@
-﻿<div class="grid">
-    <div class="col-12">
-        <div class="card p-fluid">
-            <form [formGroup]="formSetting">
-                <div class="grid">
-                    <div class="col-12 md:col-6 pb-0">
-                        <div class="field">
-                            <label for="product_type">ประเภทสินค้า</label>
-                            <p-dropdown [options]="filter_product_types" optionLabel="name" [filter]="true"
-                                filterBy="name" [showClear]="true" placeholder="เลือกประเภทสินค้า"
-                                formControlName="product_type" (onChange)="selectProductTypeFilter()">
-                            </p-dropdown>
-                        </div>
-                    </div>
-                    <div class="col-12 md:col-6">
-                        <div class="field">
-                            <label htmlFor="location">แบรน์สินค้า</label>
-                            <p-dropdown [options]="filter_product_brands" optionLabel="name" [filter]="true"
-                                filterBy="name" [showClear]="true" placeholder="เลือกแบรน์สินค้า"
-                                formControlName="product_brand" (onChange)="selectProductBrandFilter()">
-                            </p-dropdown>
-                        </div>
-                    </div>
+<div class="pd-page">
+
+    <!-- ===== LIST CARD ===== -->
+    <div class="pd-list-card">
+        <div class="pd-list-header">
+            <div class="pd-list-title">
+                <i class="pi pi-box"></i>
+                <span>รายการสินค้า</span>
+            </div>
+            <div class="pd-list-actions">
+                <form [formGroup]="formSetting" class="filter-group">
+                    <p-dropdown [options]="filter_product_types" optionLabel="name" [filter]="true"
+                        filterBy="name" [showClear]="true" placeholder="ทุกประเภท"
+                        formControlName="product_type" (onChange)="selectProductTypeFilter()"
+                        styleClass="w-full"></p-dropdown>
+                    <p-dropdown [options]="filter_product_brands" optionLabel="name" [filter]="true"
+                        filterBy="name" [showClear]="true" placeholder="ทุกแบรนด์"
+                        formControlName="product_brand" (onChange)="selectProductBrandFilter()"
+                        styleClass="w-full"></p-dropdown>
+                </form>
+                <div class="p-inputgroup search-box">
+                    <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
+                    <input pInputText type="text" [formControl]="search" placeholder="ค้นหาชื่อ / รหัส..." />
+                    <button *ngIf="search.value" pButton type="button" icon="pi pi-times"
+                        class="p-button-danger" (click)="search.reset()"></button>
+                    <button pButton type="button" icon="pi pi-camera" class="p-button-secondary"
+                        pTooltip="สแกน Barcode" (click)="openScanner('search')"></button>
                 </div>
-            </form>
+                <button *ngIf="permissions?.manag_product" (click)="openAdd()" pButton type="button"
+                    icon="pi pi-plus" label="เพิ่มสินค้า" class="p-button-success"></button>
+            </div>
         </div>
-    </div>
-    <div class="col-12">
-        <div class="card">
-            <h5>รายการสินค้า</h5>
-            <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id" [paginator]="true"
-                [loading]="loading" [rows]="10" [totalRecords]="totalRecords" styleClass="p-datatable-gridlines"
-                [rowsPerPageOptions]="[10, 25, 50]">
-                <!-- เปิด ng-template -->
-                <ng-template pTemplate="caption">
-                    <div class="flex justify-content-between flex-column sm:flex-row">
-                        <div class="p-inputgroup" style="width: fit-content;">
-                            <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
-                            <input pInputText type="text" [formControl]="search" placeholder="ค้นหา" />
-                            <button *ngIf="search.value" pButton type="button" icon="pi pi-times" class="p-button-danger" (click)="search.reset()"></button>
-                            <button pButton type="button" icon="pi pi-camera" class="p-button-secondary"
-                                pTooltip="สแกน Barcode" (click)="openScanner('search')"></button>
+
+        <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id"
+            [paginator]="true" [loading]="loading" [rows]="10" [totalRecords]="totalRecords"
+            styleClass="p-datatable-gridlines" [rowsPerPageOptions]="[10, 25, 50]">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width:56px; text-align:center;">#</th>
+                    <th style="width:80px; text-align:center;">รูปภาพ</th>
+                    <th style="width:130px;">รหัส</th>
+                    <th style="width:22%;">ประเภท / แบรนด์</th>
+                    <th>ชื่อสินค้า</th>
+                    <th style="width:110px; text-align:right;">ราคา</th>
+                    <th *ngIf="permissions?.manag_product" style="width:100px; text-align:center;">จัดการ</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                <tr>
+                    <td class="text-center text-muted">{{ rowIndex + 1 }}</td>
+                    <td class="text-center">
+                        <img class="product-thumb" [src]="item.image || 'assets/images/product.png'" alt="" />
+                    </td>
+                    <td><span class="code-chip">{{ item.code }}</span></td>
+                    <td>
+                        <div class="tb-cell">
+                            <span class="type-chip">{{ item.product_type_name }}</span>
+                            <span class="brand-sub">{{ item.product_brand_name }}</span>
                         </div>
-
-                        <div class="pt-1 flex align-items-center" *ngIf="permissions?.manag_product_type">
-
-                            <button (click)="openAdd()" pButton icon="pi pi-plus" label="เพิ่มสินค้า"
-                                style="width:auto;"></button>
+                    </td>
+                    <td><span class="product-name">{{ item.name }}</span></td>
+                    <td class="text-right"><span class="price-text">{{ item.price | number }}.-</span></td>
+                    <td *ngIf="permissions?.manag_product" class="text-center">
+                        <div class="action-btns">
+                            <button pButton type="button" icon="pi pi-file-edit"
+                                class="p-button-text p-button-sm p-button-secondary"
+                                pTooltip="แก้ไข" (click)="openEdit(item.id)"></button>
+                            <button pButton type="button" icon="pi pi-tag"
+                                class="p-button-text p-button-sm p-button-info"
+                                pTooltip="ราคาต้นทุน" (click)="openSupplierPrice(item)"></button>
                         </div>
-                    </div>
-                </ng-template>
-                <!-- ปิด ng-template -->
+                    </td>
+                </tr>
+            </ng-template>
 
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center  align-items-center">
-                                ลำดับ
-                            </div>
-                        </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center  align-items-center">
-                                รูปภาพ
-                            </div>
-                        </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center align-items-center">
-                                รหัส
-                            </div>
-                        </th>
-                        <th style="width: auto;">
-                            <div class="flex justify-content-start align-items-center">
-                                ประเภท/แบรน์
-                            </div>
-                        </th>
-                        <th style="width: auto;">
-                            <div class="flex justify-content-start align-items-center">
-                                ชื่อสินค้า
-                            </div>
-                        </th>
-                        <th style="width: 100px;">
-                            <div class="flex justify-content-center align-items-center">
-                                ราคา
-                            </div>
-                        </th>
-                        <th style="width: 70px;">
-                            <div class="flex justify-content-center align-items-center">
-                                จัดการ
-                            </div>
-                        </th>
-                    </tr>
-                </ng-template>
-
-                <!-- open template button edit and delete  -->
-                <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-                    <tr>
-                        <td class="text-center">
-                            {{ rowIndex + 1 }}
-                        </td>
-                        <td class="text-center">
-                            <img class="icon-img" [src]="item.image">
-                        </td>
-                        <td class="text-left">
-                            {{item.code}}
-                        </td>
-                        <td class="text-left">
-                            {{ item.product_type_name }}/{{ item.product_brand_name }}
-                        </td>
-                        <td class="text-left">
-                            {{item.name}}
-                        </td>
-                        <td class="text-center">
-                            {{item.price|number}}.-
-                        </td>
-
-                        <td style="text-align: center;">
-                            <div class="dropdown">
-                                <button pButton type="button" class="p-button-secondary p-button-text"><span></span>
-                                    <i class="pi pi-bars"></i>
-                                </button>
-                                <div class="dropdown-content" tabindex="0">
-                                    <a href="javascript:void(0);" (click)="openEdit(item.id)"><i
-                                            class="pi pi-file-edit pr-2"></i>แก้ไข</a>
-                                    <a href="javascript:void(0);" (click)="openSupplierPrice(item)"><i
-                                            class="pi pi-tag pr-2"></i>ราคาต้นทุน</a>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="emptyMessage" let-columns>
-                    <tr>
-                        <td [attr.colspan]="4" class="text-center">ไม่มีข้อมูล</td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td [attr.colspan]="permissions?.manag_product ? 7 : 6" class="text-center"
+                        style="padding:2.5rem; color:#94a3b8;">
+                        <i class="pi pi-box" style="font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+                        ยังไม่มีข้อมูลสินค้า
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
     </div>
 </div>
 
-<p-dialog header="เพิ่มสินค้า" [(visible)]="displayAdd" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
-    [breakpoints]="{'960px': '75vw'}">
+<p-toast position="bottom-center"></p-toast>
+
+<!-- ===== DIALOG: เพิ่มสินค้า ===== -->
+<p-dialog header="เพิ่มสินค้า" [(visible)]="displayAdd" [modal]="true" showEffect="fade"
+    [style]="{width:'480px'}" [breakpoints]="{'640px':'95vw'}">
     <form [formGroup]="formAdd">
-        <div class="card p-fluid">
-            <div class="grid">
-                <div class="col-12 py-0 pb-3">
-                    <div class="image-upload-area">
-                        <div class="image-preview">
-                            <img *ngIf="!formAdd.get('upload_image_status')!.value"
-                                src="assets/images/product.png" class="preview-img">
-                            <img *ngIf="formAdd.get('upload_image_status')!.value"
-                                [src]="formAdd.get('image')!.value" class="preview-img">
-                            <div *ngIf="imageUploadLoadingAdd" class="image-overlay">
-                                <p-progressSpinner [style]="{'width':'36px','height':'36px'}" strokeWidth="4">
-                                </p-progressSpinner>
-                            </div>
-                        </div>
-                        <div class="image-actions">
-                            <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingAdd">
-                                <i class="pi pi-camera"></i> ถ่ายรูป
-                                <input type="file" accept="image/*" capture=""
-                                    (change)="onSelectImageProfile($event)"
-                                    [disabled]="imageUploadLoadingAdd"
-                                    class="upload-overlay-input" />
-                            </div>
-                            <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingAdd">
-                                <i class="pi pi-images"></i> เลือกรูป
-                                <input type="file" accept="image/*"
-                                    (change)="onSelectImageProfile($event)"
-                                    [disabled]="imageUploadLoadingAdd"
-                                    class="upload-overlay-input" />
-                            </div>
-                        </div>
+        <div class="dialog-form">
+            <div class="image-upload-area">
+                <div class="image-preview">
+                    <img *ngIf="!formAdd.get('upload_image_status')!.value" src="assets/images/product.png" class="preview-img">
+                    <img *ngIf="formAdd.get('upload_image_status')!.value" [src]="formAdd.get('image')!.value" class="preview-img">
+                    <div *ngIf="imageUploadLoadingAdd" class="image-overlay">
+                        <p-progressSpinner [style]="{'width':'36px','height':'36px'}" strokeWidth="4"></p-progressSpinner>
                     </div>
                 </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">รหัสสินค้า</label>
-                        <div class="p-inputgroup">
-                            <input pInputText type="text" formControlName="code" maxlength="50" />
-                            <button pButton type="button" icon="pi pi-camera" class="p-button-secondary"
-                                pTooltip="สแกน Barcode" (click)="openScanner('add')"></button>
-                        </div>
+                <div class="image-actions">
+                    <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingAdd">
+                        <i class="pi pi-camera"></i> ถ่ายรูป
+                        <input type="file" accept="image/*" capture="" (change)="onSelectImageProfile($event)"
+                            [disabled]="imageUploadLoadingAdd" class="upload-overlay-input" />
                     </div>
-                </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">ชื่อสินค้า</label>
-                        <input pInputText type="text" formControlName="name" maxlength="200" />
-                    </div>
-                </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">ลายระเอียดสินค้า</label>
-                        <textarea pInputTextarea formControlName="description" maxlength="1000" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="col-12 pb-0">
-                    <div class="field">
-                        <label for="product_type">ประเภทสินค้า</label>
-                        <p-dropdown [options]="product_types" optionLabel="name" optionValue="id" [filter]="true"
-                            filterBy="name" placeholder="เลือกประเภทสินค้า" formControlName="product_type_id"
-                            (onChange)="selectProductType(formAdd.get('product_type_id')!.value)" appendTo="body">
-                        </p-dropdown>
-                    </div>
-                </div>
-                <div class="col-12 pb-0">
-                    <div class="field">
-                        <label htmlFor="location">แบรน์สินค้า</label>
-                        <p-dropdown [options]="product_brands" optionLabel="name" optionValue="id" [filter]="true"
-                            filterBy="name" placeholder="เลือกแบรน์สินค้า" formControlName="product_brand_id"
-                            appendTo="body">
-                        </p-dropdown>
-                    </div>
-                </div>
-                <div class="col-12 pb-0">
-                    <div class="field">
-                        <label htmlFor="name">ราคา</label>
-                        <input pInputText type="number" formControlName="price" min="0" max="99999" />
+                    <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingAdd">
+                        <i class="pi pi-images"></i> เลือกรูป
+                        <input type="file" accept="image/*" (change)="onSelectImageProfile($event)"
+                            [disabled]="imageUploadLoadingAdd" class="upload-overlay-input" />
                     </div>
                 </div>
             </div>
+
+            <div class="field">
+                <label>รหัสสินค้า</label>
+                <div class="p-inputgroup">
+                    <input pInputText type="text" formControlName="code" maxlength="50" placeholder="สแกนหรือพิมพ์รหัส" />
+                    <button pButton type="button" icon="pi pi-camera" class="p-button-secondary"
+                        pTooltip="สแกน Barcode" (click)="openScanner('add')"></button>
+                </div>
+            </div>
+            <div class="field">
+                <label>ชื่อสินค้า <span class="required">*</span></label>
+                <input pInputText type="text" formControlName="name" maxlength="200" class="w-full" />
+            </div>
+            <div class="field">
+                <label>รายละเอียดสินค้า</label>
+                <textarea pInputTextarea formControlName="description" maxlength="1000" rows="3" class="w-full"></textarea>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>ประเภทสินค้า <span class="required">*</span></label>
+                    <p-dropdown [options]="product_types" optionLabel="name" optionValue="id" [filter]="true"
+                        filterBy="name" placeholder="เลือกประเภท" formControlName="product_type_id"
+                        (onChange)="selectProductType(formAdd.get('product_type_id')!.value)" appendTo="body"
+                        styleClass="w-full"></p-dropdown>
+                </div>
+                <div class="field">
+                    <label>แบรนด์สินค้า</label>
+                    <p-dropdown [options]="product_brands" optionLabel="name" optionValue="id" [filter]="true"
+                        filterBy="name" placeholder="เลือกแบรนด์" formControlName="product_brand_id"
+                        appendTo="body" styleClass="w-full"></p-dropdown>
+                </div>
+            </div>
+            <div class="field">
+                <label>ราคา (บาท)</label>
+                <input pInputText type="number" formControlName="price" min="0" max="99999" class="w-full" />
+            </div>
         </div>
     </form>
-
     <ng-template pTemplate="footer">
-        <button pButton icon="pi pi-check" (click)="addConfirm()" label="ยืนยัน"
-            class="p-button-success mr-2 outline"></button>
-        <button pButton icon="pi pi-times" (click)="addCancel()" label="ยกเลิก"
-            class="p-button-danger mr-2 outline"></button>
+        <button pButton type="button" icon="pi pi-check" (click)="addConfirm()" label="บันทึก"
+            class="p-button-success mr-2"></button>
+        <button pButton type="button" icon="pi pi-times" (click)="addCancel()" label="ยกเลิก"
+            class="p-button-outlined p-button-danger"></button>
     </ng-template>
 </p-dialog>
 
-<p-dialog header="แก้ไขสินค้า" [(visible)]="displayEdit" modal="modal" showEffect="fade" [style]="{width: '30vw'}"
-    [breakpoints]="{'960px': '75vw'}">
+<!-- ===== DIALOG: แก้ไขสินค้า ===== -->
+<p-dialog header="แก้ไขสินค้า" [(visible)]="displayEdit" [modal]="true" showEffect="fade"
+    [style]="{width:'480px'}" [breakpoints]="{'640px':'95vw'}">
     <form [formGroup]="formEdit">
-        <div class="card p-fluid">
-            <div class="grid">
-                <div class="col-12 py-0 pb-3">
-                    <div class="image-upload-area">
-                        <div class="image-preview">
-                            <img [src]="formEdit.get('image')!.value" class="preview-img">
-                            <div *ngIf="imageUploadLoadingEdit" class="image-overlay">
-                                <p-progressSpinner [style]="{'width':'36px','height':'36px'}" strokeWidth="4">
-                                </p-progressSpinner>
-                            </div>
-                        </div>
-                        <div class="image-actions">
-                            <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingEdit">
-                                <i class="pi pi-camera"></i> ถ่ายรูป
-                                <input type="file" accept="image/*" capture=""
-                                    (change)="onSelectImageProfileEdit($event)"
-                                    [disabled]="imageUploadLoadingEdit"
-                                    class="upload-overlay-input" />
-                            </div>
-                            <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingEdit">
-                                <i class="pi pi-images"></i> เลือกรูป
-                                <input type="file" accept="image/*"
-                                    (change)="onSelectImageProfileEdit($event)"
-                                    [disabled]="imageUploadLoadingEdit"
-                                    class="upload-overlay-input" />
-                            </div>
-                        </div>
+        <div class="dialog-form">
+            <div class="image-upload-area">
+                <div class="image-preview">
+                    <img [src]="formEdit.get('image')!.value || 'assets/images/product.png'" class="preview-img">
+                    <div *ngIf="imageUploadLoadingEdit" class="image-overlay">
+                        <p-progressSpinner [style]="{'width':'36px','height':'36px'}" strokeWidth="4"></p-progressSpinner>
                     </div>
                 </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">รหัสสินค้า</label>
-                        <div class="p-inputgroup">
-                            <input pInputText type="text" formControlName="code" maxlength="50" />
-                            <button pButton type="button" icon="pi pi-camera" class="p-button-secondary"
-                                pTooltip="สแกน Barcode" (click)="openScanner('edit')"></button>
-                        </div>
+                <div class="image-actions">
+                    <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingEdit">
+                        <i class="pi pi-camera"></i> ถ่ายรูป
+                        <input type="file" accept="image/*" capture="" (change)="onSelectImageProfileEdit($event)"
+                            [disabled]="imageUploadLoadingEdit" class="upload-overlay-input" />
                     </div>
-                </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">ชื่อสินค้า</label>
-                        <input pInputText type="text" formControlName="name" maxlength="200" />
-                    </div>
-                </div>
-                <div class="col-12 py-0">
-                    <div class="field">
-                        <label htmlFor="name">ลายระเอียดสินค้า</label>
-                        <textarea pInputTextarea formControlName="description" maxlength="1000" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="col-12 pb-0">
-                    <div class="field">
-                        <label for="product_type">ประเภทสินค้า</label>
-                        <p-dropdown [options]="product_types" optionLabel="name" optionValue="id" [filter]="true"
-                            filterBy="name" placeholder="เลือกประเภทสินค้า" formControlName="product_type_id"
-                            (onChange)="selectProductType(formEdit.get('product_type_id')!.value)" appendTo="body">
-                        </p-dropdown>
-                    </div>
-                </div>
-                <div class="col-12 pb-0">
-                    <div class="field">
-                        <label htmlFor="location">แบรน์สินค้า</label>
-                        <p-dropdown [options]="product_brands" optionLabel="name" optionValue="id" [filter]="true"
-                            filterBy="name" placeholder="เลือกแบรน์สินค้า" formControlName="product_brand_id"
-                            appendTo="body">
-                        </p-dropdown>
-                    </div>
-                </div>
-                <div class="col-12 pb-0">
-                    <div class="field">
-                        <label htmlFor="name">ราคา</label>
-                        <input pInputText type="number" formControlName="price" min="0" max="99999" />
+                    <div class="upload-btn-wrap" [class.disabled]="imageUploadLoadingEdit">
+                        <i class="pi pi-images"></i> เลือกรูป
+                        <input type="file" accept="image/*" (change)="onSelectImageProfileEdit($event)"
+                            [disabled]="imageUploadLoadingEdit" class="upload-overlay-input" />
                     </div>
                 </div>
             </div>
+
+            <div class="field">
+                <label>รหัสสินค้า</label>
+                <div class="p-inputgroup">
+                    <input pInputText type="text" formControlName="code" maxlength="50" />
+                    <button pButton type="button" icon="pi pi-camera" class="p-button-secondary"
+                        pTooltip="สแกน Barcode" (click)="openScanner('edit')"></button>
+                </div>
+            </div>
+            <div class="field">
+                <label>ชื่อสินค้า <span class="required">*</span></label>
+                <input pInputText type="text" formControlName="name" maxlength="200" class="w-full" />
+            </div>
+            <div class="field">
+                <label>รายละเอียดสินค้า</label>
+                <textarea pInputTextarea formControlName="description" maxlength="1000" rows="3" class="w-full"></textarea>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>ประเภทสินค้า <span class="required">*</span></label>
+                    <p-dropdown [options]="product_types" optionLabel="name" optionValue="id" [filter]="true"
+                        filterBy="name" placeholder="เลือกประเภท" formControlName="product_type_id"
+                        (onChange)="selectProductType(formEdit.get('product_type_id')!.value)" appendTo="body"
+                        styleClass="w-full"></p-dropdown>
+                </div>
+                <div class="field">
+                    <label>แบรนด์สินค้า</label>
+                    <p-dropdown [options]="product_brands" optionLabel="name" optionValue="id" [filter]="true"
+                        filterBy="name" placeholder="เลือกแบรนด์" formControlName="product_brand_id"
+                        appendTo="body" styleClass="w-full"></p-dropdown>
+                </div>
+            </div>
+            <div class="field">
+                <label>ราคา (บาท)</label>
+                <input pInputText type="number" formControlName="price" min="0" max="99999" class="w-full" />
+            </div>
         </div>
     </form>
-
     <ng-template pTemplate="footer">
-        <button pButton icon="pi pi-check" (click)="confirmEdit()" label="ยืนยัน"
-            class="p-button-success mr-2 outline"></button>
-        <button pButton icon="pi pi-times" (click)="cancelEdit()" label="ยกเลิก"
-            class="p-button-danger mr-2 outline"></button>
+        <button pButton type="button" icon="pi pi-check" (click)="confirmEdit()" label="บันทึก"
+            class="p-button-success mr-2"></button>
+        <button pButton type="button" icon="pi pi-times" (click)="cancelEdit()" label="ยกเลิก"
+            class="p-button-outlined p-button-danger"></button>
     </ng-template>
 </p-dialog>
 
+<!-- ===== DIALOG: ราคาต้นทุน ===== -->
 <p-dialog [header]="'ราคาต้นทุน — ' + supplierPriceProductName" [(visible)]="displaySupplierPrice"
-    modal="modal" showEffect="fade" [style]="{width: '45vw'}" [breakpoints]="{'960px': '75vw'}">
-    <div class="card p-fluid">
-        <div class="grid mb-3 align-items-end">
-            <div class="col-5">
+    [modal]="true" showEffect="fade" [style]="{width:'520px'}" [breakpoints]="{'640px':'95vw'}">
+    <div class="dialog-form">
+        <div class="supplier-add-row">
+            <div class="field">
                 <label>ผู้ขาย</label>
                 <p-dropdown [options]="suppliers" optionLabel="name" optionValue="id"
                     [(ngModel)]="newSupplierItem.supplier_id" placeholder="เลือกผู้ขาย"
-                    appendTo="body" [style]="{'width':'100%'}">
-                </p-dropdown>
+                    appendTo="body" styleClass="w-full"></p-dropdown>
             </div>
-            <div class="col-4">
+            <div class="field">
                 <label>ราคาต้นทุน (บาท)</label>
                 <input pInputText type="number" [(ngModel)]="newSupplierItem.cost" min="0"
-                    style="text-align: right;" />
+                    class="w-full" style="text-align:right;" />
             </div>
-            <div class="col-3">
-                <button pButton icon="pi pi-plus" label="เพิ่ม" class="p-button-primary outline"
-                    style="width:100%;"
-                    [disabled]="!newSupplierItem.supplier_id"
-                    (click)="addSupplierPrice()"></button>
+            <div class="field add-supplier-field">
+                <label class="hidden-label">เพิ่ม</label>
+                <button pButton type="button" icon="pi pi-plus" label="เพิ่ม" class="p-button-success"
+                    [disabled]="!newSupplierItem.supplier_id" (click)="addSupplierPrice()"></button>
             </div>
         </div>
 
-        <p-table [value]="supplierPriceRows" responsiveLayout="scroll">
+        <p-table [value]="supplierPriceRows" responsiveLayout="scroll" styleClass="p-datatable-sm p-datatable-gridlines">
             <ng-template pTemplate="header">
                 <tr>
                     <th>ผู้ขาย</th>
-                    <th style="width: 160px; text-align: right;">ราคาต้นทุนล่าสุด (บาท)</th>
+                    <th style="width:170px; text-align:right;">ราคาต้นทุนล่าสุด (บาท)</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr>
-                    <td>{{row.supplier_name}}</td>
-                    <td style="text-align: right;">{{row.cost | number:'1.2-2'}}</td>
+                    <td>{{ row.supplier_name }}</td>
+                    <td style="text-align:right;">{{ row.cost | number:'1.2-2' }}</td>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="emptyMessage">
+            <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="2" class="text-center">ยังไม่มีรายการ</td>
+                    <td colspan="2" class="text-center" style="padding:1.5rem; color:#94a3b8;">ยังไม่มีรายการ</td>
                 </tr>
             </ng-template>
         </p-table>
     </div>
     <ng-template pTemplate="footer">
-        <button pButton icon="pi pi-times" (click)="displaySupplierPrice = false" label="ปิด"
-            class="p-button-secondary mr-2 outline"></button>
+        <button pButton type="button" icon="pi pi-times" (click)="displaySupplierPrice = false" label="ปิด"
+            class="p-button-outlined p-button-secondary"></button>
     </ng-template>
 </p-dialog>
 
+<!-- ===== DIALOG: สแกน Barcode ===== -->
 <p-dialog header="สแกน Barcode" [(visible)]="displayScanner" [modal]="true" showEffect="fade"
     [style]="{width: '95vw', maxWidth: '480px'}" [breakpoints]="{'960px': '95vw'}"
     (onShow)="startScanner()" (onHide)="stopScanner()">
@@ -384,6 +296,7 @@
     </ng-template>
 </p-dialog>
 
+<!-- ===== DIALOG: ครอปรูปภาพ ===== -->
 <p-dialog header="ครอปรูปภาพ" [(visible)]="displayCrop" [modal]="true" showEffect="fade"
     [style]="{width: '95vw', maxWidth: '480px'}" [breakpoints]="{'960px': '95vw'}"
     [closable]="false">
@@ -409,5 +322,3 @@
             (click)="cropCancel()"></button>
     </ng-template>
 </p-dialog>
-
-<p-toast position="bottom-center"></p-toast>

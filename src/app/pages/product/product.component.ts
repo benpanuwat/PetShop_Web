@@ -15,7 +15,7 @@ import { ImageCroppedEvent } from 'ngx-image-cropper';
   styleUrls: ['./product.component.scss']
 })
 export class ProductComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;
@@ -209,6 +209,7 @@ export class ProductComponent {
       product_brand_id: 0,
       code: '',
       name: '',
+      description: '',
       upload_image_status: false,
       image: '',
       price: 0,

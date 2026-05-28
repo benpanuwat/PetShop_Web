@@ -43,6 +43,7 @@ export class LoginComponent {
       this._service.pre_login(this.loginForm.value).subscribe({
         next: (resp: any) => {
           this.branchs = resp.data.branchs;
+          localStorage.setItem('user_branches', JSON.stringify(this.branchs));
           if (this.branchs.length === 1) {
             this.loginForm.patchValue({
               branch_id: this.branchs[0].id,

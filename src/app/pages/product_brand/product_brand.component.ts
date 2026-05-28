@@ -13,7 +13,7 @@ import { ProductBrandService } from '../product_brand/product_brand.service';
   styleUrls: ['./product_brand.component.scss']
 })
 export class ProductBrandComponent {
-  public permissions: string[] = [];
+  public permissions: any = {};
 
   public displayAdd: boolean = false;
   public displayEdit: boolean = false;
