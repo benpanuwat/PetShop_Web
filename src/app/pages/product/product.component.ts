@@ -20,6 +20,8 @@ export class ProductComponent {
   public displayEdit: boolean = false;
   public displaySupplierPrice: boolean = false;
   public displayScanner: boolean = false;
+  public imageUploadLoadingAdd: boolean = false;
+  public imageUploadLoadingEdit: boolean = false;
   public scannerStatus: string = '';
   private scannerTargetForm: 'add' | 'edit' | 'search' = 'add';
   private scannerControls: IScannerControls | null = null;
@@ -271,36 +273,38 @@ export class ProductComponent {
 
   onSelectImageProfile(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      this._service.uploadImage(input.files[0]).subscribe({
-        next: (resp: any) => {
-          this.formAdd.patchValue({
-            upload_image_status: true,
-            image: resp.url,
-          })
-        },
-        error: (err) => {
-          this.showError(err.error.message);
-        },
-      });
-    }
+    if (!input.files?.length) return;
+    this.imageUploadLoadingAdd = true;
+    this._service.uploadImage(input.files[0]).subscribe({
+      next: (resp: any) => {
+        this.formAdd.patchValue({ upload_image_status: true, image: resp.url });
+        this.imageUploadLoadingAdd = false;
+        input.value = '';
+      },
+      error: (err) => {
+        this.imageUploadLoadingAdd = false;
+        this.showError(err.error.message);
+        input.value = '';
+      },
+    });
   }
 
   onSelectImageProfileEdit(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      this._service.uploadImage(input.files[0]).subscribe({
-        next: (resp: any) => {
-          this.formEdit.patchValue({
-            upload_image_status: true,
-            image: resp.url,
-          })
-        },
-        error: (err) => {
-          this.showError(err.error.message);
-        },
-      });
-    }
+    if (!input.files?.length) return;
+    this.imageUploadLoadingEdit = true;
+    this._service.uploadImage(input.files[0]).subscribe({
+      next: (resp: any) => {
+        this.formEdit.patchValue({ upload_image_status: true, image: resp.url });
+        this.imageUploadLoadingEdit = false;
+        input.value = '';
+      },
+      error: (err) => {
+        this.imageUploadLoadingEdit = false;
+        this.showError(err.error.message);
+        input.value = '';
+      },
+    });
   }
 
   openSupplierPrice(item: any) {

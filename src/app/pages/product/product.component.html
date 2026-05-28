@@ -143,15 +143,33 @@
     <form [formGroup]="formAdd">
         <div class="card p-fluid">
             <div class="grid">
-                <div class="col-12 py-0 pb-5" style="text-align: center;">
-                    <img *ngIf="!formAdd.get('upload_image_status')!.value" class="img" src="assets/images/product.png"
-                        width="100" height="100" style="cursor: pointer;" (click)="fileinputadd.click()">
-
-                    <img *ngIf="formAdd.get('upload_image_status')!.value" class="img"
-                        [src]="formAdd.get('image')!.value" width="100" height="100" style="cursor: pointer;"
-                        (click)="fileinputadd.click()">
-
-                    <input #fileinputadd type="file" (change)="onSelectImageProfile($event)" accept="image/*" hidden />
+                <div class="col-12 py-0 pb-3">
+                    <div class="image-upload-area">
+                        <div class="image-preview">
+                            <img *ngIf="!formAdd.get('upload_image_status')!.value"
+                                src="assets/images/product.png" class="preview-img">
+                            <img *ngIf="formAdd.get('upload_image_status')!.value"
+                                [src]="formAdd.get('image')!.value" class="preview-img">
+                            <div *ngIf="imageUploadLoadingAdd" class="image-overlay">
+                                <p-progressSpinner [style]="{'width':'36px','height':'36px'}" strokeWidth="4">
+                                </p-progressSpinner>
+                            </div>
+                        </div>
+                        <div class="image-actions">
+                            <button pButton type="button" icon="pi pi-camera" label="ถ่ายรูป"
+                                class="p-button-outlined p-button-secondary"
+                                [disabled]="imageUploadLoadingAdd"
+                                (click)="fileinputAddCapture.click()"></button>
+                            <button pButton type="button" icon="pi pi-images" label="เลือกรูป"
+                                class="p-button-outlined p-button-secondary"
+                                [disabled]="imageUploadLoadingAdd"
+                                (click)="fileinputAddGallery.click()"></button>
+                        </div>
+                        <input #fileinputAddCapture type="file" accept="image/*" capture="environment"
+                            (change)="onSelectImageProfile($event)" hidden />
+                        <input #fileinputAddGallery type="file" accept="image/*"
+                            (change)="onSelectImageProfile($event)" hidden />
+                    </div>
                 </div>
                 <div class="col-12 py-0">
                     <div class="field">
@@ -216,12 +234,30 @@
     <form [formGroup]="formEdit">
         <div class="card p-fluid">
             <div class="grid">
-                <div class="col-12 py-0 pb-5" style="text-align: center;">
-                    <img class="img" [src]="formEdit.get('image')!.value" width="100" height="100"
-                        style="cursor: pointer;" (click)="fileinputedit.click()">
-
-                    <input #fileinputedit type="file" (change)="onSelectImageProfileEdit($event)" accept="image/*"
-                        hidden />
+                <div class="col-12 py-0 pb-3">
+                    <div class="image-upload-area">
+                        <div class="image-preview">
+                            <img [src]="formEdit.get('image')!.value" class="preview-img">
+                            <div *ngIf="imageUploadLoadingEdit" class="image-overlay">
+                                <p-progressSpinner [style]="{'width':'36px','height':'36px'}" strokeWidth="4">
+                                </p-progressSpinner>
+                            </div>
+                        </div>
+                        <div class="image-actions">
+                            <button pButton type="button" icon="pi pi-camera" label="ถ่ายรูป"
+                                class="p-button-outlined p-button-secondary"
+                                [disabled]="imageUploadLoadingEdit"
+                                (click)="fileinputEditCapture.click()"></button>
+                            <button pButton type="button" icon="pi pi-images" label="เลือกรูป"
+                                class="p-button-outlined p-button-secondary"
+                                [disabled]="imageUploadLoadingEdit"
+                                (click)="fileinputEditGallery.click()"></button>
+                        </div>
+                        <input #fileinputEditCapture type="file" accept="image/*" capture="environment"
+                            (change)="onSelectImageProfileEdit($event)" hidden />
+                        <input #fileinputEditGallery type="file" accept="image/*"
+                            (change)="onSelectImageProfileEdit($event)" hidden />
+                    </div>
                 </div>
                 <div class="col-12 py-0">
                     <div class="field">
