@@ -183,7 +183,7 @@
                         [disabled]="disabledAddOrder" (click)="addOrder()"></button>
                     <button pButton type="button" icon="pi pi-trash" label="ล้างข้อมูล"
                         class="p-button-outlined p-button-danger action-btn-sm"
-                        (click)="clearData()"></button>
+                        (click)="onClearData()"></button>
                 </ng-container>
                 <ng-container *ngIf="step=='order'">
                     <button pButton type="button" icon="pi pi-print" label="พิมพ์ใบเสร็จ"
@@ -199,6 +199,25 @@
 </div>
 
 <p-toast position="bottom-center"></p-toast>
+
+<!-- ===== DIALOG: ยืนยันล้างตะกร้า ===== -->
+<p-dialog [(visible)]="displayClearConfirm" [modal]="true" showEffect="fade"
+    [style]="{width:'360px'}" [breakpoints]="{'640px':'95vw'}" [showHeader]="false">
+    <div class="clear-confirm">
+        <div class="clear-confirm-icon"><i class="pi pi-exclamation-triangle"></i></div>
+        <div class="clear-confirm-title">ล้างรายการในตะกร้า?</div>
+        <div class="clear-confirm-msg">
+            มีสินค้าในตะกร้า {{ products.length }} รายการ ({{ totalQty }} ชิ้น)<br>
+            ยืนยันการล้างข้อมูลทั้งหมด?
+        </div>
+        <div class="clear-confirm-actions">
+            <button pButton type="button" icon="pi pi-trash" label="ล้างข้อมูล"
+                class="p-button-danger" (click)="confirmClearData()"></button>
+            <button pButton type="button" icon="pi pi-times" label="ยกเลิก"
+                class="p-button-outlined p-button-secondary" (click)="displayClearConfirm=false"></button>
+        </div>
+    </div>
+</p-dialog>
 
 <!-- ===== DIALOGS (unchanged) ===== -->
 

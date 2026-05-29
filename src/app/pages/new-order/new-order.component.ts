@@ -73,6 +73,7 @@ export class NewOrderComponent {
   public displayPrice = false;
   public displayCashTransfer = false;
   public displayCashReceived = false;
+  public displayClearConfirm = false;
 
   public disabledAddMember: boolean = true;
   public disabledAddOrder: boolean = false;
@@ -563,6 +564,20 @@ export class NewOrderComponent {
         this.showError(err.error.message);
       },
     });
+  }
+
+  onClearData() {
+    // ยังไม่สร้างคำสั่งซื้อ (step='select') และมีสินค้าในตะกร้า → ต้องยืนยันก่อนล้าง
+    if (this.products.length > 0) {
+      this.displayClearConfirm = true;
+    } else {
+      this.clearData();
+    }
+  }
+
+  confirmClearData() {
+    this.clearData();
+    this.displayClearConfirm = false;
   }
 
   clearData() {

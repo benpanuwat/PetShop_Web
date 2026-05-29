@@ -23,12 +23,12 @@
                 <div class="field">
                     <label>วันที่เริ่ม</label>
                     <p-calendar [readonlyInput]="true" formControlName="date_start" [showIcon]="true"
-                        dateFormat="dd/mm/yy" styleClass="w-full"></p-calendar>
+                        dateFormat="dd/mm/yy" appendTo="body" styleClass="w-full"></p-calendar>
                 </div>
                 <div class="field">
                     <label>ถึงวันที่</label>
                     <p-calendar [readonlyInput]="true" formControlName="date_end" [showIcon]="true"
-                        dateFormat="dd/mm/yy" styleClass="w-full"></p-calendar>
+                        dateFormat="dd/mm/yy" appendTo="body" styleClass="w-full"></p-calendar>
                 </div>
                 <div class="field filter-btn-field">
                     <label class="hidden-label">ค้นหา</label>
@@ -100,6 +100,52 @@
                 </tr>
             </ng-template>
         </p-table>
+
+        <!-- ===== SUMMARY BY PAYMENT TYPE ===== -->
+        <div class="od-summary" *ngIf="summary.length">
+            <div class="od-summary-title">
+                <i class="pi pi-calculator"></i>
+                <span>สรุปยอดตามประเภทการชำระเงิน</span>
+                <span class="od-summary-note">(ไม่รวมบิลที่ยกเลิก)</span>
+            </div>
+            <div class="od-summary-scroll">
+                <table class="od-summary-table">
+                    <thead>
+                        <tr>
+                            <th>ประเภทการชำระเงิน</th>
+                            <th class="num">จำนวนบิล</th>
+                            <th class="num">ราคารวม</th>
+                            <th class="num">ส่วนลด</th>
+                            <th class="num">เงินโอน</th>
+                            <th class="num">เงินสด</th>
+                            <th class="num">เงินทอน</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let s of summary">
+                            <td><span class="pay-chip">{{ s.payment_type }}</span></td>
+                            <td class="num">{{ s.count | number }}</td>
+                            <td class="num">{{ s.total | number }}</td>
+                            <td class="num discount-val">{{ s.discount | number }}</td>
+                            <td class="num">{{ s.cash_transfer | number }}</td>
+                            <td class="num">{{ s.cash_received | number }}</td>
+                            <td class="num">{{ s.cash_return | number }}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="od-summary-total">
+                            <td>รวมทั้งหมด</td>
+                            <td class="num">{{ summaryTotal.count | number }}</td>
+                            <td class="num">{{ summaryTotal.total | number }}</td>
+                            <td class="num discount-val">{{ summaryTotal.discount | number }}</td>
+                            <td class="num">{{ summaryTotal.cash_transfer | number }}</td>
+                            <td class="num">{{ summaryTotal.cash_received | number }}</td>
+                            <td class="num">{{ summaryTotal.cash_return | number }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 

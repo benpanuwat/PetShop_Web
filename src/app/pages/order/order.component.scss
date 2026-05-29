@@ -115,6 +115,56 @@
 .text-right { text-align: right; }
 .text-muted { color: #94a3b8; }
 
+/* ── Summary by payment type ─────────────────────── */
+.od-summary {
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.od-summary-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    i { color: #2563eb; }
+    .od-summary-note { font-size: 0.78rem; font-weight: 400; color: #94a3b8; }
+}
+
+.od-summary-scroll { overflow-x: auto; }
+
+.od-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+
+    th, td {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid #f1f5f9;
+        white-space: nowrap;
+    }
+    thead th {
+        background: #f8fafc;
+        color: #64748b;
+        font-weight: 700;
+        text-align: left;
+    }
+    .num { text-align: right; }
+    tbody tr:hover { background: #fafafa; }
+
+    .od-summary-total {
+        td {
+            border-top: 2px solid #e2e8f0;
+            border-bottom: none;
+            font-weight: 800;
+            color: #1e293b;
+            background: #f8fafc;
+        }
+    }
+}
+
 /* ── Dialog form ─────────────────────────────────── */
 .dialog-form {
     display: flex;

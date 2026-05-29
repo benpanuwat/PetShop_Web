@@ -24,6 +24,7 @@ export class OrderComponent {
   public totalRecords: number = 0;
   public search: FormControl = new FormControl('');
   public data: any[];
+  public summary: any[] = [];
 
   public formSetting: FormGroup;
   public cancelForm: FormGroup;
@@ -62,14 +63,15 @@ export class OrderComponent {
             perPage: this.table.rows,
             page,
             search: query,
-            date_start: new Date(this.formSetting.value.date_start).toISOString(),
-            date_end: new Date(this.formSetting.value.date_end).toISOString(),
+            date_start: this.toLocalDate(this.formSetting.value.date_start),
+            date_end: this.toLocalDate(this.formSetting.value.date_end),
           });
         }),
       )
       .subscribe((resp: any) => {
         this.data = (resp.data ?? []).map((item: any, index: number) => ({ ...item, order: index + 1 }));
         this.totalRecords = resp.totalRecords;
+        this.summary = resp.summary ?? [];
         this.loading = false;
       });
   }
@@ -81,18 +83,39 @@ export class OrderComponent {
       perPage: event.rows,
       page,
       search: this.search.value,
-      date_start: new Date(this.formSetting.value.date_start).toISOString(),
-      date_end: new Date(this.formSetting.value.date_end).toISOString(),
+      date_start: this.toLocalDate(this.formSetting.value.date_start),
+      date_end: this.toLocalDate(this.formSetting.value.date_end),
     }).subscribe((resp: any) => {
       this.data = resp.data;
       this.totalRecords = resp.totalRecords;
+      this.summary = resp.summary ?? [];
       this.loading = false;
     });
+  }
+
+  get summaryTotal() {
+    const s = this.summary ?? [];
+    return {
+      count: s.reduce((a, x) => a + (x.count || 0), 0),
+      total: s.reduce((a, x) => a + (x.total || 0), 0),
+      discount: s.reduce((a, x) => a + (x.discount || 0), 0),
+      cash_transfer: s.reduce((a, x) => a + (x.cash_transfer || 0), 0),
+      cash_received: s.reduce((a, x) => a + (x.cash_received || 0), 0),
+      cash_return: s.reduce((a, x) => a + (x.cash_return || 0), 0),
+    };
   }
 
 
   filterData() {
     this.table.reset();
+  }
+
+  private toLocalDate(value: any): string {
+    const d = new Date(value);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 
   openCancel(id: any) {
