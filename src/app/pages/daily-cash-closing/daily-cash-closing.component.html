@@ -257,17 +257,15 @@
                 <i class="pi pi-exclamation-triangle mr-1"
                     *ngIf="formEdit.get('diff_amount')?.value !== 0"></i>
                 หมายเหตุ
-                <span *ngIf="formEdit.get('diff_amount')?.value !== 0 && formEdit.value?.last_status"
+                <span *ngIf="formEdit.get('diff_amount')?.value !== 0"
                     class="required-tag">*จำเป็น</span>
             </label>
-            <textarea pInputTextarea formControlName="remark" rows="2"
-                [readonly]="!formEdit.value?.last_status"></textarea>
+            <textarea pInputTextarea formControlName="remark" rows="2"></textarea>
         </div>
 
     </form>
     <ng-template pTemplate="footer">
         <button pButton icon="pi pi-check" (click)="confirmEdit()" label="บันทึก"
-            [disabled]="!formEdit.value?.last_status"
             class="p-button-success mr-2"></button>
         <button pButton icon="pi pi-times" (click)="cancelEdit()" label="ปิด"
             class="p-button-outlined p-button-secondary"></button>
