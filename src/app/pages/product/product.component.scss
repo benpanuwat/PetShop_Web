@@ -237,6 +237,30 @@
     max-height: 70vh;
 }
 
+.crop-bg-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+
+    label {
+        cursor: pointer;
+        font-size: 0.95rem;
+        color: #334155;
+    }
+}
+
+.crop-bg-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.4rem 0 0;
+    font-size: 0.8rem;
+    color: #64748b;
+
+    i { color: #0ea5e9; }
+}
+
 /* ── Responsive ──────────────────────────────────── */
 @media screen and (max-width: 640px) {
     .pd-list-header { flex-direction: column; align-items: flex-start; }

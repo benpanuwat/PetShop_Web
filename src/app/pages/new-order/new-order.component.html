@@ -41,7 +41,7 @@
         <!-- ── CART ── -->
         <div class="pos-cart">
             <p-table #dt [value]="formCart.value?.products" responsiveLayout="scroll"
-                [scrollable]="true" scrollHeight="flex">
+                [scrollable]="true" scrollHeight="flex" [rowTrackBy]="trackByIndex">
                 <ng-template pTemplate="header">
                     <tr>
                         <th style="width:60px;">รูป</th>
@@ -60,7 +60,9 @@
                         </td>
                         <td>
                             <span *ngIf="item.id!=0" class="cart-name">{{item.name}}</span>
-                            <input *ngIf="item.id==0" pInputText type="text" [(ngModel)]="item.name"
+                            <input *ngIf="item.id==0" pInputText type="text"
+                                [ngModel]="item.name" (ngModelChange)="setItemName(rowIndex, $event)"
+                                [ngModelOptions]="{standalone:true}"
                                 maxlength="200" style="width:100%;" [readonly]="step=='order'" />
                         </td>
                         <td style="text-align:right;">

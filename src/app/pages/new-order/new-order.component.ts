@@ -300,6 +300,12 @@ export class NewOrderComponent {
     }
   }
 
+  trackByIndex = (index: number) => index;
+
+  setItemName(index: number, name: string) {
+    this.products.at(index)?.patchValue({ name }, { emitEvent: false });
+  }
+
   removeProduct(index: number) {
     this.products.removeAt(index);
     this.calSum();

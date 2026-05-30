@@ -27,6 +27,7 @@ export class ProductComponent {
   public displayCrop: boolean = false;
   public cropImageFile: File | null = null;
   public croppedBlob: Blob | null = null;
+  public removeBg: boolean = false;
   private cropTargetForm: 'add' | 'edit' = 'add';
   public scannerStatus: string = '';
   private scannerTargetForm: 'add' | 'edit' | 'search' = 'add';
@@ -308,14 +309,27 @@ export class ProductComponent {
     this.croppedBlob = null;
   }
 
-  cropConfirm() {
+  async cropConfirm() {
     if (!this.croppedBlob) return;
     const isAdd = this.cropTargetForm === 'add';
     if (isAdd) this.imageUploadLoadingAdd = true;
     else this.imageUploadLoadingEdit = true;
 
-    const file = new File([this.croppedBlob], 'product.jpg', { type: 'image/jpeg' });
+    const sourceBlob = this.croppedBlob;
     this.displayCrop = false;
+
+    let file: File;
+    try {
+      file = this.removeBg
+        ? await this.removeBgToWhiteJpeg(sourceBlob)
+        : new File([sourceBlob], 'product.jpg', { type: 'image/jpeg' });
+    } catch {
+      if (isAdd) this.imageUploadLoadingAdd = false;
+      else this.imageUploadLoadingEdit = false;
+      this.croppedBlob = null;
+      this.showError('ลบพื้นหลังไม่สำเร็จ กรุณาลองใหม่');
+      return;
+    }
 
     this._service.uploadImage(file).subscribe({
       next: (resp: any) => {
@@ -335,6 +349,28 @@ export class ProductComponent {
         this.croppedBlob = null;
       },
     });
+  }
+
+  // ลบพื้นหลังฝั่ง client แล้ววางบนพื้นขาว ส่งออกเป็น JPEG
+  private async removeBgToWhiteJpeg(input: Blob): Promise<File> {
+    const { removeBackground } = await import('@imgly/background-removal');
+    const cutout: Blob = await removeBackground(input);
+
+    const bitmap = await createImageBitmap(cutout);
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('canvas context unavailable');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bitmap, 0, 0);
+    bitmap.close?.();
+
+    const jpegBlob: Blob = await new Promise((resolve, reject) =>
+      canvas.toBlob(b => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/jpeg', 0.9)
+    );
+    return new File([jpegBlob], 'product.jpg', { type: 'image/jpeg' });
   }
 
   openSupplierPrice(item: any) {

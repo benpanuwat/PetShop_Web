@@ -315,6 +315,14 @@
             output="blob">
         </image-cropper>
     </div>
+    <div class="crop-bg-option">
+        <p-checkbox [(ngModel)]="removeBg" [binary]="true" inputId="removeBg"></p-checkbox>
+        <label for="removeBg">ลบพื้นหลัง (เปลี่ยนเป็นพื้นขาว)</label>
+    </div>
+    <p class="crop-bg-hint" *ngIf="removeBg">
+        <i class="pi pi-info-circle"></i>
+        ระบบจะประมวลผลในเครื่อง ครั้งแรกอาจใช้เวลาสักครู่ในการดาวน์โหลดโมเดล
+    </p>
     <ng-template pTemplate="footer">
         <button pButton icon="pi pi-check" label="ยืนยัน" class="p-button-success mr-2"
             [disabled]="!croppedBlob" (click)="cropConfirm()"></button>
