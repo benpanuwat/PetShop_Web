@@ -249,7 +249,7 @@ export class NewOrderComponent {
       this._fb.group({
         id: 0,
         code: '',
-        name: 'อื่นๆ',
+        name: '',
         qty: 1,
         price: 0,
         total: 0,
@@ -259,7 +259,7 @@ export class NewOrderComponent {
     );
     this.calSum();
     this.flashRow(0);
-    setTimeout(() => this.scrollToLastRow(), 100);
+    this.scrollToRow(this.products.length - 1);
   }
 
   private flashRow(id: any) {
@@ -270,11 +270,10 @@ export class NewOrderComponent {
 
   selectProduct(selectProduct) {
     if (this.step == 'select') {
-      let product_cart = this.formCart.value.products.find(p =>
-        p.id === selectProduct.id
-      );
+      const idx = this.products.controls.findIndex(c => c.value.id === selectProduct.id);
+      let targetIndex: number;
 
-      if (!product_cart) {
+      if (idx === -1) {
         this.products.push(
           this._fb.group({
             id: selectProduct.id,
@@ -288,18 +287,16 @@ export class NewOrderComponent {
             net_total: selectProduct.price,
           })
         );
-
+        targetIndex = this.products.length - 1;
       } else {
-        const idx = this.products.controls.findIndex(c => c.value.id === selectProduct.id);
-        if (idx !== -1) {
-          const ctrl = this.products.at(idx);
-          const newQty = ctrl.value.qty + 1;
-          ctrl.patchValue({ qty: newQty, total: ctrl.value.price * newQty, net_total: ctrl.value.price * newQty });
-        }
+        const ctrl = this.products.at(idx);
+        const newQty = ctrl.value.qty + 1;
+        ctrl.patchValue({ qty: newQty, total: ctrl.value.price * newQty, net_total: ctrl.value.price * newQty });
+        targetIndex = idx;
       }
       this.calSum();
       this.flashRow(selectProduct.id);
-      setTimeout(() => this.scrollToLastRow(), 100);
+      this.scrollToRow(targetIndex);
     }
   }
 
@@ -498,7 +495,6 @@ export class NewOrderComponent {
       this.calSum();
 
       this.formSetting.reset({ barcode: '' });
-      setTimeout(() => this.scrollToLastRow(), 100);
     }
     else {
       this.showBarcodeNotFound(barcode || raw);
@@ -540,12 +536,22 @@ export class NewOrderComponent {
       .toUpperCase();
   }
 
-  scrollToLastRow() {
-    const tableBody = this.table.el.nativeElement.querySelector('.p-datatable-wrapper');
-    if (tableBody) {
-      tableBody.scrollTop = tableBody.scrollHeight;
-      tableBody.scrollLeft = tableBody.scrollWidth;
-    }
+  scrollToRow(index: number) {
+    setTimeout(() => {
+      const wrapper = this.table?.el?.nativeElement?.querySelector('.p-datatable-wrapper');
+      if (!wrapper) return;
+      const row = wrapper.querySelector(`tr[data-row-index="${index}"]`) as HTMLElement;
+      if (row) {
+        // เลื่อนให้แถวที่เพิ่ง add/อัปเดต มาอยู่กลางจอ เพื่อให้เห็นชัดเจน
+        const rowRect = row.getBoundingClientRect();
+        const wrapRect = wrapper.getBoundingClientRect();
+        const rowTopInWrapper = rowRect.top - wrapRect.top + wrapper.scrollTop;
+        const target = rowTopInWrapper - (wrapper.clientHeight / 2) + (rowRect.height / 2);
+        wrapper.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+      } else {
+        wrapper.scrollTop = wrapper.scrollHeight;
+      }
+    }, 100);
   }
 
   onEnterMemberPhone() {

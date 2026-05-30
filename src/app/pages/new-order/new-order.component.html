@@ -40,7 +40,7 @@
 
         <!-- ── CART ── -->
         <div class="pos-cart">
-            <p-table [value]="formCart.value?.products" responsiveLayout="scroll"
+            <p-table #dt [value]="formCart.value?.products" responsiveLayout="scroll"
                 [scrollable]="true" scrollHeight="flex">
                 <ng-template pTemplate="header">
                     <tr>
@@ -53,7 +53,8 @@
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-                    <tr class="cart-item-animate" [class.cart-flash]="item.id === flashRowId">
+                    <tr class="cart-item-animate" [attr.data-row-index]="rowIndex"
+                        [class.cart-flash]="item.id === flashRowId">
                         <td>
                             <img *ngIf="item.id!=0" class="cart-img" [src]="item.image">
                         </td>
