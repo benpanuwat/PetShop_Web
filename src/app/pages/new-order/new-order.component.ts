@@ -74,6 +74,8 @@ export class NewOrderComponent {
   public displayCashTransfer = false;
   public displayCashReceived = false;
   public displayClearConfirm = false;
+  public displayImagePreview = false;
+  public previewImageSrc = '';
 
   public disabledAddMember: boolean = true;
   public disabledAddOrder: boolean = false;
@@ -301,6 +303,12 @@ export class NewOrderComponent {
   }
 
   trackByIndex = (index: number) => index;
+
+  openImagePreview(src: string) {
+    if (!src) return;
+    this.previewImageSrc = src;
+    this.displayImagePreview = true;
+  }
 
   setItemName(index: number, name: string) {
     this.products.at(index)?.patchValue({ name }, { emitEvent: false });

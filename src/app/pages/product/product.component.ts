@@ -28,6 +28,9 @@ export class ProductComponent {
   public cropImageFile: File | null = null;
   public croppedBlob: Blob | null = null;
   public removeBg: boolean = false;
+
+  public displayImagePreview: boolean = false;
+  public previewImageSrc: string = '';
   private cropTargetForm: 'add' | 'edit' = 'add';
   public scannerStatus: string = '';
   private scannerTargetForm: 'add' | 'edit' | 'search' = 'add';
@@ -277,6 +280,11 @@ export class ProductComponent {
 
   cancelEdit() {
     this.displayEdit = false
+  }
+
+  openImagePreview(src: string) {
+    this.previewImageSrc = src || 'assets/images/product.png';
+    this.displayImagePreview = true;
   }
 
   onSelectImageProfile(event: Event) {

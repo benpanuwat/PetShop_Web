@@ -51,7 +51,8 @@
                 <tr>
                     <td class="text-center text-muted">{{ rowIndex + 1 }}</td>
                     <td class="text-center">
-                        <img class="product-thumb" [src]="item.image || 'assets/images/product.png'" alt="" />
+                        <img class="product-thumb img-clickable" [src]="item.image || 'assets/images/product.png'"
+                            alt="" (click)="openImagePreview(item.image || 'assets/images/product.png')" />
                     </td>
                     <td><span class="code-chip">{{ item.code }}</span></td>
                     <td>
@@ -89,6 +90,14 @@
 </div>
 
 <p-toast position="bottom-center"></p-toast>
+
+<!-- ===== DIALOG: แสดงรูปสินค้าขนาดใหญ่ ===== -->
+<p-dialog header="รูปสินค้า" [(visible)]="displayImagePreview" [modal]="true" [dismissableMask]="true"
+    showEffect="fade" [style]="{width:'auto', maxWidth:'90vw'}" [breakpoints]="{'640px':'95vw'}">
+    <div class="image-preview-dialog">
+        <img [src]="previewImageSrc" alt="รูปสินค้า" />
+    </div>
+</p-dialog>
 
 <!-- ===== DIALOG: เพิ่มสินค้า ===== -->
 <p-dialog header="เพิ่มสินค้า" [(visible)]="displayAdd" [modal]="true" showEffect="fade"

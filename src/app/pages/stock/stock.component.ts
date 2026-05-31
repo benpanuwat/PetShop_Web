@@ -23,6 +23,8 @@ export class StockComponent {
   public displaySupplierPrice: boolean = false;
   public displayScanner: boolean = false;
   public displayLog: boolean = false;
+  public displayImagePreview: boolean = false;
+  public previewImageSrc: string = '';
   public logProductName: string = '';
   public logData: any[] = [];
   public logLoading: boolean = false;
@@ -453,6 +455,11 @@ export class StockComponent {
     this.stopScanner();
     this.displayScanner = false;
     this.scannerStatus = '';
+  }
+
+  openImagePreview(src: string) {
+    this.previewImageSrc = src || 'assets/images/product.png';
+    this.displayImagePreview = true;
   }
 
   showError(massage: string) {

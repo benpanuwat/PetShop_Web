@@ -56,7 +56,8 @@
                     <tr class="cart-item-animate" [attr.data-row-index]="rowIndex"
                         [class.cart-flash]="item.id === flashRowId">
                         <td>
-                            <img *ngIf="item.id!=0" class="cart-img" [src]="item.image">
+                            <img *ngIf="item.id!=0" class="cart-img img-clickable" [src]="item.image"
+                                alt="" (click)="openImagePreview(item.image)" />
                         </td>
                         <td>
                             <span *ngIf="item.id!=0" class="cart-name">{{item.name}}</span>
@@ -202,6 +203,14 @@
 </div>
 
 <p-toast position="bottom-center"></p-toast>
+
+<!-- ===== DIALOG: แสดงรูปสินค้าขนาดใหญ่ ===== -->
+<p-dialog header="รูปสินค้า" [(visible)]="displayImagePreview" [modal]="true" [dismissableMask]="true"
+    showEffect="fade" [style]="{width:'auto', maxWidth:'90vw'}" [breakpoints]="{'640px':'95vw'}">
+    <div class="image-preview-dialog">
+        <img [src]="previewImageSrc" alt="รูปสินค้า" />
+    </div>
+</p-dialog>
 
 <!-- ===== DIALOG: ยืนยันล้างตะกร้า ===== -->
 <p-dialog [(visible)]="displayClearConfirm" [modal]="true" showEffect="fade"
