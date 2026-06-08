@@ -67,6 +67,28 @@
 .diff-over  { background: #dbeafe; color: #1d4ed8; }
 .diff-under { background: #fee2e2; color: #b91c1c; }
 
+/* ── Cash movement (เติมเงินเข้า / ดึงเงินออก) ───────── */
+.move-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+.move-in  { background: #dcfce7; color: #166534; }
+.move-out { background: #fee2e2; color: #b91c1c; }
+
+.move-type-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.totals-item.move-in  { background: #f0fdf4; border-color: #bbf7d0; .totals-label { color: #166534; } .totals-value { color: #166534; } }
+.totals-item.move-out { background: #fff1f2; border-color: #fecdd3; .totals-label { color: #b91c1c; } .totals-value { color: #b91c1c; } }
+
 /* ── Info row (dialog top) ────────────────────────── */
 .info-row {
     display: flex;

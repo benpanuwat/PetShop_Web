@@ -6,7 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 import { AccordionModule } from 'primeng/accordion';
@@ -249,6 +249,7 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
         AppService,
         DashboardService,
         MessageService,
+        ConfirmationService,
     ],
     bootstrap: [AppComponent]
 })

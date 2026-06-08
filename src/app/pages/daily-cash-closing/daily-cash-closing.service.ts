@@ -35,4 +35,23 @@ export class DailyCashClosingService {
   updateDailyCashClosing(id: any, data: any) {
     return this.http.put(environment.url + `/update_daily_cash_closing/${id}`, data);
   }
+
+  // ===== ดึงเงินออก / เติมเงินเข้า (cash_movements) =====
+  pageCashMovement(data: { perPage: number, page: number, search?: string }) {
+    return this.http.get(environment.url + `/cash_movement/page`, {
+      params: {
+        perPage: data.perPage,
+        page: data.page,
+        search: data?.search ?? '',
+      }
+    });
+  }
+
+  addCashMovement(data: any) {
+    return this.http.post(environment.url + `/add_cash_movement`, data);
+  }
+
+  deleteCashMovement(id: any) {
+    return this.http.delete(environment.url + `/delete_cash_movement/${id}`);
+  }
 }

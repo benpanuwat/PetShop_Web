@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { LazyLoadEvent } from 'primeng/api';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { DailyCashClosingService } from './daily-cash-closing.service';
@@ -43,10 +43,24 @@ export class DailyCashClosingComponent {
   public formEdit: FormGroup;
   public editId: string;
 
+  // ===== ดึงเงินออก / เติมเงินเข้า (cash_movements) =====
+  public readonly movementTypes = [
+    { label: 'เติมเงินเข้า', value: 'in' },
+    { label: 'ดึงเงินออก', value: 'out' },
+  ];
+  @ViewChild('dtm') movementTable: Table;
+  public movementLoading = false;
+  public movementTotalRecords = 0;
+  public movementSearch: FormControl = new FormControl('');
+  public movementData: any[] = [];
+  public displayMovement = false;
+  public formMovement: FormGroup;
+
   constructor(
     private _fb: FormBuilder,
     private _service: DailyCashClosingService,
     private _messageService: MessageService,
+    private _confirmationService: ConfirmationService,
   ) {
     this.permissions = JSON.parse(localStorage.getItem('permissions') || '{}');
   }
@@ -56,6 +70,8 @@ export class DailyCashClosingComponent {
       closing_date: new Date(),
       opening_amount: 0,
       cash_sales: 0,
+      cash_in: 0,
+      cash_out: 0,
       expected_amount: 0,
       actual_amount: 0,
       diff_amount: 0,
@@ -75,6 +91,8 @@ export class DailyCashClosingComponent {
       closing_date: new Date(),
       opening_amount: 0,
       cash_sales: 0,
+      cash_in: 0,
+      cash_out: 0,
       expected_amount: 0,
       actual_amount: 0,
       diff_amount: 0,
@@ -90,6 +108,37 @@ export class DailyCashClosingComponent {
       remark: '',
       last_status: false,
     });
+
+    this.formMovement = this._fb.group({
+      type: 'in',
+      amount: 0,
+      cash_1000: 0,
+      cash_500: 0,
+      cash_100: 0,
+      cash_50: 0,
+      cash_20: 0,
+      cash_10: 0,
+      cash_5: 0,
+      cash_2: 0,
+      cash_1: 0,
+      remark: '',
+    });
+
+    this.movementSearch.valueChanges
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap((query) => {
+          this.movementLoading = true;
+          const page = this.movementTable.first / this.movementTable.rows + 1;
+          return this._service.pageCashMovement({ perPage: this.movementTable.rows, page, search: query });
+        }),
+      )
+      .subscribe((resp: any) => {
+        this.movementData = this.extractRows(resp);
+        this.movementTotalRecords = this.extractTotalRecords(resp, this.movementData.length);
+        this.movementLoading = false;
+      });
 
     this.search.valueChanges
       .pipe(
@@ -144,10 +193,14 @@ export class DailyCashClosingComponent {
   openAdd() {
     this._service.getLastDailyCashClosing()
       .subscribe((resp: any) => {
+        const cashIn = resp.data.cash_in || 0;
+        const cashOut = resp.data.cash_out || 0;
         this.formAdd = this._fb.group({
           opening_amount: resp.data.opening_amount,
           cash_sales: resp.data.cash_sales,
-          expected_amount: resp.data.opening_amount + resp.data.cash_sales,
+          cash_in: cashIn,
+          cash_out: cashOut,
+          expected_amount: resp.data.opening_amount + resp.data.cash_sales + cashIn - cashOut,
           actual_amount: 0,
           diff_amount: 0,
           cash_1000: 0,
@@ -250,6 +303,93 @@ export class DailyCashClosingComponent {
       actual_amount: actualAmount,
       diff_amount: diffAmount,
     }, { emitEvent: false });
+  }
+
+  // ===== ดึงเงินออก / เติมเงินเข้า =====
+  loadMovementTable(event: LazyLoadEvent) {
+    this.movementLoading = true;
+    const page = event.first / event.rows + 1;
+    this._service.pageCashMovement({ perPage: event.rows, page, search: this.movementSearch.value })
+      .subscribe((resp: any) => {
+        this.movementData = this.extractRows(resp);
+        this.movementTotalRecords = this.extractTotalRecords(resp, this.movementData.length);
+        this.movementLoading = false;
+      });
+  }
+
+  openMovement() {
+    this.formMovement.reset({
+      type: 'in',
+      amount: 0,
+      cash_1000: 0,
+      cash_500: 0,
+      cash_100: 0,
+      cash_50: 0,
+      cash_20: 0,
+      cash_10: 0,
+      cash_5: 0,
+      cash_2: 0,
+      cash_1: 0,
+      remark: '',
+    });
+    this.displayMovement = true;
+  }
+
+  changeMovementPrice() {
+    const amount =
+      (Number(this.formMovement.get('cash_1000')?.value) || 0) * 1000 +
+      (Number(this.formMovement.get('cash_500')?.value) || 0) * 500 +
+      (Number(this.formMovement.get('cash_100')?.value) || 0) * 100 +
+      (Number(this.formMovement.get('cash_50')?.value) || 0) * 50 +
+      (Number(this.formMovement.get('cash_20')?.value) || 0) * 20 +
+      (Number(this.formMovement.get('cash_10')?.value) || 0) * 10 +
+      (Number(this.formMovement.get('cash_5')?.value) || 0) * 5 +
+      (Number(this.formMovement.get('cash_2')?.value) || 0) * 2 +
+      (Number(this.formMovement.get('cash_1')?.value) || 0) * 1;
+
+    this.formMovement.patchValue({ amount }, { emitEvent: false });
+  }
+
+  addMovementConfirm() {
+    if ((Number(this.formMovement.get('amount')?.value) || 0) <= 0) {
+      this.showError('กรุณาระบุจำนวนเงิน');
+      return;
+    }
+    this._service.addCashMovement(this.formMovement.value).subscribe({
+      next: (resp: any) => {
+        this.displayMovement = false;
+        this.showSuccess(resp.message);
+        this.movementTable.reset();
+      },
+      error: (err) => {
+        this.showError(err.error?.message || 'ไม่สามารถบันทึกข้อมูลได้');
+      },
+    });
+  }
+
+  addMovementCancel() {
+    this.displayMovement = false;
+  }
+
+  deleteMovement(item: any) {
+    this._confirmationService.confirm({
+      message: 'ต้องการลบรายการนี้หรือไม่?',
+      header: 'ยืนยันการลบ',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'ลบ',
+      rejectLabel: 'ยกเลิก',
+      accept: () => {
+        this._service.deleteCashMovement(item.id).subscribe({
+          next: (resp: any) => {
+            this.showSuccess(resp.message);
+            this.movementTable.reset();
+          },
+          error: (err) => {
+            this.showError(err.error?.message || 'ไม่สามารถลบข้อมูลได้');
+          },
+        });
+      },
+    });
   }
 
   showError(message: string) {
