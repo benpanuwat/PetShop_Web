@@ -32,7 +32,20 @@
             <button pButton icon="pi pi-plus-circle" label="อื่นๆ"
                 class="p-button-outlined p-button-secondary"
                 [disabled]="step=='order'" (click)="addItem()"></button>
+            <button pButton icon="pi pi-gift" [label]="giftMode ? 'กำลังแถม' : 'ของแถม'"
+                class="p-button-success" [class.p-button-outlined]="!giftMode"
+                [disabled]="step=='order'" (click)="toggleGiftMode()"></button>
         </div>
+    </div>
+
+    <!-- ===== GIFT MODE BANNER ===== -->
+    <div class="gift-mode-banner" *ngIf="giftMode">
+        <i class="pi pi-gift"></i>
+        <span class="gift-mode-text">โหมดของแถม — สแกนบาร์โค้ดหรือกดเลือกสินค้า เพื่อเพิ่มเป็นของแถมฟรี</span>
+        <button pButton type="button" icon="pi pi-search" label="เลือกสินค้า"
+            class="p-button-sm p-button-success" (click)="openGiftPicker()"></button>
+        <button pButton type="button" icon="pi pi-times" label="ออกจากโหมดแถม"
+            class="p-button-sm p-button-outlined p-button-secondary" (click)="giftMode=false"></button>
     </div>
 
     <!-- ===== BODY: CART + SUMMARY ===== -->
@@ -65,11 +78,15 @@
                                 [ngModel]="item.name" (ngModelChange)="setItemName(rowIndex, $event)"
                                 [ngModelOptions]="{standalone:true}"
                                 maxlength="200" style="width:100%;" [readonly]="step=='order'" />
+                            <span *ngIf="item.is_free" class="gift-badge"><i class="pi pi-gift"></i> แถมฟรี</span>
                         </td>
                         <td style="text-align:right;">
-                            <span *ngIf="step=='select'" class="editable-val"
-                                (click)="openPrice(item)">{{item.price | number:'1.2-2'}}</span>
-                            <span *ngIf="step=='order'">{{item.price | number:'1.2-2'}}</span>
+                            <span *ngIf="item.is_free" class="gift-free-text">ฟรี</span>
+                            <ng-container *ngIf="!item.is_free">
+                                <span *ngIf="step=='select'" class="editable-val"
+                                    (click)="openPrice(item)">{{item.price | number:'1.2-2'}}</span>
+                                <span *ngIf="step=='order'">{{item.price | number:'1.2-2'}}</span>
+                            </ng-container>
                         </td>
                         <td style="text-align:right;">
                             <span *ngIf="step=='select'" class="editable-val qty-chip"
@@ -267,8 +284,8 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog header="เพิ่มสินค้า" [(visible)]="displayAddProduct" modal="modal" showEffect="fade" [style]="{width: '70vw'}"
-    [breakpoints]="{'960px': '75vw'}">
+<p-dialog [header]="giftMode ? 'เลือกของแถม' : 'เพิ่มสินค้า'" [(visible)]="displayAddProduct" modal="modal"
+    showEffect="fade" [style]="{width: '70vw'}" [breakpoints]="{'960px': '75vw'}">
     <div class="grid">
         <div class="col-12">
             <ng-container *ngIf="select_type=='product_type'">

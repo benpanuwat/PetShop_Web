@@ -98,6 +98,7 @@ export class NewOrderComponent {
 
   public flashRowId: any = null;
   public barcodeAlert: string = '';
+  public giftMode: boolean = false;
   private _flashTimer: any;
   private _barcodeAlertTimer: any;
 
@@ -257,11 +258,21 @@ export class NewOrderComponent {
         total: 0,
         discount: 0,
         net_total: 0,
+        is_free: false,
       })
     );
     this.calSum();
     this.flashRow(0);
     this.scrollToRow(this.products.length - 1);
+  }
+
+  toggleGiftMode() {
+    this.giftMode = !this.giftMode;
+  }
+
+  openGiftPicker() {
+    this.giftMode = true;
+    this.displayAddProduct = true;
   }
 
   private flashRow(id: any) {
@@ -272,7 +283,29 @@ export class NewOrderComponent {
 
   selectProduct(selectProduct) {
     if (this.step == 'select') {
-      const idx = this.products.controls.findIndex(c => c.value.id === selectProduct.id);
+      // โหมดของแถม: เพิ่มเป็นบรรทัดใหม่เสมอ ราคา 0 + ติดธง is_free (ไม่ merge กับสินค้าที่มีอยู่)
+      if (this.giftMode) {
+        this.products.push(
+          this._fb.group({
+            id: selectProduct.id,
+            code: selectProduct.code,
+            name: selectProduct.name,
+            image: selectProduct.image,
+            qty: 1,
+            price: 0,
+            total: 0,
+            discount: 0,
+            net_total: 0,
+            is_free: true,
+          })
+        );
+        this.calSum();
+        this.flashRow(selectProduct.id);
+        this.scrollToRow(this.products.length - 1);
+        return;
+      }
+
+      const idx = this.products.controls.findIndex(c => c.value.id === selectProduct.id && !c.value.is_free);
       let targetIndex: number;
 
       if (idx === -1) {
@@ -287,6 +320,7 @@ export class NewOrderComponent {
             total: selectProduct.price,
             discount: 0,
             net_total: selectProduct.price,
+            is_free: false,
           })
         );
         targetIndex = this.products.length - 1;
@@ -321,6 +355,7 @@ export class NewOrderComponent {
 
 
   openPrice(item) {
+    if (item.is_free) return; // ของแถมราคา 0 เสมอ แก้ราคาไม่ได้
     this.itemSelect = item;
     this._editNumber = "";
     this.displayPrice = true;
@@ -653,6 +688,7 @@ export class NewOrderComponent {
     this.clearData();
     this.step = "select";
     this.disabledAddOrder = false;
+    this.giftMode = false;
   }
 
   printSlip() {
