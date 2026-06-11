@@ -54,7 +54,7 @@ export class LoginComponent {
                 this._service.setName(resp2.data.first_name + " " + resp2.data.last_name);
                 localStorage.setItem('branch', this.branchs[0].id);
                 localStorage.setItem('branch_name', this.branchs[0].name);
-                this._router.navigate(['/app/user_group']);
+                this._router.navigate(['/app/dashboard']);
               },
               error: (err2) => {
                 this.showError(err2.error.message);
@@ -86,7 +86,7 @@ export class LoginComponent {
         this._service.setName(resp2.data.first_name + " " + resp2.data.last_name);
         localStorage.setItem('branch', branch?.id);
         localStorage.setItem('branch_name', branch?.name ?? '');
-        this._router.navigate(['/app/user_group']);
+        this._router.navigate(['/app/dashboard']);
       },
       error: (err2) => {
         this.showError(err2.error.message);

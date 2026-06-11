@@ -7,6 +7,7 @@ import { AccessdeniedComponent } from './pages/accessdenied/accessdenied.compone
 import { ErrorComponent } from './pages/error/error.component';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { BestSellerComponent } from './pages/best-seller/best-seller.component';
 
 import { UserComponent } from './pages/user/user.component';
 import { UserGroupComponent } from './pages/user-group/user-group.component';
@@ -33,6 +34,7 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
                 path: 'app', component: AppMainComponent,
                 children: [
                     { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+                    { path: 'best-seller', component: BestSellerComponent, canActivate: [AuthGuard] },
                     { path: 'user', component: UserComponent, canActivate: [AuthGuard] },
                     { path: 'user_group', component: UserGroupComponent, canActivate: [AuthGuard] },
                     { path: 'member', component: MemberComponent, canActivate: [AuthGuard] },

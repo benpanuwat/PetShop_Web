@@ -1,0 +1,49 @@
+<div class="best-seller-page">
+    <div class="panel-card">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title"><i class="pi pi-star-fill"></i> สินค้าขายดี</div>
+                <div class="panel-subtitle">จัดอันดับสินค้าตามจำนวนที่ขายได้ (ไม่รวมของแถมและบิลที่ยกเลิก)</div>
+            </div>
+            <p-selectButton [options]="periodOptions" [(ngModel)]="period" optionLabel="label" optionValue="value"
+                (onChange)="onPeriodChange()"></p-selectButton>
+        </div>
+
+        <p-table [value]="data" [loading]="loading" styleClass="p-datatable-gridlines" responsiveLayout="scroll"
+            [paginator]="true" [rows]="25" [rowsPerPageOptions]="[25, 50, 100]">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width:70px; text-align:center;">อันดับ</th>
+                    <th style="width:64px;">รูป</th>
+                    <th style="width:140px;">รหัส</th>
+                    <th>สินค้า</th>
+                    <th style="width:120px; text-align:right;">ขายได้ (ชิ้น)</th>
+                    <th style="width:150px; text-align:right;">ยอดขาย</th>
+                    <th style="width:110px; text-align:right;">คงเหลือ</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+                <tr>
+                    <td class="text-center">
+                        <span class="rank-badge" [class.rank-top]="item.rank <= 3">{{ item.rank }}</span>
+                    </td>
+                    <td><img *ngIf="item.image" class="bs-img" [src]="item.image" alt="" /></td>
+                    <td>{{ item.product_code || '-' }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td class="text-right">{{ item.total_qty | number }}</td>
+                    <td class="text-right">{{ item.total_revenue | number:'1.2-2' }}</td>
+                    <td class="text-right">{{ item.stock | number }}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7" class="text-center" style="padding:2rem; color:#94a3b8;">
+                        <i class="pi pi-inbox" style="font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+                        ยังไม่มีข้อมูลการขายในช่วงนี้
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+<p-toast position="top-right"></p-toast>

@@ -20,4 +20,8 @@ export class DashboardService {
   getChartMonthly(year: number) {
     return this.http.get(environment.url + `/dashboard/chart/monthly`, { params: { year } });
   }
+
+  getBestSeller(period: string = 'month', take: number = 20) {
+    return this.http.get(environment.url + `/dashboard/best_seller`, { params: { period, take } });
+  }
 }

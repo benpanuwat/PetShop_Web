@@ -26,7 +26,8 @@ export class AppMenuComponent implements OnInit {
                         label: 'Dashboard',
                         icon: 'pi pi-fw pi-home',
                         items: [
-                            { label: 'ภาพรวมระบบ', icon: 'pi pi-fw pi-chart-line', routerLink: ['/app/dashboard'] }
+                            { label: 'ภาพรวมระบบ', icon: 'pi pi-fw pi-chart-line', routerLink: ['/app/dashboard'] },
+                            { label: 'สินค้าขายดี', icon: 'pi pi-fw pi-star', routerLink: ['/app/best-seller'] }
                         ]
                     }
                 ];

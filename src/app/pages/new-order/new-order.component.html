@@ -178,7 +178,7 @@
                 <div class="total-row">
                     <span class="total-label">
                         ส่วนลด
-                        <input pInputText type="number" formControlName="discount_per" min="0" max="20"
+                        <input pInputText type="number" formControlName="discount_per" min="0" max="50"
                             class="discount-input" (change)="calSum()" [readonly]="step=='order'" /> %
                     </span>
                     <span class="discount-val">- {{formCart.value.discount | number:'1.2-2'}}</span>
@@ -270,7 +270,7 @@
                 <div class="col-6 py-0">
                     <div class="field">
                         <label htmlFor="name">ส่วนลด(%)</label>
-                        <input pInputText type="number" formControlName="discount" min="0" max="20" />
+                        <input pInputText type="number" formControlName="discount" min="0" max="50" />
                     </div>
                 </div>
             </div>
