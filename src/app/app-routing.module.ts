@@ -8,6 +8,7 @@ import { ErrorComponent } from './pages/error/error.component';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { BestSellerComponent } from './pages/best-seller/best-seller.component';
+import { ProductGroupComponent } from './pages/product_group/product_group.component';
 
 import { UserComponent } from './pages/user/user.component';
 import { UserGroupComponent } from './pages/user-group/user-group.component';
@@ -42,6 +43,7 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
                     { path: 'product_type', component: ProductTypeComponent, canActivate: [AuthGuard] },
                     { path: 'product_brand', component: ProductBrandComponent, canActivate: [AuthGuard] },
                     { path: 'product', component: ProductComponent, canActivate: [AuthGuard] },
+                    { path: 'product_group', component: ProductGroupComponent, canActivate: [AuthGuard] },
                     { path: 'new_order', component: NewOrderComponent, canActivate: [AuthGuard] },
                     { path: 'order', component: OrderComponent, canActivate: [AuthGuard] },
                     { path: 'order/detail/:id', component: OrderDetailComponent, canActivate: [AuthGuard] },

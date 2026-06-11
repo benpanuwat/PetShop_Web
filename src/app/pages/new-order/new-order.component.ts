@@ -99,6 +99,8 @@ export class NewOrderComponent {
   public flashRowId: any = null;
   public barcodeAlert: string = '';
   public giftMode: boolean = false;
+  public productGroups: any[] = [];
+  public promoDiscountTotal: number = 0;
   private _flashTimer: any;
   private _barcodeAlertTimer: any;
 
@@ -142,6 +144,7 @@ export class NewOrderComponent {
     this.loadBranch();
     this.loadPaymentType();
     this.loadProduct();
+    this.loadProductGroups();
   }
 
   get products(): FormArray {
@@ -177,6 +180,72 @@ export class NewOrderComponent {
       .subscribe((resp: any) => {
         this.product_type_groups = resp.data;
       });
+  }
+
+  loadProductGroups() {
+    this._service.getProductGroups()
+      .subscribe((resp: any) => {
+        this.productGroups = resp?.data ?? [];
+      });
+  }
+
+  // คำนวณส่วนลดโปรโมชั่นจากกลุ่มสินค้า: ครบขั้นต่ำ -> ลดทุกชิ้นในกลุ่ม
+  // สินค้าอยู่ได้หลายกลุ่ม -> ใช้ส่วนลด/ชิ้นที่มากที่สุด (ไม่ซ้อนกัน)
+  applyGroupDiscounts() {
+    this.promoDiscountTotal = 0;
+    const controls = this.products.controls;
+
+    // 1) รีเซ็ตบรรทัดที่ไม่ใช่ของแถมกลับเป็นราคาเต็ม
+    controls.forEach((ctrl: any) => {
+      const v = ctrl.value;
+      if (v.is_free) return;
+      const base = (Number(v.price) || 0) * (Number(v.qty) || 0);
+      ctrl.patchValue({ discount: 0, net_total: base, noti_discount: '' }, { emitEvent: false });
+    });
+
+    if (!this.productGroups || this.productGroups.length === 0) return;
+
+    // 2) หาส่วนลด/ชิ้นที่ดีที่สุดของแต่ละบรรทัด
+    const bestPerPiece: { [index: number]: number } = {};
+    for (const group of this.productGroups) {
+      const ids: number[] = group.product_ids || [];
+      if (!ids.length) continue;
+
+      let sumQty = 0;
+      controls.forEach((ctrl: any) => {
+        const v = ctrl.value;
+        if (!v.is_free && ids.includes(v.id)) sumQty += Number(v.qty) || 0;
+      });
+      if (sumQty < (Number(group.min_qty) || 0)) continue;
+
+      controls.forEach((ctrl: any, idx: number) => {
+        const v = ctrl.value;
+        if (v.is_free || !ids.includes(v.id)) return;
+        const price = Number(v.price) || 0;
+        let perPiece = group.discount_type === 'percent'
+          ? Math.round((price * (Number(group.discount_value) || 0) / 100) * 100) / 100
+          : (Number(group.discount_value) || 0);
+        if (perPiece > price) perPiece = price;
+        if (perPiece > (bestPerPiece[idx] || 0)) bestPerPiece[idx] = perPiece;
+      });
+    }
+
+    // 3) ใส่ส่วนลดลงบรรทัด
+    controls.forEach((ctrl: any, idx: number) => {
+      const perPiece = bestPerPiece[idx];
+      if (!perPiece || perPiece <= 0) return;
+      const v = ctrl.value;
+      const qty = Number(v.qty) || 0;
+      const price = Number(v.price) || 0;
+      const discount = Math.round(perPiece * qty * 100) / 100;
+      const net = Math.max(0, price * qty - discount);
+      this.promoDiscountTotal += discount;
+      ctrl.patchValue({
+        discount: discount,
+        net_total: net,
+        noti_discount: `โปรโมชั่น -${perPiece}/ชิ้น`,
+      }, { emitEvent: false });
+    });
   }
 
   openAddMember() {
@@ -259,6 +328,7 @@ export class NewOrderComponent {
         discount: 0,
         net_total: 0,
         is_free: false,
+        noti_discount: '',
       })
     );
     this.calSum();
@@ -297,6 +367,7 @@ export class NewOrderComponent {
             discount: 0,
             net_total: 0,
             is_free: true,
+            noti_discount: '',
           })
         );
         this.calSum();
@@ -321,6 +392,7 @@ export class NewOrderComponent {
             discount: 0,
             net_total: selectProduct.price,
             is_free: false,
+            noti_discount: '',
           })
         );
         targetIndex = this.products.length - 1;
@@ -514,6 +586,8 @@ export class NewOrderComponent {
   }
 
   calSum() {
+    this.applyGroupDiscounts();
+
     let total = 0;
     let discount_per = this.formCart.get('discount_per').value;
     for (const product of this.formCart.value.products) {

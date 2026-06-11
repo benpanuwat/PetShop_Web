@@ -1,0 +1,312 @@
+.pg-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.pg-list-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 1.25rem;
+    border: 1px solid #edf1f5;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.pg-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.pg-list-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+        color: #14b8a6;
+    }
+}
+
+.pg-list-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.discount-chip {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 14px;
+    background: #ecfeff;
+    color: #0e7490;
+    font-weight: 600;
+    font-size: 0.82rem;
+    white-space: nowrap;
+
+    &.is-percent {
+        background: #fef3c7;
+        color: #b45309;
+    }
+}
+
+.count-pill,
+.qty-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 36px;
+    justify-content: center;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+.count-pill {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.qty-pill {
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+/* ── กล่องกติกาส่วนลดในไดอะล็อก ── */
+.rule-box {
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem 1rem;
+    border: 1px solid #d6f4ee;
+    background: #f6fefb;
+    border-radius: 14px;
+
+    .rule-box-head {
+        font-weight: 700;
+        color: #0f766e;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .field-row {
+        margin-bottom: 0.75rem;
+    }
+
+    ::ng-deep .p-selectbutton {
+        display: flex;
+
+        .p-button {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+}
+
+.rule-preview {
+    margin-top: 0.85rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px dashed #99e6d5;
+    color: #334155;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+
+    i {
+        color: #14b8a6;
+        margin-top: 2px;
+    }
+
+    strong {
+        color: #0f766e;
+    }
+}
+
+.count-badge {
+    margin-left: 0.4rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 10px;
+    background: #ecfeff;
+    color: #0e7490;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+/* ── หัวไดอะล็อก ── */
+.dlg-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #0f172a;
+
+    i {
+        color: #14b8a6;
+    }
+}
+
+/* ช่องตัวเลขในกล่องกติกา: ใหญ่ อ่านง่าย จัดกึ่งกลาง สูงเท่ากัน */
+::ng-deep .pg-form .big-num.p-inputtext {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+}
+
+::ng-deep .pg-form .p-inputnumber {
+    width: 100%;
+}
+
+/* ปรับ select button ในกล่องกติกาให้ดูเป็นสวิตช์ */
+.rule-box ::ng-deep .p-selectbutton .p-button {
+    padding: 0.55rem 0.75rem;
+    font-weight: 600;
+}
+
+/* ── ตารางเลือกสินค้า ── */
+.product-picker {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+
+    .picker-search {
+        padding: 0.6rem;
+        border-bottom: 1px solid #eef2f6;
+        background: #f8fafc;
+    }
+
+    ::ng-deep .picker-table {
+        .p-datatable-thead > tr > th {
+            background: #f8fafc;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .p-datatable-tbody > tr {
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+
+        .p-datatable-tbody > tr > td {
+            padding: 0.5rem 0.75rem;
+        }
+
+        .picker-row.selected > td {
+            background: #f0fdf9;
+        }
+
+        .picker-row:hover > td {
+            background: #f1f5f9;
+        }
+    }
+
+    .pk-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .pk-code {
+        margin-left: 0.4rem;
+        color: #94a3b8;
+        font-size: 0.78rem;
+    }
+}
+
+/* กล่องติ๊กเลือก */
+.chk {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid #cbd5e1;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.12s;
+
+    i {
+        font-size: 0.7rem;
+        color: #fff;
+        opacity: 0;
+    }
+
+    &.on {
+        background: #14b8a6;
+        border-color: #14b8a6;
+
+        i {
+            opacity: 1;
+        }
+    }
+}
+
+.pg-form {
+    .field {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+
+        label {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: #334155;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+    }
+
+    .field-row {
+        display: flex;
+        gap: 1rem;
+
+        .field {
+            flex: 1;
+        }
+    }
+}
+
+.delete-confirm {
+    text-align: center;
+    padding: 1.25rem 0.5rem 0.5rem;
+
+    .delete-icon {
+        font-size: 2.2rem;
+        color: #f59e0b;
+        margin-bottom: 0.5rem;
+    }
+
+    .delete-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .delete-msg {
+        color: #64748b;
+        margin-bottom: 1.1rem;
+    }
+
+    .delete-actions {
+        display: flex;
+        justify-content: center;
+        gap: 0.6rem;
+    }
+}

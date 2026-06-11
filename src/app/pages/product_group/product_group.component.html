@@ -1,0 +1,221 @@
+<div class="pg-page">
+    <div class="pg-list-card">
+        <div class="pg-list-header">
+            <div class="pg-list-title">
+                <i class="pi pi-tags"></i>
+                <span>จัดกลุ่มสินค้า (ส่วนลดโปรโมชั่น)</span>
+            </div>
+            <div class="pg-list-actions">
+                <div class="p-inputgroup search-group">
+                    <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
+                    <input pInputText type="text" [formControl]="search" placeholder="ค้นหาชื่อกลุ่ม" />
+                    <button *ngIf="search.value" pButton type="button" icon="pi pi-times"
+                        class="p-button-danger" (click)="search.reset()"></button>
+                </div>
+                <button (click)="openAdd()" pButton icon="pi pi-plus" label="เพิ่มกลุ่ม"
+                    class="p-button-success"></button>
+            </div>
+        </div>
+
+        <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id"
+            [paginator]="true" [loading]="loading" [rows]="10" [totalRecords]="totalRecords"
+            styleClass="p-datatable-gridlines" [rowsPerPageOptions]="[10, 25, 50]">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width:56px; text-align:center;">#</th>
+                    <th>ชื่อกลุ่ม</th>
+                    <th style="width:120px; text-align:center;">จำนวนสินค้า</th>
+                    <th style="width:110px; text-align:center;">ซื้อครบ (ชิ้น)</th>
+                    <th style="width:160px; text-align:center;">ส่วนลด</th>
+                    <th style="width:130px; text-align:center;">จัดการ</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                <tr>
+                    <td class="text-center text-muted">{{ rowIndex + 1 }}</td>
+                    <td>{{ item.name }}</td>
+                    <td class="text-center">
+                        <span class="count-pill"><i class="pi pi-box"></i> {{ item.product_count | number }}</span>
+                    </td>
+                    <td class="text-center"><span class="qty-pill">{{ item.min_qty | number }}</span></td>
+                    <td class="text-center">
+                        <span class="discount-chip" [class.is-percent]="item.discount_type === 'percent'">
+                            {{ discountText(item) }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button pButton type="button" icon="pi pi-file-edit"
+                            class="p-button-text p-button-sm p-button-secondary"
+                            pTooltip="แก้ไข" (click)="openEdit(item.id)"></button>
+                        <button pButton type="button" icon="pi pi-trash"
+                            class="p-button-text p-button-sm p-button-danger"
+                            pTooltip="ลบ" (click)="openDelete(item.id)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="text-center" style="padding:2.5rem; color:#94a3b8;">
+                        <i class="pi pi-tags" style="font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+                        ยังไม่มีกลุ่มสินค้า
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== DIALOG: เพิ่ม ===== -->
+<p-dialog [(visible)]="displayAdd" [modal]="true" showEffect="fade" styleClass="pg-dialog"
+    [style]="{width:'560px'}" [breakpoints]="{'640px':'95vw'}" [draggable]="false">
+    <ng-template pTemplate="header">
+        <div class="dlg-title"><i class="pi pi-tags"></i> เพิ่มกลุ่มสินค้า</div>
+    </ng-template>
+    <form [formGroup]="formAdd" class="pg-form">
+        <ng-container *ngTemplateOutlet="formFields; context: { form: formAdd }"></ng-container>
+    </form>
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-check" (click)="addConfirm()" label="บันทึก"
+            class="p-button-success mr-2"></button>
+        <button pButton type="button" icon="pi pi-times" (click)="addCancel()" label="ยกเลิก"
+            class="p-button-outlined p-button-danger"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- ===== DIALOG: แก้ไข ===== -->
+<p-dialog [(visible)]="displayEdit" [modal]="true" showEffect="fade" styleClass="pg-dialog"
+    [style]="{width:'560px'}" [breakpoints]="{'640px':'95vw'}" [draggable]="false">
+    <ng-template pTemplate="header">
+        <div class="dlg-title"><i class="pi pi-pencil"></i> แก้ไขกลุ่มสินค้า</div>
+    </ng-template>
+    <form [formGroup]="formEdit" class="pg-form">
+        <ng-container *ngTemplateOutlet="formFields; context: { form: formEdit }"></ng-container>
+    </form>
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-check" (click)="confirmEdit()" label="บันทึก"
+            class="p-button-success mr-2"></button>
+        <button pButton type="button" icon="pi pi-times" (click)="cancelEdit()" label="ปิด"
+            class="p-button-outlined p-button-secondary"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- ===== Shared form fields ===== -->
+<ng-template #formFields let-form="form">
+    <div [formGroup]="form">
+        <div class="field">
+            <label>ชื่อกลุ่ม <span class="required">*</span></label>
+            <input pInputText type="text" formControlName="name" maxlength="200" class="w-full"
+                placeholder="เช่น อาหารแมว Nekko" />
+        </div>
+
+        <!-- กล่องกติกาส่วนลด -->
+        <div class="rule-box">
+            <div class="rule-box-head"><i class="pi pi-percentage"></i> กติกาส่วนลด</div>
+            <div class="field-row">
+                <div class="field">
+                    <label>ซื้อครบ (ชิ้น) <span class="required">*</span></label>
+                    <p-inputNumber formControlName="min_qty" [min]="1"
+                        inputStyleClass="w-full text-center big-num" styleClass="w-full"
+                        suffix=" ชิ้น"></p-inputNumber>
+                </div>
+                <div class="field">
+                    <label>ส่วนลดต่อชิ้น <span class="required">*</span></label>
+                    <p-inputNumber formControlName="discount_value" [min]="0" [minFractionDigits]="0"
+                        [maxFractionDigits]="2" inputStyleClass="w-full text-center big-num" styleClass="w-full"
+                        [suffix]="form.get('discount_type')?.value === 'percent' ? ' %' : ' บาท'"></p-inputNumber>
+                </div>
+            </div>
+
+            <div class="field" style="margin-bottom:0;">
+                <label>ประเภทส่วนลด</label>
+                <p-selectButton [options]="discountTypeOptions" formControlName="discount_type"
+                    optionLabel="label" optionValue="value" styleClass="w-full"></p-selectButton>
+            </div>
+
+            <div class="rule-preview">
+                <i class="pi pi-info-circle"></i>
+                ซื้อครบ <strong>{{ form.get('min_qty')?.value || 0 }}</strong> ชิ้น (รวมทุกสินค้าในกลุ่ม)
+                ลดชิ้นละ <strong>{{ form.get('discount_value')?.value || 0 }}{{ form.get('discount_type')?.value === 'percent' ? '%' : ' บาท' }}</strong>
+            </div>
+        </div>
+
+        <div class="field">
+            <label>
+                สินค้าในกลุ่ม <span class="required">*</span>
+                <span class="count-badge" *ngIf="form.get('product_ids')?.value?.length">
+                    เลือกแล้ว {{ form.get('product_ids')?.value?.length }} รายการ
+                </span>
+            </label>
+
+            <div class="product-picker">
+                <div class="picker-search">
+                    <span class="p-input-icon-left" style="width:100%;">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" [(ngModel)]="productSearch"
+                            [ngModelOptions]="{standalone:true}" class="w-full"
+                            placeholder="ค้นหาชื่อหรือรหัสสินค้า" />
+                    </span>
+                </div>
+
+                <p-table [value]="filteredProducts" [scrollable]="true" scrollHeight="260px"
+                    styleClass="p-datatable-sm picker-table" dataKey="id">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width:48px; text-align:center;">
+                                <span class="chk" [class.on]="isAllFilteredSelected(form)"
+                                    (click)="toggleAllFiltered(form)" pTooltip="เลือก/ยกเลิกทั้งหมด">
+                                    <i class="pi pi-check"></i>
+                                </span>
+                            </th>
+                            <th>สินค้า</th>
+                            <th style="width:100px; text-align:right;">ราคา</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-p>
+                        <tr class="picker-row" [class.selected]="isSelected(form, p.id)"
+                            (click)="toggleProduct(form, p.id)">
+                            <td style="text-align:center;">
+                                <span class="chk" [class.on]="isSelected(form, p.id)">
+                                    <i class="pi pi-check"></i>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="pk-name">{{ p.name }}</span>
+                                <span class="pk-code">{{ p.code }}</span>
+                            </td>
+                            <td class="text-right">{{ p.price | number:'1.2-2' }}</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="3" class="text-center" style="padding:1.5rem; color:#94a3b8;">
+                                ไม่พบสินค้า
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- ===== DIALOG: ลบ ===== -->
+<p-dialog [(visible)]="displayDelete" [modal]="true" showEffect="fade"
+    [style]="{width:'360px'}" [breakpoints]="{'640px':'95vw'}" [showHeader]="false">
+    <div class="delete-confirm">
+        <div class="delete-icon"><i class="pi pi-exclamation-triangle"></i></div>
+        <div class="delete-title">ยืนยันการลบ</div>
+        <div class="delete-msg">ต้องการลบกลุ่มสินค้านี้ใช่หรือไม่?</div>
+        <div class="delete-actions">
+            <button pButton type="button" icon="pi pi-trash" label="ลบ"
+                class="p-button-danger" (click)="confirmDelete()"></button>
+            <button pButton type="button" icon="pi pi-times" label="ยกเลิก"
+                class="p-button-outlined p-button-secondary" (click)="cancelDelete()"></button>
+        </div>
+    </div>
+</p-dialog>

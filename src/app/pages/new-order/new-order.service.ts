@@ -38,4 +38,8 @@ export class NewOrderService {
     return this.http.get(environment.url + `/get_branch/${id}`);
   }
 
+  getProductGroups() {
+    return this.http.get(environment.url + `/product_group/active`);
+  }
+
 }

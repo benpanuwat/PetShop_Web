@@ -57,6 +57,9 @@ export class AppMenuComponent implements OnInit {
                 if (this.permissions.view_product) {
                     itemsMenu3.push({ label: 'สินค้า', icon: 'pi pi-fw pi-box', routerLink: ['/app/product'] });
                 }
+                if (this.permissions.view_product) {
+                    itemsMenu3.push({ label: 'จัดกลุ่มสินค้า', icon: 'pi pi-fw pi-tags', routerLink: ['/app/product_group'] });
+                }
 
 
                 let itemsMenu4 = [];

@@ -175,6 +175,10 @@
                     <span class="total-label">ราคารวม</span>
                     <span>{{formCart.value.total | number:'1.2-2'}}</span>
                 </div>
+                <div class="total-row" *ngIf="promoDiscountTotal > 0">
+                    <span class="total-label">ส่วนลดโปรโมชั่น (รวมในราคาแล้ว)</span>
+                    <span class="discount-val">- {{promoDiscountTotal | number:'1.2-2'}}</span>
+                </div>
                 <div class="total-row">
                     <span class="total-label">
                         ส่วนลด
