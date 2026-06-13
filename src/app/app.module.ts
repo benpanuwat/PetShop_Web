@@ -106,6 +106,7 @@ import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { BestSellerComponent } from './pages/best-seller/best-seller.component';
 import { ProductGroupComponent } from './pages/product_group/product_group.component';
+import { ProductProfitComponent } from './pages/product_profit/product_profit.component';
 
 import { UserComponent } from './pages/user/user.component';
 import { UserGroupComponent } from './pages/user-group/user-group.component';
@@ -230,6 +231,7 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
         DashboardComponent,
         BestSellerComponent,
         ProductGroupComponent,
+        ProductProfitComponent,
         UserComponent,
         UserGroupComponent,
         MemberComponent,

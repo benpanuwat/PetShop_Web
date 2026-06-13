@@ -60,6 +60,9 @@ export class AppMenuComponent implements OnInit {
                 if (this.permissions.view_product) {
                     itemsMenu3.push({ label: 'จัดกลุ่มสินค้า', icon: 'pi pi-fw pi-tags', routerLink: ['/app/product_group'] });
                 }
+                if (this.permissions.view_product_profit) {
+                    itemsMenu3.push({ label: 'กำไรสินค้า', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/product_profit'] });
+                }
 
 
                 let itemsMenu4 = [];

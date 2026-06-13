@@ -39,6 +39,15 @@
     gap: 0.5rem;
     align-items: center;
     flex-wrap: wrap;
+
+    .search-group {
+        flex: 1 1 auto;
+    }
+
+    // ปุ่มเพิ่มกลุ่มชิดขวาเสมอ
+    > button {
+        margin-left: auto;
+    }
 }
 
 .discount-chip {

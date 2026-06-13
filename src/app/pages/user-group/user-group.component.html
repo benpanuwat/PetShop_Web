@@ -86,8 +86,10 @@
                     <span *ngIf="!item.hasView" class="perm-na">—</span>
                 </div>
                 <div class="perm-col-manag">
-                    <p-checkbox [formControlName]="'manag_' + item.key"
+                    <p-checkbox *ngIf="item.hasManag"
+                        [formControlName]="'manag_' + item.key"
                         binary="true" [trueValue]="1" [falseValue]="0"></p-checkbox>
+                    <span *ngIf="!item.hasManag" class="perm-na">—</span>
                 </div>
             </div>
         </div>

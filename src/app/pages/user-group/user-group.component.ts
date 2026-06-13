@@ -15,14 +15,15 @@ export class UserGroupComponent {
   public permissions: any = {};
 
   public readonly permissionItems = [
-    { key: 'user',          label: 'ผู้ใช้งาน',       hasView: true  },
-    { key: 'user_group',    label: 'กลุ่มผู้ใช้งาน',   hasView: true  },
-    { key: 'member',        label: 'สมาชิก',           hasView: true  },
-    { key: 'product_type',  label: 'ประเภทสินค้า',     hasView: true  },
-    { key: 'product_brand', label: 'แบรนด์สินค้า',     hasView: true  },
-    { key: 'product',       label: 'สินค้า',           hasView: true  },
-    { key: 'stock',         label: 'คลังสินค้า',       hasView: true  },
-    { key: 'setting',       label: 'ตั้งค่า',           hasView: false },
+    { key: 'user',           label: 'ผู้ใช้งาน',       hasView: true,  hasManag: true  },
+    { key: 'user_group',     label: 'กลุ่มผู้ใช้งาน',   hasView: true,  hasManag: true  },
+    { key: 'member',         label: 'สมาชิก',           hasView: true,  hasManag: true  },
+    { key: 'product_type',   label: 'ประเภทสินค้า',     hasView: true,  hasManag: true  },
+    { key: 'product_brand',  label: 'แบรนด์สินค้า',     hasView: true,  hasManag: true  },
+    { key: 'product',        label: 'สินค้า',           hasView: true,  hasManag: true  },
+    { key: 'product_profit', label: 'กำไรสินค้า',       hasView: true,  hasManag: false },
+    { key: 'stock',          label: 'คลังสินค้า',       hasView: true,  hasManag: true  },
+    { key: 'setting',        label: 'ตั้งค่า',           hasView: false, hasManag: true  },
   ];
   
   public displayAdd: boolean = false;
@@ -63,6 +64,7 @@ export class UserGroupComponent {
       manag_product_brand: 0,
       view_product: 0,
       manag_product: 0,
+      view_product_profit: 0,
       view_stock: 0,
       manag_stock: 0,
       manag_setting: 0,
@@ -82,6 +84,7 @@ export class UserGroupComponent {
       manag_product_brand: 0,
       view_product: 0,
       manag_product: 0,
+      view_product_profit: 0,
       view_stock: 0,
       manag_stock: 0,
       manag_setting: 0,
@@ -141,6 +144,7 @@ export class UserGroupComponent {
       manag_product_brand: 0,
       view_product: 0,
       manag_product: 0,
+      view_product_profit: 0,
       view_stock: 0,
       manag_stock: 0,
       manag_setting: 0,

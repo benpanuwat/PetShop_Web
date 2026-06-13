@@ -1,0 +1,185 @@
+.pp-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.pp-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 1.25rem;
+    border: 1px solid #edf1f5;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.pp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.pp-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+        color: #6366f1;
+    }
+}
+
+.pp-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .filter-group {
+        display: flex;
+        gap: 0.5rem;
+
+        ::ng-deep .p-dropdown {
+            min-width: 150px;
+        }
+    }
+
+    .search-box {
+        min-width: 220px;
+    }
+}
+
+.product-thumb {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.code-chip {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.tb-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    .type-chip {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .brand-sub {
+        font-size: 0.78rem;
+        color: #94a3b8;
+    }
+}
+
+.product-name {
+    color: #1e293b;
+}
+
+.no-data {
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+.supplier-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 10px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    i {
+        font-size: 0.75rem;
+    }
+}
+
+/* ── dialog ราคาต้นทุน ── */
+.supplier-add-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+    margin-bottom: 1rem;
+
+    .field {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+
+        label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #334155;
+        }
+    }
+
+    .add-supplier-field {
+        flex: 0 0 auto;
+    }
+
+    .hidden-label {
+        visibility: hidden;
+    }
+}
+
+.price-chart-section {
+    .price-chart-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #334155;
+        margin-bottom: 0.6rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        i {
+            color: #6366f1;
+        }
+    }
+
+    .price-chart-wrap {
+        height: 320px;
+    }
+
+    .price-chart-empty {
+        text-align: center;
+        color: #94a3b8;
+        padding: 1.5rem 0;
+        font-size: 0.88rem;
+    }
+}
+
+.profit-badge {
+    display: inline-block;
+    min-width: 56px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 14px;
+    background: #dcfce7;
+    color: #166534;
+    font-weight: 700;
+    font-size: 0.85rem;
+
+    &.low {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+}

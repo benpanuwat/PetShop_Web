@@ -1,0 +1,175 @@
+<div class="pp-page">
+    <div class="pp-card">
+        <div class="pp-header">
+            <div class="pp-title">
+                <i class="pi pi-chart-bar"></i>
+                <span>กำไรสินค้า</span>
+            </div>
+            <div class="pp-actions">
+                <form [formGroup]="formSetting" class="filter-group">
+                    <p-dropdown [options]="filter_product_types" optionLabel="name" [filter]="true"
+                        filterBy="name" [showClear]="true" placeholder="ทุกประเภท"
+                        formControlName="product_type" (onChange)="selectProductTypeFilter()"
+                        styleClass="w-full"></p-dropdown>
+                    <p-dropdown [options]="filter_product_brands" optionLabel="name" [filter]="true"
+                        filterBy="name" [showClear]="true" placeholder="ทุกแบรนด์"
+                        formControlName="product_brand" (onChange)="selectProductBrandFilter()"
+                        styleClass="w-full"></p-dropdown>
+                </form>
+                <div class="p-inputgroup search-box">
+                    <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
+                    <input pInputText type="text" [formControl]="search" placeholder="ค้นหาชื่อ / รหัส..." />
+                    <button *ngIf="search.value" pButton type="button" icon="pi pi-times"
+                        class="p-button-danger" (click)="search.reset()"></button>
+                </div>
+            </div>
+        </div>
+
+        <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id"
+            [paginator]="true" [loading]="loading" [rows]="10" [totalRecords]="totalRecords"
+            styleClass="p-datatable-gridlines" [rowsPerPageOptions]="[10, 25, 50]">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width:56px; text-align:center;">#</th>
+                    <th style="width:80px; text-align:center;">รูปภาพ</th>
+                    <th style="width:130px;">รหัส</th>
+                    <th style="width:20%;">ประเภท / แบรนด์</th>
+                    <th>ชื่อสินค้า</th>
+                    <th style="width:110px; text-align:right;">ราคาขาย</th>
+                    <th style="width:110px; text-align:right;">ต้นทุน</th>
+                    <th style="width:150px;">ผู้ขาย (ถูกสุด)</th>
+                    <th style="width:120px; text-align:center;">กำไร (%)</th>
+                    <th *ngIf="permissions?.manag_product" style="width:110px; text-align:center;">จัดการ</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                <tr>
+                    <td class="text-center text-muted">{{ rowIndex + 1 }}</td>
+                    <td class="text-center">
+                        <img class="product-thumb" [src]="item.image || 'assets/images/product.png'" alt="" />
+                    </td>
+                    <td><span class="code-chip">{{ item.code }}</span></td>
+                    <td>
+                        <div class="tb-cell">
+                            <span class="type-chip">{{ item.product_type_name }}</span>
+                            <span class="brand-sub">{{ item.product_brand_name }}</span>
+                        </div>
+                    </td>
+                    <td><span class="product-name">{{ item.name }}</span></td>
+                    <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
+                    <td class="text-right">
+                        <ng-container *ngIf="item.cost !== null && item.cost !== undefined; else dashCost">
+                            {{ item.cost | number:'1.2-2' }}
+                        </ng-container>
+                        <ng-template #dashCost><span class="no-data">-</span></ng-template>
+                    </td>
+                    <td>
+                        <span *ngIf="item.supplier_name; else dashSup" class="supplier-chip">
+                            <i class="pi pi-truck"></i> {{ item.supplier_name }}
+                        </span>
+                        <ng-template #dashSup><span class="no-data">-</span></ng-template>
+                    </td>
+                    <td class="text-center">
+                        <ng-container *ngIf="item.profit_percent !== null && item.profit_percent !== undefined; else dashProfit">
+                            <span class="profit-badge" [class.low]="item.profit_percent < lowProfitThreshold">
+                                {{ item.profit_percent | number:'1.0-2' }}%
+                            </span>
+                        </ng-container>
+                        <ng-template #dashProfit><span class="no-data">-</span></ng-template>
+                    </td>
+                    <td *ngIf="permissions?.manag_product" class="text-center">
+                        <button pButton type="button" icon="pi pi-chart-line"
+                            class="p-button-text p-button-sm p-button-help"
+                            pTooltip="กราฟราคา" (click)="openPriceChart(item)"></button>
+                        <button pButton type="button" icon="pi pi-tag"
+                            class="p-button-text p-button-sm p-button-info"
+                            pTooltip="ราคาต้นทุน" (click)="openSupplierPrice(item)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td [attr.colspan]="permissions?.manag_product ? 10 : 9" class="text-center" style="padding:2.5rem; color:#94a3b8;">
+                        <i class="pi pi-box" style="font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+                        ยังไม่มีข้อมูลสินค้า
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== DIALOG: ราคาต้นทุน ===== -->
+<p-dialog [header]="'ราคาต้นทุน — ' + supplierPriceProductName" [(visible)]="displaySupplierPrice"
+    [modal]="true" showEffect="fade" [style]="{width:'520px'}" [breakpoints]="{'640px':'95vw'}">
+    <div class="dialog-form">
+        <div class="supplier-add-row">
+            <div class="field">
+                <label>ผู้ขาย</label>
+                <p-dropdown [options]="suppliers" optionLabel="name" optionValue="id"
+                    [(ngModel)]="newSupplierItem.supplier_id" placeholder="เลือกผู้ขาย"
+                    appendTo="body" styleClass="w-full"></p-dropdown>
+            </div>
+            <div class="field">
+                <label>ราคาต้นทุน (บาท)</label>
+                <input pInputText type="number" [(ngModel)]="newSupplierItem.cost" min="0"
+                    class="w-full" style="text-align:right;" />
+            </div>
+            <div class="field add-supplier-field">
+                <label class="hidden-label">เพิ่ม</label>
+                <button pButton type="button" icon="pi pi-plus" label="เพิ่ม" class="p-button-success"
+                    [disabled]="!newSupplierItem.supplier_id" (click)="addSupplierPrice()"></button>
+            </div>
+        </div>
+
+        <p-table [value]="supplierPriceRows" responsiveLayout="scroll"
+            styleClass="p-datatable-sm p-datatable-gridlines">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>ผู้ขาย</th>
+                    <th style="width:170px; text-align:right;">ราคาต้นทุนล่าสุด (บาท)</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+                <tr>
+                    <td>{{ row.supplier_name }}</td>
+                    <td style="text-align:right;">{{ row.cost | number:'1.2-2' }}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="2" class="text-center" style="padding:1.5rem; color:#94a3b8;">ยังไม่มีรายการ</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-times" (click)="displaySupplierPrice = false" label="ปิด"
+            class="p-button-outlined p-button-secondary"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- ===== DIALOG: กราฟราคาต้นทุน ===== -->
+<p-dialog [header]="'กราฟราคาต้นทุน — ' + priceChartProductName" [(visible)]="displayPriceChart"
+    [modal]="true" showEffect="fade" [style]="{width:'640px'}" [breakpoints]="{'768px':'95vw'}">
+    <div class="price-chart-section">
+        <div class="price-chart-title">
+            <i class="pi pi-chart-line"></i> ความเคลื่อนไหวราคาต้นทุนแต่ละผู้ขาย (12 เดือนล่าสุด)
+        </div>
+        <div class="price-chart-wrap" *ngIf="hasPriceHistory; else noHistory">
+            <p-chart type="line" [data]="priceChartData" [options]="priceChartOptions"></p-chart>
+        </div>
+        <ng-template #noHistory>
+            <div class="price-chart-empty">ยังไม่มีประวัติราคาต้นทุน</div>
+        </ng-template>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-times" (click)="displayPriceChart = false" label="ปิด"
+            class="p-button-outlined p-button-secondary"></button>
+    </ng-template>
+</p-dialog>
