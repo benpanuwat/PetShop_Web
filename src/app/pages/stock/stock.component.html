@@ -219,18 +219,27 @@
             <ng-template pTemplate="header">
                 <tr>
                     <th>ผู้ขาย</th>
-                    <th style="width:170px; text-align:right;">ราคาต้นทุนล่าสุด (บาท)</th>
+                    <th style="width:140px; text-align:right;">ราคาต้นทุนล่าสุด (บาท)</th>
+                    <th style="width:110px; text-align:center;">กำไร (%)</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td>{{ row.supplier_name }}</td>
                     <td style="text-align:right;">{{ row.cost | number:'1.2-2' }}</td>
+                    <td style="text-align:center;">
+                        <ng-container *ngIf="row.profit_percent !== null && row.profit_percent !== undefined; else dashProfit">
+                            <span class="profit-badge" [class.low]="row.profit_percent < lowProfitThreshold">
+                                {{ row.profit_percent | number:'1.0-2' }}%
+                            </span>
+                        </ng-container>
+                        <ng-template #dashProfit><span style="color:#cbd5e1;font-weight:600;">-</span></ng-template>
+                    </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="2" class="text-center" style="padding:1.5rem; color:#94a3b8;">ยังไม่มีรายการ</td>
+                    <td colspan="3" class="text-center" style="padding:1.5rem; color:#94a3b8;">ยังไม่มีรายการ</td>
                 </tr>
             </ng-template>
         </p-table>

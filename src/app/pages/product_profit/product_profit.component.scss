@@ -1,3 +1,117 @@
+/* ── Dialog นำเข้า Excel ── */
+.import-toolbar {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    .field {
+        flex: 1;
+        min-width: 240px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+
+        label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #334155;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+    }
+}
+
+.import-file-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    .file-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.55rem 0.9rem;
+        border-radius: 8px;
+        background: #6366f1;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .file-name {
+        color: #64748b;
+        font-size: 0.85rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.import-options {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+
+    label {
+        color: #334155;
+        font-size: 0.88rem;
+    }
+
+    .template-btn {
+        margin-left: auto;
+    }
+}
+
+.import-summary {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+
+    .sum-chip {
+        padding: 0.2rem 0.7rem;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 0.82rem;
+    }
+
+    .sum-total { background: #f1f5f9; color: #475569; }
+    .sum-match { background: #dcfce7; color: #166534; }
+    .sum-new { background: #e0f2fe; color: #075985; }
+}
+
+.old-name {
+    font-size: 0.75rem;
+    color: #f59e0b;
+}
+
+.imp-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.8rem;
+
+    &.match { background: #dcfce7; color: #166534; }
+    &.new { background: #e0f2fe; color: #075985; }
+}
+
+.import-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 2.5rem 1rem;
+    color: #94a3b8;
+
+    i { font-size: 2rem; }
+}
+
 .pp-page {
     display: flex;
     flex-direction: column;
@@ -39,10 +153,12 @@
     gap: 0.5rem;
     align-items: center;
     flex-wrap: wrap;
+    margin-bottom: 1rem;
 
     .filter-group {
         display: flex;
         gap: 0.5rem;
+        flex-wrap: wrap;
 
         ::ng-deep .p-dropdown {
             min-width: 150px;

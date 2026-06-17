@@ -10,7 +10,7 @@ export class ProductProfitService {
 
   constructor(private http: HttpClient) { }
 
-  page(data: { perPage: number, page: number, search?: string, searchId1?: string, searchId2?: string }) {
+  page(data: { perPage: number, page: number, search?: string, searchId1?: string, searchId2?: string, profitRange?: string }) {
     return this.http.get(environment.url + `/product_profit/page`, {
       params: {
         perPage: data.perPage,
@@ -18,6 +18,7 @@ export class ProductProfitService {
         search: data?.search ?? "",
         searchId1: data?.searchId1 ?? "",
         searchId2: data?.searchId2 ?? "",
+        profitRange: data?.profitRange ?? "",
       }
     }).pipe(map((resp: any) => resp.data));
   }
@@ -44,5 +45,13 @@ export class ProductProfitService {
 
   addSupplierPriceItem(data: { product_id: any; supplier_id: number; cost: number }) {
     return this.http.post(environment.url + `/supplier_price_list`, data);
+  }
+
+  importPreview(rows: any[]) {
+    return this.http.post(environment.url + `/product_profit/import/preview`, { rows });
+  }
+
+  importProducts(data: { supplier_id: number; edit_name: boolean; rows: any[] }) {
+    return this.http.post(environment.url + `/product_profit/import`, data);
   }
 }

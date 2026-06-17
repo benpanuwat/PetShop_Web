@@ -6,6 +6,7 @@ import { debounceTime, distinctUntilChanged, tap } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ProductProfitService } from './product_profit.service';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-product_profit',
@@ -17,6 +18,14 @@ export class ProductProfitComponent {
 
   // เกณฑ์กำไรต่ำ (margin %) -> แสดงสีแดง
   public readonly lowProfitThreshold = 20;
+
+  public readonly profitRangeOptions = [
+    { label: 'ทุกช่วงกำไร', value: '' },
+    { label: 'น้อยกว่า 20%', value: 'lt20' },
+    { label: '20% - 30%', value: '20_30' },
+    { label: 'มากกว่า 30%', value: 'gt30' },
+  ];
+  public profitRange: string = '';
 
   public urlData: any = {
     product_type_id: '',
@@ -37,7 +46,8 @@ export class ProductProfitComponent {
   public displaySupplierPrice: boolean = false;
   public supplierPriceProductId: any;
   public supplierPriceProductName: string = '';
-  public supplierPriceRows: { supplier_id: number; supplier_name: string; cost: number }[] = [];
+  public supplierPriceSellPrice: number = 0;
+  public supplierPriceRows: { supplier_id: number; supplier_name: string; cost: number; profit_percent: number | null }[] = [];
   public suppliers: any[] = [];
   public newSupplierItem: { supplier_id: number; cost: number } = { supplier_id: 0, cost: 0 };
 
@@ -47,6 +57,14 @@ export class ProductProfitComponent {
   public priceChartData: any = null;
   public priceChartOptions: any = null;
   public hasPriceHistory: boolean = false;
+
+  // ===== dialog นำเข้า Excel =====
+  public displayImport: boolean = false;
+  public importSupplierId: number = 0;
+  public importEditName: boolean = false;
+  public importFileName: string = '';
+  public previewRows: any[] = [];
+  public importing: boolean = false;
 
   constructor(
     private _fb: FormBuilder,
@@ -76,7 +94,7 @@ export class ProductProfitComponent {
         tap((query) => {
           this.loading = true;
           const page = this.table.first / this.table.rows + 1;
-          this._service.page({ perPage: this.table.rows, page, search: query, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id })
+          this._service.page({ perPage: this.table.rows, page, search: query, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id, profitRange: this.profitRange })
             .subscribe((resp: any) => {
               this.data = resp.data;
               this.totalRecords = resp.totalRecords;
@@ -92,12 +110,16 @@ export class ProductProfitComponent {
   loadTable(event: LazyLoadEvent) {
     this.loading = true;
     const page = event.first / event.rows + 1;
-    this._service.page({ perPage: event.rows, page, search: this.search.value, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id })
+    this._service.page({ perPage: event.rows, page, search: this.search.value, searchId1: this.urlData.product_type_id, searchId2: this.urlData.product_brand_id, profitRange: this.profitRange })
       .subscribe((resp: any) => {
         this.data = resp.data;
         this.totalRecords = resp.totalRecords;
         this.loading = false;
       });
+  }
+
+  selectProfitFilter() {
+    this.table.reset();
   }
 
   loadProductTypeFilter() {
@@ -150,6 +172,7 @@ export class ProductProfitComponent {
   openSupplierPrice(item: any) {
     this.supplierPriceProductId = item.id;
     this.supplierPriceProductName = item.name;
+    this.supplierPriceSellPrice = Number(item.price) || 0;
     this.supplierPriceRows = [];
     this.newSupplierItem = { supplier_id: 0, cost: 0 };
 
@@ -274,10 +297,12 @@ export class ProductProfitComponent {
     this._service.getSupplierPriceLists(this.supplierPriceProductId).subscribe({
       next: (priceResp: any) => {
         const rows: any[] = priceResp.data ?? [];
+        const sell = this.supplierPriceSellPrice;
         this.supplierPriceRows = rows.map(e => ({
           supplier_id: e.supplier_id,
           supplier_name: e.supplier_name ?? (this.suppliers.find(s => s.id === e.supplier_id)?.name ?? ''),
           cost: e.cost,
+          profit_percent: (sell > 0 && e.cost != null) ? Math.round((sell - e.cost) / sell * 100 * 100) / 100 : null,
         }));
       },
       error: (err) => this.showError(err?.error?.message ?? 'โหลดราคาต้นทุนไม่สำเร็จ'),
@@ -305,6 +330,89 @@ export class ProductProfitComponent {
   private reloadTable() {
     if (!this.table) return;
     this.loadTable({ first: this.table.first, rows: this.table.rows } as LazyLoadEvent);
+  }
+
+  // ===== นำเข้า Excel =====
+  get matchedCount(): number { return this.previewRows.filter(r => r.matched).length; }
+  get newCount(): number { return this.previewRows.filter(r => !r.matched).length; }
+
+  openImport() {
+    this.importSupplierId = 0;
+    this.importEditName = false;
+    this.importFileName = '';
+    this.previewRows = [];
+    if (!this.suppliers || this.suppliers.length === 0) {
+      this._service.getSuppliers().subscribe({
+        next: (resp: any) => { this.suppliers = resp.data; },
+      });
+    }
+    this.displayImport = true;
+  }
+
+  onImportFile(event: any) {
+    const file: File = event?.target?.files?.[0];
+    if (!file) return;
+    this.importFileName = file.name;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const aoa: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
+
+      const parsePrice = (v: any) => Math.round((parseFloat(String(v ?? '').replace(/,/g, '')) || 0) * 100) / 100;
+
+      // แถวแรก = หัวตาราง (ข้าม) | คอลัมน์ 1 = barcode, 2 = ชื่อสินค้า, 3 = ต้นทุน
+      let rows = aoa.slice(1).map(r => ({
+        barcode: String(r?.[0] ?? '').trim(),
+        name: String(r?.[1] ?? '').trim(),
+        price: parsePrice(r?.[2]),
+      })).filter(r => r.barcode !== '');
+
+      if (rows.length === 0) {
+        this.previewRows = [];
+        this.showError('ไม่พบรายการสินค้าในไฟล์ (คอลัมน์ 1=barcode, 2=ชื่อสินค้า, 3=ต้นทุน)');
+        return;
+      }
+
+      this._service.importPreview(rows).subscribe({
+        next: (resp: any) => { this.previewRows = resp.data ?? []; },
+        error: (err) => this.showError(err?.error?.message ?? 'อ่านไฟล์ไม่สำเร็จ'),
+      });
+    };
+    reader.readAsArrayBuffer(file);
+    event.target.value = ''; // ให้เลือกไฟล์เดิมซ้ำได้
+  }
+
+  confirmImport() {
+    if (!this.importSupplierId) { this.showError('กรุณาเลือกผู้ขาย'); return; }
+    if (this.previewRows.length === 0) { this.showError('ไม่มีข้อมูลนำเข้า'); return; }
+
+    this.importing = true;
+    const rows = this.previewRows.map(r => ({ barcode: r.barcode, name: r.name, price: r.price }));
+    this._service.importProducts({ supplier_id: this.importSupplierId, edit_name: this.importEditName, rows }).subscribe({
+      next: (resp: any) => {
+        this.importing = false;
+        this.displayImport = false;
+        const d = resp.data || {};
+        this.showSuccess(`นำเข้าสำเร็จ: เพิ่มต้นทุน ${d.cost_added || 0} | สร้างใหม่ ${d.created || 0} | แก้ชื่อ ${d.name_updated || 0}${d.skipped ? (' | ข้าม ' + d.skipped) : ''}`);
+        this.table.reset();
+      },
+      error: (err) => {
+        this.importing = false;
+        this.showError(err?.error?.message ?? 'นำเข้าไม่สำเร็จ');
+      },
+    });
+  }
+
+  downloadTemplate() {
+    const ws = XLSX.utils.aoa_to_sheet([
+      ['barcode', 'ชื่อสินค้า', 'ราคา'],
+      ['8850123456789', 'ตัวอย่างสินค้า', 25],
+    ]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'template');
+    XLSX.writeFile(wb, 'import_product_template.xlsx');
   }
 
   showError(message: string) {

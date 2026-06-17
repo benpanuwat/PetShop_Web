@@ -5,23 +5,30 @@
                 <i class="pi pi-chart-bar"></i>
                 <span>กำไรสินค้า</span>
             </div>
-            <div class="pp-actions">
-                <form [formGroup]="formSetting" class="filter-group">
-                    <p-dropdown [options]="filter_product_types" optionLabel="name" [filter]="true"
-                        filterBy="name" [showClear]="true" placeholder="ทุกประเภท"
-                        formControlName="product_type" (onChange)="selectProductTypeFilter()"
-                        styleClass="w-full"></p-dropdown>
-                    <p-dropdown [options]="filter_product_brands" optionLabel="name" [filter]="true"
-                        filterBy="name" [showClear]="true" placeholder="ทุกแบรนด์"
-                        formControlName="product_brand" (onChange)="selectProductBrandFilter()"
-                        styleClass="w-full"></p-dropdown>
-                </form>
-                <div class="p-inputgroup search-box">
-                    <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
-                    <input pInputText type="text" [formControl]="search" placeholder="ค้นหาชื่อ / รหัส..." />
-                    <button *ngIf="search.value" pButton type="button" icon="pi pi-times"
-                        class="p-button-danger" (click)="search.reset()"></button>
-                </div>
+            <button *ngIf="permissions?.manag_product" pButton type="button" icon="pi pi-file-excel"
+                label="นำเข้า Excel" class="p-button-success" (click)="openImport()"></button>
+        </div>
+
+        <div class="pp-actions">
+            <form [formGroup]="formSetting" class="filter-group">
+                <p-dropdown [options]="filter_product_types" optionLabel="name" [filter]="true"
+                    filterBy="name" [showClear]="true" placeholder="ทุกประเภท"
+                    formControlName="product_type" (onChange)="selectProductTypeFilter()"
+                    styleClass="w-full"></p-dropdown>
+                <p-dropdown [options]="filter_product_brands" optionLabel="name" [filter]="true"
+                    filterBy="name" [showClear]="true" placeholder="ทุกแบรนด์"
+                    formControlName="product_brand" (onChange)="selectProductBrandFilter()"
+                    styleClass="w-full"></p-dropdown>
+                <p-dropdown [options]="profitRangeOptions" optionLabel="label" optionValue="value"
+                    [(ngModel)]="profitRange" [ngModelOptions]="{standalone:true}"
+                    (onChange)="selectProfitFilter()" placeholder="ทุกช่วงกำไร"
+                    styleClass="w-full"></p-dropdown>
+            </form>
+            <div class="p-inputgroup search-box">
+                <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
+                <input pInputText type="text" [formControl]="search" placeholder="ค้นหาชื่อ / รหัส..." />
+                <button *ngIf="search.value" pButton type="button" icon="pi pi-times"
+                    class="p-button-danger" (click)="search.reset()"></button>
             </div>
         </div>
 
@@ -36,8 +43,8 @@
                     <th style="width:130px;">รหัส</th>
                     <th style="width:20%;">ประเภท / แบรนด์</th>
                     <th>ชื่อสินค้า</th>
-                    <th style="width:110px; text-align:right;">ราคาขาย</th>
                     <th style="width:110px; text-align:right;">ต้นทุน</th>
+                    <th style="width:110px; text-align:right;">ราคาขาย</th>
                     <th style="width:150px;">ผู้ขาย (ถูกสุด)</th>
                     <th style="width:120px; text-align:center;">กำไร (%)</th>
                     <th *ngIf="permissions?.manag_product" style="width:110px; text-align:center;">จัดการ</th>
@@ -58,13 +65,13 @@
                         </div>
                     </td>
                     <td><span class="product-name">{{ item.name }}</span></td>
-                    <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
                     <td class="text-right">
                         <ng-container *ngIf="item.cost !== null && item.cost !== undefined; else dashCost">
                             {{ item.cost | number:'1.2-2' }}
                         </ng-container>
                         <ng-template #dashCost><span class="no-data">-</span></ng-template>
                     </td>
+                    <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
                     <td>
                         <span *ngIf="item.supplier_name; else dashSup" class="supplier-chip">
                             <i class="pi pi-truck"></i> {{ item.supplier_name }}
@@ -132,18 +139,27 @@
             <ng-template pTemplate="header">
                 <tr>
                     <th>ผู้ขาย</th>
-                    <th style="width:170px; text-align:right;">ราคาต้นทุนล่าสุด (บาท)</th>
+                    <th style="width:140px; text-align:right;">ราคาต้นทุนล่าสุด (บาท)</th>
+                    <th style="width:110px; text-align:center;">กำไร (%)</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td>{{ row.supplier_name }}</td>
                     <td style="text-align:right;">{{ row.cost | number:'1.2-2' }}</td>
+                    <td style="text-align:center;">
+                        <ng-container *ngIf="row.profit_percent !== null && row.profit_percent !== undefined; else dashSpProfit">
+                            <span class="profit-badge" [class.low]="row.profit_percent < lowProfitThreshold">
+                                {{ row.profit_percent | number:'1.0-2' }}%
+                            </span>
+                        </ng-container>
+                        <ng-template #dashSpProfit><span class="no-data">-</span></ng-template>
+                    </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="2" class="text-center" style="padding:1.5rem; color:#94a3b8;">ยังไม่มีรายการ</td>
+                    <td colspan="3" class="text-center" style="padding:1.5rem; color:#94a3b8;">ยังไม่มีรายการ</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -171,5 +187,100 @@
     <ng-template pTemplate="footer">
         <button pButton type="button" icon="pi pi-times" (click)="displayPriceChart = false" label="ปิด"
             class="p-button-outlined p-button-secondary"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- ===== DIALOG: นำเข้า Excel ราคาต้นทุน ===== -->
+<p-dialog header="นำเข้าราคาต้นทุนจาก Excel" [(visible)]="displayImport" [modal]="true" showEffect="fade"
+    [style]="{width:'920px'}" [breakpoints]="{'1024px':'97vw'}">
+
+    <div class="import-toolbar">
+        <div class="field">
+            <label>ผู้ขาย <span class="required">*</span></label>
+            <p-dropdown [options]="suppliers" optionLabel="name" optionValue="id"
+                [(ngModel)]="importSupplierId" placeholder="เลือกผู้ขาย" appendTo="body"
+                styleClass="w-full"></p-dropdown>
+        </div>
+        <div class="field import-file-field">
+            <label>ไฟล์ Excel <span class="required">*</span></label>
+            <div class="import-file-row">
+                <label class="file-btn">
+                    <i class="pi pi-upload"></i> เลือกไฟล์
+                    <input type="file" accept=".xlsx,.xls" (change)="onImportFile($event)" hidden />
+                </label>
+                <span class="file-name">{{ importFileName || 'ยังไม่ได้เลือกไฟล์' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="import-options">
+        <p-checkbox [(ngModel)]="importEditName" [binary]="true" inputId="editName"></p-checkbox>
+        <label for="editName">แก้ไขชื่อสินค้า (อัปเดตชื่อสินค้าที่ barcode ตรงกันด้วยชื่อจาก Excel)</label>
+        <button pButton type="button" icon="pi pi-download" label="ดาวน์โหลดเทมเพลต"
+            class="p-button-text p-button-sm template-btn" (click)="downloadTemplate()"></button>
+    </div>
+
+    <div class="import-summary" *ngIf="previewRows.length">
+        <span class="sum-chip sum-total">ทั้งหมด {{ previewRows.length }}</span>
+        <span class="sum-chip sum-match">มีสินค้าแล้ว {{ matchedCount }}</span>
+        <span class="sum-chip sum-new">เพิ่มสินค้าใหม่ {{ newCount }}</span>
+    </div>
+
+    <p-table [value]="previewRows" [scrollable]="true" scrollHeight="60vh"
+        styleClass="p-datatable-sm p-datatable-gridlines" *ngIf="previewRows.length">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:46px; text-align:center;">#</th>
+                <th style="width:150px;">Barcode</th>
+                <th>ชื่อสินค้า (Excel)</th>
+                <th style="width:100px; text-align:right;">ต้นทุน</th>
+                <th style="width:140px; text-align:center;">สถานะ</th>
+                <th style="width:100px; text-align:right;">ราคาขาย</th>
+                <th style="width:90px; text-align:center;">กำไร (%)</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-i="rowIndex">
+            <tr>
+                <td class="text-center">{{ i + 1 }}</td>
+                <td>{{ row.barcode }}</td>
+                <td>
+                    {{ row.name }}
+                    <div *ngIf="row.matched && row.current_name && row.current_name !== row.name"
+                        class="old-name">เดิม: {{ row.current_name }}</div>
+                </td>
+                <td class="text-right">{{ row.price | number:'1.2-2' }}</td>
+                <td class="text-center">
+                    <span class="imp-badge" [class.match]="row.matched" [class.new]="!row.matched">
+                        {{ row.matched ? 'มีสินค้าแล้ว' : 'เพิ่มสินค้าใหม่' }}
+                    </span>
+                </td>
+                <td class="text-right">
+                    <ng-container *ngIf="row.sell_price !== null && row.sell_price !== undefined; else dashSell">
+                        {{ row.sell_price | number:'1.0-0' }}
+                    </ng-container>
+                    <ng-template #dashSell><span class="no-data">-</span></ng-template>
+                </td>
+                <td class="text-center">
+                    <ng-container *ngIf="row.profit_percent !== null && row.profit_percent !== undefined; else dashImpProfit">
+                        <span class="profit-badge" [class.low]="row.profit_percent < lowProfitThreshold">
+                            {{ row.profit_percent | number:'1.0-2' }}%
+                        </span>
+                    </ng-container>
+                    <ng-template #dashImpProfit><span class="no-data">-</span></ng-template>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <div *ngIf="!previewRows.length" class="import-empty">
+        <i class="pi pi-file-excel"></i>
+        <span>เลือกไฟล์ Excel (คอลัมน์: barcode, ชื่อสินค้า, ราคา) เพื่อแสดงตัวอย่างก่อนนำเข้า</span>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-check" (click)="confirmImport()" label="ยืนยันนำเข้า"
+            class="p-button-success mr-2" [disabled]="!importSupplierId || !previewRows.length || importing"></button>
+        <button pButton type="button" icon="pi pi-times" (click)="displayImport = false" label="ปิด"
+            class="p-button-outlined p-button-secondary" [disabled]="importing"></button>
     </ng-template>
 </p-dialog>

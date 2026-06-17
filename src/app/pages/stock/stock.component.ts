@@ -58,7 +58,9 @@ export class StockComponent {
   public editProductId: string;
   public supplierPriceProductId: any;
   public supplierPriceProductName: string = '';
-  public supplierPriceRows: { supplier_id: number; supplier_name: string; cost: number }[] = [];
+  public supplierPriceSellPrice: number = 0;
+  public readonly lowProfitThreshold = 20;
+  public supplierPriceRows: { supplier_id: number; supplier_name: string; cost: number; profit_percent: number | null }[] = [];
   public suppliers: any[] = [];
   public newSupplierItem: { supplier_id: number; cost: number } = { supplier_id: 0, cost: 0 };
 
@@ -369,6 +371,7 @@ export class StockComponent {
   openSupplierPrice(item: any) {
     this.supplierPriceProductId = item.id;
     this.supplierPriceProductName = item.name;
+    this.supplierPriceSellPrice = Number(item.price) || 0;
     this.supplierPriceRows = [];
     this.newSupplierItem = { supplier_id: 0, cost: 0 };
 
@@ -386,10 +389,12 @@ export class StockComponent {
     this._productService.getSupplierPriceLists(this.supplierPriceProductId).subscribe({
       next: (priceResp: any) => {
         const rows: any[] = priceResp.data ?? [];
+        const sell = this.supplierPriceSellPrice;
         this.supplierPriceRows = rows.map(e => ({
           supplier_id: e.supplier_id,
           supplier_name: e.supplier_name ?? (this.suppliers.find(s => s.id === e.supplier_id)?.name ?? ''),
           cost: e.cost,
+          profit_percent: (sell > 0 && e.cost != null) ? Math.round((sell - e.cost) / sell * 100 * 100) / 100 : null,
         }));
       },
       error: (err) => this.showError(err?.error?.message ?? 'โหลดราคาต้นทุนไม่สำเร็จ'),
