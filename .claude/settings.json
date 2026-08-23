@@ -17,7 +17,15 @@
       "PowerShell(dotnet build \"C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Folder\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api\" --nologo -v q -p:BaseOutputPath=\"$env:TEMP\\\\petshop_api_build\\\\\" 2>&1 | Select-String -Pattern \"error|Warning\\\\\\(s\\\\\\)|Error\\\\\\(s\\\\\\)\" | Select-Object -Last 12)",
       "Read(//c/Users/BenPanuwat/Desktop/Folder/Job/Project/Panara/.Net/PetShop_Api/**)",
       "Bash(cat \"C:/Users/BenPanuwat/Desktop/Folder/Job/Project/Panara/.Net/PetShop_Api/appsettings.Development.json\")",
-      "Bash(cat \"C:/Users/BenPanuwat/Desktop/Folder/Job/Project/Panara/.Net/PetShop_Api/appsettings.json\")"
+      "Bash(cat \"C:/Users/BenPanuwat/Desktop/Folder/Job/Project/Panara/.Net/PetShop_Api/appsettings.json\")",
+      "PowerShell(dotnet build \"C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Folder\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api\" --nologo -v q -p:BaseOutputPath=\"$env:TEMP\\\\petshop_api_build\\\\\" 2>&1 | Select-String -Pattern \": error|Warning\\\\\\(s\\\\\\)|Error\\\\\\(s\\\\\\)\" | Select-Object -Last 10)",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -uroot \"-pi@Pwd[6499]\" -D petshop --default-character-set=utf8mb4 -e \"SELECT m.id, m.name, COALESCE\\(SUM\\(CASE WHEN o.status<>'cancel' AND o.payment_type<>'�Ѵ�ͧ�͡' THEN o.net_total END\\),0\\) total_purchase, COUNT\\(CASE WHEN o.payment_type='�Ѵ�ͧ�͡' THEN 1 END\\) cut_bills, COUNT\\(CASE WHEN o.status='cancel' THEN 1 END\\) cancelled FROM members m LEFT JOIN orders o ON o.member_id=m.id GROUP BY m.id ORDER BY total_purchase DESC LIMIT 5;\")",
+      "PowerShell(git -C \"c:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Folder\\\\Job\\\\Project\\\\Panara\\\\Angular\\\\PetShop_Web\" status --short src/app/pages/member)",
+      "PowerShell(git -C \"C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Folder\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api\" status --short 2>&1)",
+      "PowerShell(git -C \"C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Folder\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api\" rev-parse --is-inside-work-tree 2>&1)",
+      "PowerShell(git -C \"C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Folder\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api\" status --short --untracked-files=no 2>&1)",
+      "PowerShell(git -C \"C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Folder\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api\" status --short)",
+      "PowerShell(git -C \"C:\\\\Users\\\\BenPanuwat\\\\Desktop\\\\Folder\\\\Job\\\\Project\\\\Panara\\\\.Net\\\\PetShop_Api\" log --oneline -5)"
     ],
     "additionalDirectories": [
       "C:\\Users\\BenPanuwat\\Desktop\\Folder\\Job\\Project\\Panara\\.Net\\PetShop_Api\\Controllers"
