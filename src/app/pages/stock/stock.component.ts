@@ -158,15 +158,19 @@ export class StockComponent {
   }
 
   selectProductTypeFilter() {
-    this.urlData.product_type_id = this.formSetting.get('product_type').value.id;
+    const id = this.formSetting.get('product_type').value?.id ?? '';
+    this.urlData.product_type_id = id;
+    // เปลี่ยน/ล้างประเภท -> ล้างแบรนด์ด้วย
+    this.urlData.product_brand_id = '';
+    this.formSetting.patchValue({ product_brand: null }, { emitEvent: false });
+    this.filter_product_brands = [];
     this._router.navigate([], {
       relativeTo: this._route,
-      queryParams: { product_type_id: this.formSetting.get('product_type').value.id },
+      queryParams: { product_type_id: id || null, product_brand_id: null },
       queryParamsHandling: 'merge',
     });
     this.table.reset();
-
-    this.loadProductBrandFilter(this.urlData.product_type_id);
+    if (id) this.loadProductBrandFilter(id);
   }
 
   loadProductBrandFilter(id: any) {
@@ -181,10 +185,11 @@ export class StockComponent {
   }
 
   selectProductBrandFilter() {
-    this.urlData.product_brand_id = this.formSetting.get('product_brand').value.id;
+    const id = this.formSetting.get('product_brand').value?.id ?? '';
+    this.urlData.product_brand_id = id;
     this._router.navigate([], {
       relativeTo: this._route,
-      queryParams: { product_brand_id: this.formSetting.get('product_brand').value.id },
+      queryParams: { product_brand_id: id || null },
       queryParamsHandling: 'merge',
     });
     this.table.reset();

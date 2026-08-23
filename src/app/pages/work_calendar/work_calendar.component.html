@@ -1,0 +1,159 @@
+<div class="wc-page">
+    <div class="wc-card">
+        <div class="wc-header">
+            <div class="wc-title">
+                <i class="pi pi-calendar"></i>
+                <span>ปฏิทินทำงาน</span>
+            </div>
+            <div class="wc-header-actions">
+                <p-dropdown [options]="users" optionLabel="name" optionValue="id" [filter]="true" filterBy="name"
+                    [(ngModel)]="selectedUserId" (onChange)="selectUser()" placeholder="ทุกคน"
+                    appendTo="body" styleClass="user-filter"></p-dropdown>
+            </div>
+        </div>
+
+        <div class="wc-toolbar">
+            <div class="wc-month-nav">
+                <button pButton type="button" icon="pi pi-chevron-left"
+                    class="p-button-text p-button-secondary" pTooltip="เดือนก่อนหน้า"
+                    (click)="changeMonth(-1)"></button>
+                <span class="wc-month-label">{{ monthLabel }}</span>
+                <button pButton type="button" icon="pi pi-chevron-right"
+                    class="p-button-text p-button-secondary" pTooltip="เดือนถัดไป"
+                    (click)="changeMonth(1)"></button>
+                <p-calendar view="month" dateFormat="mm/yy" [readonlyInput]="true" [showIcon]="true"
+                    [(ngModel)]="monthDate" (onSelect)="selectMonth()" appendTo="body"
+                    styleClass="month-picker"></p-calendar>
+                <button pButton type="button" icon="pi pi-calendar" label="วันนี้"
+                    class="p-button-outlined p-button-sm" (click)="goToday()"></button>
+            </div>
+            <div class="wc-stats">
+                <span class="stat-chip stat-user"><i class="pi pi-users"></i> พนักงาน {{ summary.length }} คน</span>
+                <span class="stat-chip stat-day"><i class="pi pi-calendar-plus"></i> วันที่มีการทำงาน {{ totalDays }} วัน</span>
+                <span class="stat-chip stat-login"><i class="pi pi-sign-in"></i> เข้าสู่ระบบ {{ totalLogins }} ครั้ง</span>
+            </div>
+        </div>
+
+        <div class="wc-loading" *ngIf="loading">
+            <p-progressSpinner strokeWidth="4" [style]="{width:'42px', height:'42px'}"></p-progressSpinner>
+        </div>
+
+        <div class="wc-grid" *ngIf="!loading">
+            <div class="wc-weekday" *ngFor="let w of weekDayNames; let i = index"
+                [class.weekend]="i === 0 || i === 6">{{ w }}</div>
+
+            <ng-container *ngFor="let week of weeks">
+                <div class="wc-cell" *ngFor="let cell of week"
+                    [class.out-month]="!cell.inMonth"
+                    [class.weekend]="cell.isWeekend"
+                    [class.today]="cell.isToday"
+                    [class.has-items]="cell.items.length > 0"
+                    (click)="openDay(cell)">
+                    <div class="wc-cell-head">
+                        <span class="wc-day">{{ cell.day }}</span>
+                        <span class="wc-day-count" *ngIf="cell.items.length">{{ cell.items.length }} คน</span>
+                    </div>
+                    <div class="wc-chips">
+                        <div class="wc-chip" *ngFor="let item of cell.items"
+                            [style.border-color]="userColor(item.user_id)"
+                            [pTooltip]="chipTooltip(item)" tooltipPosition="top"
+                            tooltipStyleClass="wc-tip" [appendTo]="'body'">
+                            <span class="wc-dot" [style.background]="userColor(item.user_id)"></span>
+                            <span class="wc-chip-name">{{ item.name }}</span>
+                            <span class="wc-chip-time">{{ item.first_time }}</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+    <!-- ===== สรุปรายคนของเดือนนี้ ===== -->
+    <div class="wc-card">
+        <div class="wc-header">
+            <div class="wc-title">
+                <i class="pi pi-chart-bar"></i>
+                <span>สรุปรายคน — {{ monthLabel }}</span>
+            </div>
+        </div>
+
+        <p-table [value]="summary" styleClass="p-datatable-sm p-datatable-gridlines" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width:56px; text-align:center;">#</th>
+                    <th>ผู้ใช้งาน</th>
+                    <th style="width:140px; text-align:center;">จำนวนวันทำงาน</th>
+                    <th style="width:150px; text-align:center;">เข้าสู่ระบบ (ครั้ง)</th>
+                    <th style="width:130px; text-align:center;">วันแรก</th>
+                    <th style="width:130px; text-align:center;">วันล่าสุด</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row let-i="rowIndex">
+                <tr>
+                    <td class="text-center text-muted">{{ i + 1 }}</td>
+                    <td>
+                        <div class="user-cell">
+                            <span class="wc-dot" [style.background]="userColor(row.user_id)"></span>
+                            <div class="user-info">
+                                <span class="user-name">{{ row.name }}</span>
+                                <span class="user-sub">{{ row.username }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-center"><span class="day-badge">{{ row.days }}</span></td>
+                    <td class="text-center">{{ row.logins }}</td>
+                    <td class="text-center">{{ row.first_date | date:'dd/MM/yyyy' }}</td>
+                    <td class="text-center">{{ row.last_date | date:'dd/MM/yyyy' }}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="text-center" style="padding:2.5rem; color:#94a3b8;">
+                        <i class="pi pi-calendar-times" style="font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
+                        ไม่มีข้อมูลการเข้าสู่ระบบในเดือนนี้
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== DIALOG: รายละเอียดการเข้าสู่ระบบรายวัน ===== -->
+<p-dialog [header]="'การเข้าสู่ระบบ — ' + dayTitle" [(visible)]="displayDay" [modal]="true" showEffect="fade"
+    [style]="{width:'560px'}" [breakpoints]="{'640px':'95vw'}">
+    <p-table [value]="dayRows" [loading]="dayLoading" styleClass="p-datatable-sm p-datatable-gridlines"
+        responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:56px; text-align:center;">#</th>
+                <th>ผู้ใช้งาน</th>
+                <th style="width:130px;">Username</th>
+                <th style="width:110px; text-align:center;">เวลา</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-i="rowIndex">
+            <tr>
+                <td class="text-center text-muted">{{ i + 1 }}</td>
+                <td>
+                    <div class="user-cell">
+                        <span class="wc-dot" [style.background]="userColor(row.user_id)"></span>
+                        <span class="user-name">{{ row.name }}</span>
+                    </div>
+                </td>
+                <td><span class="code-chip">{{ row.username }}</span></td>
+                <td class="text-center">{{ row.time }}</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="4" class="text-center" style="padding:1.5rem; color:#94a3b8;">ไม่มีรายการ</td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-times" (click)="displayDay = false" label="ปิด"
+            class="p-button-outlined p-button-secondary"></button>
+    </ng-template>
+</p-dialog>

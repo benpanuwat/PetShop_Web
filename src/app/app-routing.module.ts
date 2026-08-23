@@ -13,6 +13,7 @@ import { ProductProfitComponent } from './pages/product_profit/product_profit.co
 
 import { UserComponent } from './pages/user/user.component';
 import { UserGroupComponent } from './pages/user-group/user-group.component';
+import { WorkCalendarComponent } from './pages/work_calendar/work_calendar.component';
 import { MemberComponent } from './pages/member/member.component';
 import { BranchComponent } from './pages/branch/branch.component';
 import { ProductTypeComponent } from './pages/product_type/product_type.component';
@@ -39,6 +40,7 @@ import { SlipPrintComponent } from './slip-print/slip-print.component';
                     { path: 'best-seller', component: BestSellerComponent, canActivate: [AuthGuard] },
                     { path: 'user', component: UserComponent, canActivate: [AuthGuard] },
                     { path: 'user_group', component: UserGroupComponent, canActivate: [AuthGuard] },
+                    { path: 'work_calendar', component: WorkCalendarComponent, canActivate: [AuthGuard] },
                     { path: 'member', component: MemberComponent, canActivate: [AuthGuard] },
                     { path: 'branch', component: BranchComponent, canActivate: [AuthGuard] },
                     { path: 'product_type', component: ProductTypeComponent, canActivate: [AuthGuard] },

@@ -31,6 +31,14 @@ export class ProductProfitService {
     return this.http.get(environment.url + `/product_brand/list/${id}`);
   }
 
+  getProduct(id: any) {
+    return this.http.get(environment.url + `/get_product/${id}`);
+  }
+
+  updateProduct(id: any, data: any) {
+    return this.http.put(environment.url + `/update_product/${id}`, data);
+  }
+
   getSuppliers() {
     return this.http.get(environment.url + `/supplier/list`);
   }
@@ -45,6 +53,10 @@ export class ProductProfitService {
 
   addSupplierPriceItem(data: { product_id: any; supplier_id: number; cost: number }) {
     return this.http.post(environment.url + `/supplier_price_list`, data);
+  }
+
+  bulkAddSupplierPrice(data: { supplier_id: number; items: { product_id: number; cost: number }[] }) {
+    return this.http.post(environment.url + `/supplier_price_list/bulk`, data);
   }
 
   importPreview(rows: any[]) {

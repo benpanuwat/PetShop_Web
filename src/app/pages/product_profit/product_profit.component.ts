@@ -42,6 +42,13 @@ export class ProductProfitComponent {
   public filter_product_types: any = [];
   public filter_product_brands: any = [];
 
+  // ===== dialog แก้ไขสินค้า =====
+  public displayEditProduct: boolean = false;
+  public editProductId: any;
+  public formEditProduct: FormGroup;
+  public product_types: any[] = [];
+  public product_brands: any[] = [];
+
   // ===== dialog ราคาต้นทุน (เหมือนหน้าสินค้า) =====
   public displaySupplierPrice: boolean = false;
   public supplierPriceProductId: any;
@@ -57,6 +64,14 @@ export class ProductProfitComponent {
   public priceChartData: any = null;
   public priceChartOptions: any = null;
   public hasPriceHistory: boolean = false;
+
+  // ===== เลือกหลายรายการ + เพิ่มต้นทุนพร้อมกัน =====
+  public selectedProducts: any[] = [];
+  public displayBulkCost: boolean = false;
+  public bulkSupplierId: number = 0;
+  public bulkRows: { product_id: number; code: string; name: string; sell: number; cost: number | null }[] = [];
+  public bulkSaving: boolean = false;
+  public bulkApplyCost: number | null = null;   // ต้นทุนที่จะนำไปใช้กับทุกช่อง
 
   // ===== dialog นำเข้า Excel =====
   public displayImport: boolean = false;
@@ -126,6 +141,7 @@ export class ProductProfitComponent {
     this._service.getProductType()
       .subscribe((resp: any) => {
         this.filter_product_types = resp.data;
+        this.product_types = resp.data;
         if (this.urlData.product_type_id != null) {
           const product_type = this.filter_product_types.find(item => item.id == this.urlData.product_type_id);
           this.formSetting.patchValue({ product_type: product_type });
@@ -332,6 +348,77 @@ export class ProductProfitComponent {
     this.loadTable({ first: this.table.first, rows: this.table.rows } as LazyLoadEvent);
   }
 
+  // ===== เพิ่มต้นทุนหลายรายการพร้อมกัน =====
+  openBulkCost() {
+    if (!this.selectedProducts || this.selectedProducts.length === 0) {
+      this.showError('กรุณาเลือกสินค้าอย่างน้อย 1 รายการ');
+      return;
+    }
+    this.bulkSupplierId = 0;
+    this.bulkApplyCost = null;
+    this.bulkRows = this.selectedProducts.map(p => ({
+      product_id: p.id,
+      code: p.code,
+      name: p.name,
+      sell: Number(p.price) || 0,
+      cost: null,
+    }));
+
+    const open = () => { this.displayBulkCost = true; };
+    if (!this.suppliers || this.suppliers.length === 0) {
+      this._service.getSuppliers().subscribe({
+        next: (resp: any) => { this.suppliers = resp.data; open(); },
+        error: (err) => this.showError(err?.error?.message ?? 'โหลดรายชื่อผู้ขายไม่สำเร็จ'),
+      });
+    } else {
+      open();
+    }
+  }
+
+  // ใส่ต้นทุนที่กรอกไว้ด้านบนลงทุกช่องในตาราง
+  applyCostToAll() {
+    const cost = Number(this.bulkApplyCost);
+    if (this.bulkApplyCost === null || this.bulkApplyCost === undefined || isNaN(cost) || cost < 0) {
+      this.showError('กรุณากรอกราคาต้นทุนให้ถูกต้อง');
+      return;
+    }
+    this.bulkRows.forEach(r => r.cost = cost);
+    this.showSuccess(`ใส่ต้นทุน ${cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท ให้ ${this.bulkRows.length} รายการแล้ว`);
+  }
+
+  // กำไร % สดตามต้นทุนที่กรอก (เทียบราคาขายของสาขาปัจจุบัน)
+  bulkProfit(row: { sell: number; cost: number | null }): number | null {
+    if (row.cost == null || row.cost <= 0 || row.sell <= 0) return null;
+    return Math.round((row.sell - row.cost) / row.sell * 100 * 100) / 100;
+  }
+
+  get bulkFilledCount(): number {
+    return this.bulkRows.filter(r => r.cost != null && r.cost > 0).length;
+  }
+
+  confirmBulkCost() {
+    if (!this.bulkSupplierId) { this.showError('กรุณาเลือกผู้ขาย'); return; }
+    const items = this.bulkRows
+      .filter(r => r.cost != null && r.cost > 0)
+      .map(r => ({ product_id: r.product_id, cost: r.cost as number }));
+    if (items.length === 0) { this.showError('กรุณากรอกต้นทุนอย่างน้อย 1 รายการ'); return; }
+
+    this.bulkSaving = true;
+    this._service.bulkAddSupplierPrice({ supplier_id: this.bulkSupplierId, items }).subscribe({
+      next: (resp: any) => {
+        this.bulkSaving = false;
+        this.displayBulkCost = false;
+        this.selectedProducts = [];
+        this.showSuccess(resp.message ?? `บันทึกต้นทุน ${items.length} รายการสำเร็จ`);
+        this.reloadTable();
+      },
+      error: (err) => {
+        this.bulkSaving = false;
+        this.showError(err?.error?.message ?? 'บันทึกไม่สำเร็จ');
+      },
+    });
+  }
+
   // ===== นำเข้า Excel =====
   get matchedCount(): number { return this.previewRows.filter(r => r.matched).length; }
   get newCount(): number { return this.previewRows.filter(r => !r.matched).length; }
@@ -413,6 +500,49 @@ export class ProductProfitComponent {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'template');
     XLSX.writeFile(wb, 'import_product_template.xlsx');
+  }
+
+  // ===== แก้ไขสินค้า =====
+  openEditProduct(item: any) {
+    this.editProductId = item.id;
+    this.formEditProduct = this._fb.group({
+      product_type_id: 0,
+      product_brand_id: 0,
+      code: '',
+      name: '',
+      description: '',
+      upload_image_status: false,
+      image: '',
+      price: 0,
+    });
+    this._service.getProduct(this.editProductId).subscribe({
+      next: (resp: any) => {
+        this.formEditProduct.patchValue({ ...resp.data });
+        this._service.getProductBrand(this.formEditProduct.value.product_type_id)
+          .subscribe((r: any) => { this.product_brands = r.data; });
+        this.displayEditProduct = true;
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'ไม่สามารถโหลดข้อมูลสินค้าได้'),
+    });
+  }
+
+  selectProductType(id: any) {
+    this._service.getProductBrand(id).subscribe((r: any) => { this.product_brands = r.data; });
+  }
+
+  confirmEditProduct() {
+    this._service.updateProduct(this.editProductId, this.formEditProduct.value).subscribe({
+      next: (resp: any) => {
+        this.displayEditProduct = false;
+        this.showSuccess(resp.message);
+        this.reloadTable();
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'ไม่สามารถแก้ไขสินค้าได้'),
+    });
+  }
+
+  cancelEditProduct() {
+    this.displayEditProduct = false;
   }
 
   showError(message: string) {

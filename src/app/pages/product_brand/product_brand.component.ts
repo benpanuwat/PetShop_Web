@@ -123,10 +123,11 @@ export class ProductBrandComponent {
   }
 
   selectProductTypeFilter() {
-    this.urlData.product_type_id = this.formSetting.get('product_type').value.id;
+    const id = this.formSetting.get('product_type').value?.id ?? '';
+    this.urlData.product_type_id = id;
     this._router.navigate([], {
       relativeTo: this._route,
-      queryParams: { product_type_id: this.formSetting.get('product_type').value.id },
+      queryParams: { product_type_id: id || null },
       queryParamsHandling: 'merge',
     });
 

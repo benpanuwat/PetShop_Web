@@ -21,11 +21,12 @@
                 <div>
                     <div class="stat-label">{{ item.label }}</div>
                     <div class="stat-value">
-                        <ng-container *ngIf="item.label === 'ยอดขายวันนี้'; else amountCount">
+                        <ng-container *ngIf="item.type === 'amount'; else amountCount">
                             {{ item.value | number:'1.2-2' }}
                         </ng-container>
                         <ng-template #amountCount>{{ item.value | number }}</ng-template>
                     </div>
+                    <div class="stat-hint" *ngIf="item.hint">{{ item.hint }}</div>
                 </div>
                 <div class="stat-icon">
                     <i [class]="item.icon"></i>
@@ -42,6 +43,10 @@
                     </div>
                 </div>
                 <div class="quick-metrics">
+                    <div class="quick-metric">
+                        <span>ยอดขายรวมทั้งหมด (รวม Grab / Line Man)</span>
+                        <strong>{{ salesGrandTotal | number:'1.2-2' }}</strong>
+                    </div>
                     <div class="quick-metric">
                         <span>ค่าเฉลี่ยต่อบิล</span>
                         <strong>{{ averageBill | number:'1.2-2' }}</strong>
@@ -138,7 +143,11 @@
                 <div class="payment-list" *ngIf="paymentSummary.length > 0; else noPayments">
                     <div class="payment-item" *ngFor="let item of paymentSummary">
                         <div>
-                            <strong>{{ item.label }}</strong>
+                            <strong>
+                                {{ item.label }}
+                                <span class="pay-tag delivery" *ngIf="item.group === 'delivery'">เดลิเวอรี่</span>
+                                <span class="pay-tag other" *ngIf="item.group === 'other'">ไม่นับยอดขาย</span>
+                            </strong>
                             <div class="panel-subtitle">{{ item.count | number }} บิล</div>
                         </div>
                         <strong>{{ item.amount | number:'1.2-2' }}</strong>
@@ -158,7 +167,7 @@
             <div class="panel-header">
                 <div>
                     <div class="panel-title">กราฟยอดขาย</div>
-                    <div class="panel-subtitle">เปรียบเทียบยอดขายตามช่วงเวลา (เฉพาะบิลปกติ)</div>
+                    <div class="panel-subtitle">เปรียบเทียบยอดขายตามช่วงเวลา แยกยอดขายหน้าร้าน กับ Grab / Line Man (เฉพาะบิลปกติ)</div>
                 </div>
                 <div class="chart-controls">
                     <p-selectButton [options]="chartModeOptions" [(ngModel)]="chartMode" optionLabel="label"

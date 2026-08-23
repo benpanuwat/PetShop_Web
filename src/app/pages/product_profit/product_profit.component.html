@@ -5,8 +5,13 @@
                 <i class="pi pi-chart-bar"></i>
                 <span>กำไรสินค้า</span>
             </div>
-            <button *ngIf="permissions?.manag_product" pButton type="button" icon="pi pi-file-excel"
-                label="นำเข้า Excel" class="p-button-success" (click)="openImport()"></button>
+            <div class="pp-header-actions">
+                <button *ngIf="permissions?.manag_product && selectedProducts.length" pButton type="button"
+                    icon="pi pi-tags" label="เพิ่มต้นทุนที่เลือก ({{ selectedProducts.length }})"
+                    class="p-button-info" (click)="openBulkCost()"></button>
+                <button *ngIf="permissions?.manag_product" pButton type="button" icon="pi pi-file-excel"
+                    label="นำเข้า Excel" class="p-button-success" (click)="openImport()"></button>
+            </div>
         </div>
 
         <div class="pp-actions">
@@ -33,11 +38,15 @@
         </div>
 
         <p-table #dt [value]="data" [lazy]="true" (onLazyLoad)="loadTable($event)" dataKey="id"
+            [(selection)]="selectedProducts"
             [paginator]="true" [loading]="loading" [rows]="10" [totalRecords]="totalRecords"
             styleClass="p-datatable-gridlines" [rowsPerPageOptions]="[10, 25, 50]">
 
             <ng-template pTemplate="header">
                 <tr>
+                    <th *ngIf="permissions?.manag_product" style="width:46px; text-align:center;">
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    </th>
                     <th style="width:56px; text-align:center;">#</th>
                     <th style="width:80px; text-align:center;">รูปภาพ</th>
                     <th style="width:130px;">รหัส</th>
@@ -47,12 +56,15 @@
                     <th style="width:110px; text-align:right;">ราคาขาย</th>
                     <th style="width:150px;">ผู้ขาย (ถูกสุด)</th>
                     <th style="width:120px; text-align:center;">กำไร (%)</th>
-                    <th *ngIf="permissions?.manag_product" style="width:110px; text-align:center;">จัดการ</th>
+                    <th *ngIf="permissions?.manag_product" style="width:150px; text-align:center;">จัดการ</th>
                 </tr>
             </ng-template>
 
             <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
                 <tr>
+                    <td *ngIf="permissions?.manag_product" class="text-center">
+                        <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                    </td>
                     <td class="text-center text-muted">{{ rowIndex + 1 }}</td>
                     <td class="text-center">
                         <img class="product-thumb" [src]="item.image || 'assets/images/product.png'" alt="" />
@@ -87,6 +99,9 @@
                         <ng-template #dashProfit><span class="no-data">-</span></ng-template>
                     </td>
                     <td *ngIf="permissions?.manag_product" class="text-center">
+                        <button pButton type="button" icon="pi pi-file-edit"
+                            class="p-button-text p-button-sm p-button-secondary"
+                            pTooltip="แก้ไขสินค้า" (click)="openEditProduct(item)"></button>
                         <button pButton type="button" icon="pi pi-chart-line"
                             class="p-button-text p-button-sm p-button-help"
                             pTooltip="กราฟราคา" (click)="openPriceChart(item)"></button>
@@ -99,7 +114,7 @@
 
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td [attr.colspan]="permissions?.manag_product ? 10 : 9" class="text-center" style="padding:2.5rem; color:#94a3b8;">
+                    <td [attr.colspan]="permissions?.manag_product ? 11 : 9" class="text-center" style="padding:2.5rem; color:#94a3b8;">
                         <i class="pi pi-box" style="font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
                         ยังไม่มีข้อมูลสินค้า
                     </td>
@@ -167,6 +182,76 @@
     <ng-template pTemplate="footer">
         <button pButton type="button" icon="pi pi-times" (click)="displaySupplierPrice = false" label="ปิด"
             class="p-button-outlined p-button-secondary"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- ===== DIALOG: เพิ่มต้นทุนหลายรายการ ===== -->
+<p-dialog header="เพิ่มต้นทุนสินค้าที่เลือก" [(visible)]="displayBulkCost" [modal]="true" showEffect="fade"
+    [style]="{width:'760px'}" [breakpoints]="{'768px':'96vw'}">
+    <div class="bulk-toolbar">
+        <div class="field">
+            <label>ผู้ขาย <span class="required">*</span></label>
+            <p-dropdown [options]="suppliers" optionLabel="name" optionValue="id" [(ngModel)]="bulkSupplierId"
+                placeholder="เลือกผู้ขาย" [filter]="true" filterBy="name" appendTo="body"
+                styleClass="w-full"></p-dropdown>
+        </div>
+        <div class="field bulk-apply-field">
+            <label>ใส่ต้นทุนเดียวกันทุกช่อง (บาท)</label>
+            <div class="bulk-apply-row">
+                <input pInputText type="number" [(ngModel)]="bulkApplyCost" min="0" placeholder="0.00"
+                    class="bulk-apply-input" (keyup.enter)="applyCostToAll()" />
+                <button pButton type="button" icon="pi pi-copy" label="นำไปใช้กับทุกช่อง"
+                    class="p-button-info bulk-apply-btn"
+                    [disabled]="bulkApplyCost === null || bulkApplyCost === undefined"
+                    (click)="applyCostToAll()"></button>
+            </div>
+        </div>
+        <div class="bulk-hint">
+            <i class="pi pi-info-circle"></i>
+            กรอกต้นทุนเฉพาะรายการที่ต้องการ (เว้นว่าง = ข้าม) ระบบจะบันทึกให้ผู้ขายที่เลือก
+        </div>
+    </div>
+
+    <p-table [value]="bulkRows" [scrollable]="true" scrollHeight="55vh"
+        styleClass="p-datatable-sm p-datatable-gridlines">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:46px; text-align:center;">#</th>
+                <th style="width:130px;">รหัส</th>
+                <th>ชื่อสินค้า</th>
+                <th style="width:110px; text-align:right;">ราคาขาย</th>
+                <th style="width:140px; text-align:right;">ต้นทุน (บาท)</th>
+                <th style="width:90px; text-align:center;">กำไร (%)</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-i="rowIndex">
+            <tr>
+                <td class="text-center">{{ i + 1 }}</td>
+                <td><span class="code-chip">{{ row.code }}</span></td>
+                <td><span class="product-name">{{ row.name }}</span></td>
+                <td class="text-right">{{ row.sell | number:'1.2-2' }}</td>
+                <td class="text-right">
+                    <input pInputText type="number" [(ngModel)]="row.cost" min="0" placeholder="-"
+                        class="w-full bulk-cost-input" style="text-align:right;" />
+                </td>
+                <td class="text-center">
+                    <ng-container *ngIf="bulkProfit(row) !== null; else dashBulkProfit">
+                        <span class="profit-badge" [class.low]="bulkProfit(row)! < lowProfitThreshold">
+                            {{ bulkProfit(row) | number:'1.0-2' }}%
+                        </span>
+                    </ng-container>
+                    <ng-template #dashBulkProfit><span class="no-data">-</span></ng-template>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-check" label="บันทึกต้นทุน ({{ bulkFilledCount }})"
+            class="p-button-success mr-2" [disabled]="!bulkSupplierId || bulkFilledCount === 0 || bulkSaving"
+            (click)="confirmBulkCost()"></button>
+        <button pButton type="button" icon="pi pi-times" (click)="displayBulkCost = false" label="ปิด"
+            class="p-button-outlined p-button-secondary" [disabled]="bulkSaving"></button>
     </ng-template>
 </p-dialog>
 
@@ -282,5 +367,51 @@
             class="p-button-success mr-2" [disabled]="!importSupplierId || !previewRows.length || importing"></button>
         <button pButton type="button" icon="pi pi-times" (click)="displayImport = false" label="ปิด"
             class="p-button-outlined p-button-secondary" [disabled]="importing"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- ===== DIALOG: แก้ไขสินค้า ===== -->
+<p-dialog header="แก้ไขสินค้า" [(visible)]="displayEditProduct" [modal]="true" showEffect="fade"
+    [style]="{width:'480px'}" [breakpoints]="{'640px':'95vw'}">
+    <form [formGroup]="formEditProduct" *ngIf="formEditProduct">
+        <div class="dialog-form">
+            <div class="field">
+                <label>รหัสสินค้า</label>
+                <input pInputText type="text" formControlName="code" maxlength="50" class="w-full" />
+            </div>
+            <div class="field">
+                <label>ชื่อสินค้า <span class="required">*</span></label>
+                <input pInputText type="text" formControlName="name" maxlength="200" class="w-full" />
+            </div>
+            <div class="field">
+                <label>รายละเอียดสินค้า</label>
+                <textarea pInputTextarea formControlName="description" maxlength="1000" rows="3" class="w-full"></textarea>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>ประเภทสินค้า <span class="required">*</span></label>
+                    <p-dropdown [options]="product_types" optionLabel="name" optionValue="id" [filter]="true"
+                        filterBy="name" placeholder="เลือกประเภท" formControlName="product_type_id"
+                        (onChange)="selectProductType(formEditProduct.get('product_type_id').value)" appendTo="body"
+                        styleClass="w-full"></p-dropdown>
+                </div>
+                <div class="field">
+                    <label>แบรนด์สินค้า</label>
+                    <p-dropdown [options]="product_brands" optionLabel="name" optionValue="id" [filter]="true"
+                        filterBy="name" placeholder="เลือกแบรนด์" formControlName="product_brand_id"
+                        appendTo="body" styleClass="w-full"></p-dropdown>
+                </div>
+            </div>
+            <div class="field">
+                <label>ราคาขาย (บาท)</label>
+                <input pInputText type="number" formControlName="price" min="0" max="99999" class="w-full" />
+            </div>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <button pButton type="button" icon="pi pi-check" (click)="confirmEditProduct()" label="บันทึก"
+            class="p-button-success mr-2"></button>
+        <button pButton type="button" icon="pi pi-times" (click)="cancelEditProduct()" label="ยกเลิก"
+            class="p-button-outlined p-button-danger"></button>
     </ng-template>
 </p-dialog>

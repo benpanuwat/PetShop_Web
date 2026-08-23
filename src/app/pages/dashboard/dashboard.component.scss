@@ -53,7 +53,7 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -83,7 +83,15 @@
   color: #101828;
 }
 
+.stat-hint {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #98a2b3;
+  line-height: 1.35;
+}
+
 .stat-icon {
+  flex: 0 0 auto;
   width: 56px;
   height: 56px;
   border-radius: 16px;
@@ -111,6 +119,31 @@
 .tone-amber .stat-icon {
   color: #b45309;
   background: #fef3c7;
+}
+
+.tone-violet .stat-icon {
+  color: #6d28d9;
+  background: #ede9fe;
+}
+
+.pay-tag {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  vertical-align: middle;
+
+  &.delivery {
+    color: #6d28d9;
+    background: #ede9fe;
+  }
+
+  &.other {
+    color: #64748b;
+    background: #f1f5f9;
+  }
 }
 
 .content-grid {
@@ -285,6 +318,12 @@
   justify-content: center;
   color: #98a2b3;
   font-size: 0.95rem;
+}
+
+@media screen and (max-width: 1600px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media screen and (max-width: 1200px) {

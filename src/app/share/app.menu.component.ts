@@ -39,6 +39,9 @@ export class AppMenuComponent implements OnInit {
                 if (this.permissions.view_user_group) {
                     itemsMenu1.push({ label: 'กลุ่มสิทธิ', icon: 'pi pi-fw pi-lock', routerLink: ['/app/user_group'] });
                 }
+                if (this.permissions.view_user) {
+                    itemsMenu1.push({ label: 'ปฏิทินทำงาน', icon: 'pi pi-fw pi-calendar', routerLink: ['/app/work_calendar'] });
+                }
 
 
                 let itemsMenu2 = [];
