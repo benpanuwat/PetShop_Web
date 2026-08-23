@@ -11,12 +11,13 @@ export class MemberService {
 
   constructor(private http: HttpClient) { }
 
-  page(data: { perPage: number, page: number, search?: string }) {
+  page(data: { perPage: number, page: number, search?: string, tier_level?: number }) {
     return this.http.get(environment.url + `/member/page`, {
       params: {
         perPage: data.perPage,
         page: data.page,
         search: data?.search ?? "",
+        tier_level: data?.tier_level ?? 0,
       }
     })
       .pipe(
@@ -24,6 +25,10 @@ export class MemberService {
           return resp.data;
         })
       );
+  }
+
+  getTierList() {
+    return this.http.get(environment.url + `/member_tier/list`);
   }
 
   addMember(formData: FormData) {

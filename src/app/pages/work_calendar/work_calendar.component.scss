@@ -241,18 +241,6 @@
     display: inline-block;
 }
 
-/* ── Tooltip ของชิป (ต่อท้าย body จึงต้องใช้ ::ng-deep แบบ global) ── */
-::ng-deep .p-tooltip.wc-tip {
-    max-width: none;
-
-    .p-tooltip-text {
-        max-width: none;
-        white-space: nowrap;
-        font-size: 0.78rem;
-        padding: 0.35rem 0.6rem;
-    }
-}
-
 /* ── Summary table ───────────────────────────────── */
 .user-cell {
     display: flex;

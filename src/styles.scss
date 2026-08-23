@@ -460,3 +460,18 @@ textarea {
   font-size: 0.8rem;
   color: #94a3b8;
 }
+
+/* ============================================================
+   TOOLTIP — บรรทัดเดียว ไม่ถูกบีบจนตัวอักษรตกบรรทัด
+   ใช้คู่กับ tooltipStyleClass="tip-nowrap" + appendTo="body"
+   ============================================================ */
+.p-tooltip.tip-nowrap {
+  max-width: none;
+
+  .p-tooltip-text {
+    max-width: none;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.6rem;
+  }
+}

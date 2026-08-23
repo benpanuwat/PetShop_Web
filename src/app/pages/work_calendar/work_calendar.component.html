@@ -57,7 +57,7 @@
                         <div class="wc-chip" *ngFor="let item of cell.items"
                             [style.border-color]="userColor(item.user_id)"
                             [pTooltip]="chipTooltip(item)" tooltipPosition="top"
-                            tooltipStyleClass="wc-tip" [appendTo]="'body'">
+                            tooltipStyleClass="tip-nowrap" [appendTo]="'body'">
                             <span class="wc-dot" [style.background]="userColor(item.user_id)"></span>
                             <span class="wc-chip-name">{{ item.name }}</span>
                             <span class="wc-chip-time">{{ item.first_time }}</span>

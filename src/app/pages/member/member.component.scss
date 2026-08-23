@@ -87,6 +87,51 @@
     font-size: 0.82rem;
 }
 
+/* ── Tier filter ─────────────────────────────────── */
+::ng-deep .tier-filter {
+    min-width: 170px;
+}
+
+.tier-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+}
+
+.tier-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+}
+
+.tier-min {
+    margin-left: auto;
+    padding-left: 0.75rem;
+    color: #94a3b8;
+    font-size: 0.78rem;
+}
+
+/* ── Tier badge ──────────────────────────────────── */
+.tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .15);
+
+    i {
+        font-size: 0.7rem;
+        opacity: .85;
+    }
+}
+
 /* ── Actions ─────────────────────────────────────── */
 .action-btns {
     display: flex;

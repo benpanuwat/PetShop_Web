@@ -8,6 +8,23 @@
                 <span>รายการสมาชิก</span>
             </div>
             <div class="mb-list-actions">
+                <p-dropdown [options]="tiers" optionLabel="name" optionValue="level" [(ngModel)]="selectedTier"
+                    (onChange)="selectTier()" placeholder="ทุกระดับ" appendTo="body"
+                    styleClass="tier-filter">
+                    <ng-template pTemplate="selectedItem" let-item>
+                        <span class="tier-option">
+                            <span class="tier-dot" *ngIf="item.level" [style.background]="item.color || '#64748b'"></span>
+                            {{ item.name }}
+                        </span>
+                    </ng-template>
+                    <ng-template pTemplate="item" let-item>
+                        <span class="tier-option">
+                            <span class="tier-dot" *ngIf="item.level" [style.background]="item.color || '#64748b'"></span>
+                            {{ item.name }}
+                            <span class="tier-min" *ngIf="item.level">{{ item.min_amount | number }}+</span>
+                        </span>
+                    </ng-template>
+                </p-dropdown>
                 <div class="p-inputgroup search-box">
                     <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
                     <input pInputText type="text" [formControl]="search" placeholder="ค้นหาชื่อ / เบอร์โทร..." />
@@ -28,6 +45,7 @@
                     <th style="width:56px; text-align:center;">#</th>
                     <th>ชื่อ</th>
                     <th style="width:180px;">เบอร์โทร</th>
+                    <th style="width:150px; text-align:center;">ระดับ</th>
                     <th style="width:120px; text-align:center;">ส่วนลด</th>
                     <th *ngIf="permissions?.manag_user" style="width:100px; text-align:center;">จัดการ</th>
                 </tr>
@@ -47,6 +65,15 @@
                         <span *ngIf="!item.phone" class="text-muted">—</span>
                     </td>
                     <td class="text-center">
+                        <span *ngIf="item.tier_level; else noTier" class="tier-badge"
+                            [style.background]="item.tier_color || '#64748b'"
+                            [pTooltip]="'ระดับ ' + item.tier_level + ' • ยอดสะสม ' + (item.total_purchase | number:'1.2-2') + ' บาท'"
+                            tooltipPosition="top" tooltipStyleClass="tip-nowrap" [appendTo]="'body'">
+                            <i class="pi pi-star-fill"></i>{{ item.tier_name }}
+                        </span>
+                        <ng-template #noTier><span class="text-muted">—</span></ng-template>
+                    </td>
+                    <td class="text-center">
                         <span class="discount-badge">{{ item.discount }}%</span>
                     </td>
                     <td *ngIf="permissions?.manag_user" class="text-center">
@@ -64,7 +91,7 @@
 
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td [attr.colspan]="permissions?.manag_user ? 5 : 4" class="text-center"
+                    <td [attr.colspan]="permissions?.manag_user ? 6 : 5" class="text-center"
                         style="padding:2.5rem; color:#94a3b8;">
                         <i class="pi pi-users" style="font-size:1.5rem; display:block; margin-bottom:.5rem;"></i>
                         ยังไม่มีข้อมูลสมาชิก

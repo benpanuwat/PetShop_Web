@@ -88,6 +88,8 @@ export class NewOrderComponent {
   public product_type_groups: any[];
   public product_brand_groups: any[];
   public payment_types: any = []
+  // ระดับสมาชิกของลูกค้าที่เลือก { level, name, color, total }
+  public memberTier: any = null;
   public product_groups: any[];
   public product_carts: any[] = [];
   public select_type = "product_type";
@@ -272,6 +274,7 @@ export class NewOrderComponent {
               member_phone: resp.data.phone,
               discount_per: resp.data.discount,
             });
+            this.setMemberTier(resp.data);
             this.calSum();
           },
           error: (err) => {
@@ -686,6 +689,7 @@ export class NewOrderComponent {
           member_phone: resp.data.phone,
           discount_per: resp.data.discount,
         });
+        this.setMemberTier(resp.data);
         this.calSum();
         this.showSuccess(resp.message);
       },
@@ -693,6 +697,13 @@ export class NewOrderComponent {
         this.showError(err.error.message);
       },
     });
+  }
+
+  // ระดับสมาชิกที่ได้จาก API (ใช้แสดงป้ายระดับข้างชื่อลูกค้า)
+  private setMemberTier(data: any) {
+    this.memberTier = data?.tier_level
+      ? { level: data.tier_level, name: data.tier_name, color: data.tier_color, total: data.total_purchase }
+      : null;
   }
 
   onClearData() {
@@ -710,6 +721,7 @@ export class NewOrderComponent {
   }
 
   clearData() {
+    this.memberTier = null;
     this.formCart = this._fb.group({
       code: "",
       created_date: "",

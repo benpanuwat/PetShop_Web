@@ -36,6 +36,10 @@ export class MemberComponent {
 
   public userGroups: any = [];
 
+  // ===== ตัวกรองระดับสมาชิก =====
+  public tiers: any[] = [];
+  public selectedTier: number = 0;
+
   constructor(
     private _fb: FormBuilder,
     private _service: MemberService,
@@ -56,6 +60,7 @@ export class MemberComponent {
       discount: 0,
     });
 
+    this.loadTiers();
 
     this.search.valueChanges
       .pipe(
@@ -69,7 +74,7 @@ export class MemberComponent {
 
           const page = first / rows + 1;
 
-          this._service.page({ perPage: rows, page: page, search: query })
+          this._service.page({ perPage: rows, page: page, search: query, tier_level: this.selectedTier })
             .subscribe((resp: any) => {
               this.data = resp.data;
               this.data = this.data.map((item, index) => ({ ...item, order: index + 1 }));
@@ -86,12 +91,25 @@ export class MemberComponent {
 
     const page = event.first / event.rows + 1;
 
-    this._service.page({ perPage: event.rows, page, search: this.search.value })
+    this._service.page({ perPage: event.rows, page, search: this.search.value, tier_level: this.selectedTier })
       .subscribe((resp: any) => {
         this.data = resp.data;
         this.totalRecords = resp.totalRecords;
         this.loading = false;
       });
+  }
+
+  loadTiers() {
+    this._service.getTierList().subscribe({
+      next: (resp: any) => {
+        this.tiers = [{ level: 0, name: 'ทุกระดับ' }, ...(resp.data ?? [])];
+      },
+      error: (err) => this.showError(err?.error?.message ?? 'โหลดระดับสมาชิกไม่สำเร็จ'),
+    });
+  }
+
+  selectTier() {
+    this.table.reset();
   }
 
   openAdd() {

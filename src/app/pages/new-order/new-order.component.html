@@ -130,6 +130,12 @@
                     [readonly]="step=='order'" />
                 <div *ngIf="formCart.value.member_name" class="member-tag">
                     <i class="pi pi-check-circle"></i> {{formCart.value.member_name}}
+                    <span *ngIf="memberTier" class="member-tier"
+                        [style.background]="memberTier.color || '#64748b'"
+                        [pTooltip]="'ระดับ ' + memberTier.level + ' • ยอดสะสม ' + (memberTier.total | number:'1.2-2') + ' บาท'"
+                        tooltipPosition="top" tooltipStyleClass="tip-nowrap" [appendTo]="'body'">
+                        <i class="pi pi-star-fill"></i>{{ memberTier.name }}
+                    </span>
                 </div>
             </div>
 
