@@ -147,7 +147,7 @@
                     <label>ประเภทสินค้า <span class="required">*</span></label>
                     <p-dropdown [options]="product_types" optionLabel="name" optionValue="id" [filter]="true"
                         filterBy="name" placeholder="เลือกประเภท" formControlName="product_type_id"
-                        (onChange)="selectProductType(formAdd.get('product_type_id')!.value)" appendTo="body"
+                        (onChange)="selectProductTypeAdd(formAdd.get('product_type_id')!.value)" appendTo="body"
                         styleClass="w-full"></p-dropdown>
                 </div>
                 <div class="field">

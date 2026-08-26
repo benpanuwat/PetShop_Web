@@ -214,9 +214,19 @@ export class ProductComponent {
   }
 
 
+  // เปลี่ยนประเภทในฟอร์มเพิ่มสินค้า -> โหลดแบรนด์ใหม่ และล้างแบรนด์เดิมที่ไม่อยู่ในประเภทนี้แล้ว
+  selectProductTypeAdd(id: any) {
+    this.formAdd.patchValue({ product_brand_id: 0 });
+    this.selectProductType(id);
+  }
+
   openAdd() {
+    // ถ้าหน้ารายการกรองประเภท / แบรนด์ไว้อยู่ ให้ตั้งค่าเริ่มต้นในฟอร์มตามตัวกรอง
+    const filterTypeId = Number(this.urlData.product_type_id) || 0;
+    const filterBrandId = Number(this.urlData.product_brand_id) || 0;
+
     this.formAdd = this._fb.group({
-      product_type_id: 0,
+      product_type_id: filterTypeId,
       product_brand_id: 0,
       code: '',
       name: '',
@@ -225,7 +235,19 @@ export class ProductComponent {
       image: '',
       price: 0,
     });
+    this.product_brands = [];
     this.displayAdd = true
+
+    // ต้องรอให้รายการแบรนด์โหลดเสร็จก่อนค่อยใส่ค่า ไม่งั้น dropdown หาชื่อแบรนด์ไม่เจอและขึ้นเป็น placeholder
+    if (filterTypeId) {
+      this._service.getProductBrand(filterTypeId)
+        .subscribe((resp: any) => {
+          this.product_brands = resp.data;
+          if (filterBrandId) {
+            this.formAdd.patchValue({ product_brand_id: filterBrandId });
+          }
+        });
+    }
   }
 
   addConfirm() {
